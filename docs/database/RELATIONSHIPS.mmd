@@ -1,0 +1,24 @@
+erDiagram
+    USERS ||--o{ USER_ROLES : has
+    USERS ||--o{ REFRESH_SESSIONS : owns
+    USERS ||--o{ PARTNER_MEMBERSHIPS : belongs
+    PARTNERS ||--o{ PARTNER_MEMBERSHIPS : has
+    DESTINATIONS ||--o{ PLACES : contains
+    PLACES ||--o{ SERVICE_OFFERS : hosts
+    PLACES ||--o{ PLACE_MEDIA : has
+    PARTNERS ||--o{ SERVICE_OFFERS : sells
+    SERVICE_OFFERS ||--o{ INVENTORY_SLOTS : provides
+    USERS ||--o{ ITINERARIES : plans
+    ITINERARIES ||--o{ ITINERARY_ITEMS : includes
+    PLACES ||--o{ ITINERARY_ITEMS : visited
+    USERS ||--o{ AI_GENERATION_LOGS : requests
+    USERS ||--o{ BOOKING_QUOTES : gets
+    BOOKING_QUOTES ||--|{ BOOKING_QUOTE_ITEMS : contains
+    INVENTORY_SLOTS ||--o{ BOOKING_QUOTE_ITEMS : quoted
+    BOOKING_QUOTES ||--o| BOOKINGS : converts
+    BOOKINGS ||--|{ BOOKING_ITEMS : contains
+    BOOKING_ITEMS ||--o| INVENTORY_HOLDS : reserves
+    INVENTORY_SLOTS ||--o{ INVENTORY_HOLDS : held
+    BOOKINGS ||--o{ PAYMENT_ATTEMPTS : tries
+    PAYMENT_ATTEMPTS ||--o{ PAYMENT_EVENTS : receives
+    BOOKING_ITEMS ||--o{ VOUCHERS : issues

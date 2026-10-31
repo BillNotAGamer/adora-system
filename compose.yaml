@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgis/postgis:18-3.6
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-adora}
+      POSTGRES_USER: ${POSTGRES_USER:-adora}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_for_local_development}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - adora_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    networks:
+      - adora_local
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - adora_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks:
+      - adora_local
+
+volumes:
+  adora_pgdata:
+    name: adora_pgdata
+  adora_redisdata:
+    name: adora_redisdata
+
+networks:
+  adora_local:
+    name: adora_local
+    driver: bridge
+

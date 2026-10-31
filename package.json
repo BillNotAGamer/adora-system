@@ -1,0 +1,31 @@
+{
+  "name": "adora-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ADORA AI-powered smart travel planning and integrated booking platform",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=24.3.0 <25",
+    "pnpm": ">=12.16.1"
+  },
+  "scripts": {
+    "dev": "corepack pnpm@12.16.1 --recursive --parallel --if-present run dev",
+    "dev:web": "corepack pnpm@12.16.1 --filter @adora/web dev",
+    "dev:mobile": "corepack pnpm@12.16.1 --filter @adora/mobile start",
+    "dev:api": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/run_server.py --reload --port 8000",
+    "build": "corepack pnpm@12.16.1 --recursive --if-present run build",
+    "lint": "corepack pnpm@12.16.1 lint:js && corepack pnpm@12.16.1 lint:api",
+    "lint:js": "corepack pnpm@12.16.1 --recursive --if-present run lint",
+    "lint:api": ".\\services\\api\\.venv\\Scripts\\python.exe -m ruff check services/api/app services/api/tests services/api/scripts",
+    "format:api": ".\\services\\api\\.venv\\Scripts\\python.exe -m ruff format services/api/app services/api/tests services/api/scripts",
+    "typecheck": "corepack pnpm@12.16.1 typecheck:js && corepack pnpm@12.16.1 typecheck:api",
+    "typecheck:js": "corepack pnpm@12.16.1 --recursive --if-present run typecheck",
+    "typecheck:api": ".\\services\\api\\.venv\\Scripts\\python.exe -m mypy services/api/app",
+    "test": "corepack pnpm@12.16.1 --recursive --if-present run test && corepack pnpm@12.16.1 test:api",
+    "test:api": ".\\services\\api\\.venv\\Scripts\\python.exe -m pytest services/api/tests",
+    "api:openapi": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/export_openapi.py",
+    "api:generate": "corepack pnpm@12.16.1 api:openapi && corepack pnpm@12.16.1 --filter @adora/api-client generate",
+    "compose:config": "docker compose config",
+    "compose:up": "docker compose up -d db redis"
+  }
+}

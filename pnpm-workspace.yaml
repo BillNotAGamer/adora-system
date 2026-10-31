@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+linkWorkspacePackages: true
+preferWorkspacePackages: true
+nodeVersion: 24.19.0
+allowBuilds:
+  unrs-resolver: true
