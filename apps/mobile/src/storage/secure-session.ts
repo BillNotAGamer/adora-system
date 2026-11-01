@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const SESSION_TOKEN_KEY = 'adora.session-token';
+const REFRESH_TOKEN_KEY = 'adora.refresh-token';
 
 function assertNativeSecureStorage() {
   if (Platform.OS === 'web') {
@@ -9,17 +9,17 @@ function assertNativeSecureStorage() {
   }
 }
 
-export async function saveSessionToken(token: string): Promise<void> {
+export async function saveRefreshToken(token: string): Promise<void> {
   assertNativeSecureStorage();
-  await SecureStore.setItemAsync(SESSION_TOKEN_KEY, token);
+  await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, token);
 }
 
-export async function readSessionToken(): Promise<string | null> {
+export async function readRefreshToken(): Promise<string | null> {
   assertNativeSecureStorage();
-  return SecureStore.getItemAsync(SESSION_TOKEN_KEY);
+  return SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
 }
 
-export async function clearSessionToken(): Promise<void> {
+export async function clearRefreshToken(): Promise<void> {
   assertNativeSecureStorage();
-  await SecureStore.deleteItemAsync(SESSION_TOKEN_KEY);
+  await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
 }

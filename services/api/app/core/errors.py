@@ -14,12 +14,16 @@ def error_payload(code: str, message: str, details: Any = None) -> dict[str, Any
     return {"error": {"code": code, "message": message, "details": details}}
 
 
-async def validation_error_handler(
-    _request: Request, exc: RequestValidationError
-) -> JSONResponse:
+async def validation_error_handler(_request: Request, exc: RequestValidationError) -> JSONResponse:
+    # Pydantic errors may contain raw request values (including passwords) and
+    # exception objects. Expose only stable, non-sensitive validation facts.
+    safe_errors = [
+        {key: value for key, value in error.items() if key not in {"input", "ctx", "url"}}
+        for error in exc.errors()
+    ]
     return JSONResponse(
         status_code=422,
-        content=error_payload("validation_error", "Request validation failed", exc.errors()),
+        content=error_payload("validation_error", "Request validation failed", safe_errors),
     )
 
 

@@ -23,8 +23,10 @@
     "typecheck:api": ".\\services\\api\\.venv\\Scripts\\python.exe -m mypy services/api/app",
     "test": "corepack pnpm@12.16.1 --recursive --if-present run test && corepack pnpm@12.16.1 test:api",
     "test:api": ".\\services\\api\\.venv\\Scripts\\python.exe -m pytest services/api/tests",
+    "verify": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1",
     "api:openapi": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/export_openapi.py",
     "api:generate": "corepack pnpm@12.16.1 api:openapi && corepack pnpm@12.16.1 --filter @adora/api-client generate",
+    "db:audit": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/audit_schema.py",
     "compose:config": "docker compose config",
     "compose:up": "docker compose up -d db redis"
   }

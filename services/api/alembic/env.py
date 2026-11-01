@@ -1,22 +1,34 @@
-"""Minimal synchronous Alembic runner for bootstrap; API runtime may be async."""
+"""Schema-aware Alembic runner backed by the complete ADORA ORM metadata."""
 from logging.config import fileConfig
 import os
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+
+from app.domain.models import Base
 
 config = context.config
 if os.getenv("DATABASE_URL"):
     config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"].replace("%", "%%"))
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-# SQL-first baseline; metadata will be imported after ORM model bootstrap.
-target_metadata = None
+# The SQL-first 0001 revision remains authoritative. Metadata is used only for
+# reviewed drift detection and future revisions; application startup never calls create_all().
+target_metadata = Base.metadata
+
+
+def include_name(name, type_, parent_names):
+    """Keep autogeneration scoped to the ADORA business schema."""
+    if type_ == "schema":
+        return name == "adora"
+    return True
 
 
 def run_migrations_offline():
     context.configure(url=config.get_main_option("sqlalchemy.url"),
                       target_metadata=target_metadata, literal_binds=True,
-                      dialect_opts={"paramstyle": "named"})
+                      dialect_opts={"paramstyle": "named"}, include_schemas=True,
+                      include_name=include_name, compare_type=True,
+                      compare_server_default=True)
     with context.begin_transaction():
         context.run_migrations()
 
@@ -25,8 +37,12 @@ def run_migrations_online():
     connectable = engine_from_config(config.get_section(config.config_ini_section, {}),
                                      prefix="sqlalchemy.", poolclass=pool.NullPool)
     with connectable.connect() as connection:
+        # The local role is also named ``adora``, so PostgreSQL resolves $user as
+        # the default schema. Keep Alembic's reflection namespace explicit.
+        connection.dialect.default_schema_name = "public"
         context.configure(connection=connection, target_metadata=target_metadata,
-                          include_schemas=True)
+                          include_schemas=True, include_name=include_name,
+                          compare_type=True, compare_server_default=True)
         with context.begin_transaction():
             context.run_migrations()
 

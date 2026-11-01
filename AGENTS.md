@@ -25,6 +25,18 @@
 - Never edit a migration that may have been applied. Add sequential revisions (`0002`, `0003`, and so on) and document corrections.
 - ORM metadata must reflect the baseline. Review every autogenerate diff; schema changes require migration and integration tests.
 - Never delete Docker volumes automatically. Back up and verify restore procedures before destructive database work.
+- Import every model through `app.domain.models`; there is one schema-qualified metadata registry.
+- Application startup must never call `create_all()`. Run Alembic check plus the schema audit before proposing a migration.
+
+## Identity and access rules
+
+- FastAPI owns authentication policy. Public registration grants only `traveler`; never accept client-assigned roles.
+- Store passwords only as Argon2id hashes and refresh credentials only as SHA-256 digests.
+- Access JWT validation must pin the algorithm and require issuer, audience, time, subject, and token-ID claims.
+- Resolve active status, current roles, and partner memberships from PostgreSQL for authorization decisions.
+- A `partner` role never grants global partner access; require a matching `partner_memberships` row.
+- Browser refresh credentials use HttpOnly cookies and Origin validation. Mobile refresh credentials use Expo SecureStore, never AsyncStorage.
+- Do not log credentials or return validation input values. Authentication rate limiting fails closed when Redis is unavailable.
 
 ## Source of truth and testing
 
