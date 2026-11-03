@@ -265,6 +265,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@adora/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@tanstack/react-query':
         specifier: 5.105.0
         version: 5.105.0(@types/react@19.3.0)(react@19.3.0)

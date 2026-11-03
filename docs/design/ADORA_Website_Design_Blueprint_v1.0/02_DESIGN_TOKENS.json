@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_meta": {
+    "project": "ADORA",
+    "version": "1.0",
+    "status": "proposed",
+    "note": "ADORA original design choices; not extracted from Snami Travel"
+  },
+  "color": {
+    "ink": "#171A19",
+    "ivory": "#F3EFE7",
+    "paper": "#FAF8F3",
+    "gold": "#B39A70",
+    "sage": "#586C65",
+    "mist": "#C8D7DB",
+    "white": "#FFFFFF",
+    "textSecondary": "#46524D",
+    "hairline": "#CEC8BC",
+    "overlay": "rgba(10, 16, 14, 0.52)"
+  },
+  "typography": {
+    "display": {"family": "Playfair Display", "fallback": "Georgia, serif", "weight": [400, 500, 600], "fluid": "clamp(3.1rem, 7.1vw, 8.5rem)"},
+    "body": {"family": "Be Vietnam Pro", "fallback": "system-ui, sans-serif", "weight": [400, 500, 600], "base": "1rem", "lineHeight": 1.6},
+    "heading": {"fluid": "clamp(2.2rem, 4.7vw, 5.4rem)"},
+    "label": {"min": "0.6875rem", "max": "0.8125rem"}
+  },
+  "layout": {
+    "contentMax": "1360px",
+    "pageGutter": "clamp(20px, 4vw, 72px)",
+    "sectionSpaceDesktop": "clamp(112px, 10vw, 160px)",
+    "sectionSpaceMobile": "clamp(64px, 12vw, 88px)"
+  },
+  "motion": {
+    "fast": "180ms",
+    "standard": "320ms",
+    "slow": "600ms",
+    "ease": "cubic-bezier(.2,.7,.2,1)",
+    "hoverScale": 1.025,
+    "reducedMotion": "remove decorative transitions and transforms"
+  },
+  "breakpoints": {"small": 640, "medium": 768, "large": 1024, "extraLarge": 1280, "wide": 1536},
+  "radii": {"small": "4px", "medium": "10px", "pill": "9999px"}
+}

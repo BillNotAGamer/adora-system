@@ -1,6 +1,7 @@
-import type { paths } from "./schema.js";
+import type { components, paths } from "./schema.js";
 
 export type ApiPaths = paths;
+export type ApiComponents = components;
 
 export type ApiClientOptions = {
   baseUrl: string;
