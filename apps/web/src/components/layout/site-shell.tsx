@@ -11,10 +11,13 @@ export function SiteShell({ children }: Readonly<{ children: React.ReactNode }>)
             </span>
             <span className="text-lg font-bold tracking-[0.16em] text-slate-950">ADORA</span>
           </Link>
-          <nav aria-label="Primary navigation" className="flex items-center gap-6 text-sm font-medium text-slate-600">
+          <nav aria-label="Primary navigation" className="flex items-center gap-4 text-sm font-medium text-slate-600 sm:gap-6">
             <a href="#platform" className="transition-colors hover:text-cyan-800">
               Platform
             </a>
+            <Link href="/ai-planner" className="transition-colors hover:text-cyan-800">
+              AI planner
+            </Link>
             <span className="hidden text-slate-400 sm:inline">Customer + Admin</span>
           </nav>
         </div>
@@ -23,7 +26,7 @@ export function SiteShell({ children }: Readonly<{ children: React.ReactNode }>)
       <footer className="border-t border-slate-200 bg-slate-950 px-6 py-8 text-sm text-slate-400">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
           <span>ADORA · Smart Travel Platform</span>
-          <span>Modular monolith foundation · Phase 1.0</span>
+          <span>Catalog foundation · Phase 1.2</span>
         </div>
       </footer>
     </div>

@@ -38,6 +38,16 @@
 - Browser refresh credentials use HttpOnly cookies and Origin validation. Mobile refresh credentials use Expo SecureStore, never AsyncStorage.
 - Do not log credentials or return validation input values. Authentication rate limiting fails closed when Redis is unavailable.
 
+## Catalog and partner rules
+
+- Public catalog queries expose only active destinations, places, and service offers.
+- The baseline has no partner ownership column on places or place media; only administrators mutate them.
+- Partner-owned resources require both the database `partner` role and the matching membership row. Offer mutations require owner/manager membership unless an administrator explicitly overrides scope.
+- Store catalog money as integer VND. Service offers do not imply dated availability; inventory and booking mutations belong to later phases.
+- Construct WGS84 points in longitude/latitude order and run radius filtering in PostGIS with bounded radius and result limits. Spatial distance is not driving distance.
+- Demo seeding must stay explicit, additive, deterministic, and limited to development/test. Never seed credentials or represent demo prices as live offers.
+- The `/ai-planner` page is a static interface preview until a later AI phase; do not add model calls, chat persistence, or fake responses to it.
+
 ## Source of truth and testing
 
 - Backend OpenAPI is the source of truth for client contracts; run `pnpm api:generate` after API changes.

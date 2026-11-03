@@ -1,4 +1,5 @@
 import { ArrowRight, Bot, CalendarCheck2, MapPinned, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 import { SiteShell } from "@/components/layout/site-shell";
 import { buttonVariants } from "@/components/ui/button";
@@ -49,7 +50,13 @@ export default function Home() {
                 aria-hidden="true"
               />
             </a>
-            <span className="text-sm text-slate-500">Phase 1.0 foundation is running.</span>
+            <Link
+              href="/ai-planner"
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "group")}
+            >
+              Preview AI planner
+              <Bot className="size-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

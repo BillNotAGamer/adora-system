@@ -27,6 +27,7 @@
     "api:openapi": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/export_openapi.py",
     "api:generate": "corepack pnpm@12.16.1 api:openapi && corepack pnpm@12.16.1 --filter @adora/api-client generate",
     "db:audit": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/audit_schema.py",
+    "db:seed-demo": ".\\services\\api\\.venv\\Scripts\\python.exe services/api/scripts/seed_demo_catalog.py --confirm",
     "compose:config": "docker compose config",
     "compose:up": "docker compose up -d db redis"
   }

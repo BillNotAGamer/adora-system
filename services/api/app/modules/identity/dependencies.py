@@ -46,7 +46,10 @@ async def get_current_principal(
             detail="Invalid or expired access token",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
-    user = await IdentityRepository(session).get_user_by_id(claims.subject)
+    # End the authorization read transaction before a route-level application
+    # service starts its explicit mutation transaction on the shared session.
+    async with session.begin():
+        user = await IdentityRepository(session).get_user_by_id(claims.subject)
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token")
     if user.status != "active":
@@ -91,9 +94,10 @@ async def require_partner_scope(
         return PartnerScope(principal=principal, partner_id=partner_id, membership=None)
     if "partner" not in principal.roles:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Partner role required")
-    membership = await IdentityRepository(session).get_partner_membership(
-        principal.user.id, partner_id
-    )
+    async with session.begin():
+        membership = await IdentityRepository(session).get_partner_membership(
+            principal.user.id, partner_id
+        )
     if membership is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Partner access denied")
     return PartnerScope(principal=principal, partner_id=partner_id, membership=membership)

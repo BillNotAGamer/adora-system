@@ -1,0 +1,1 @@
+"""Travel catalog application module."""
