@@ -282,7 +282,8 @@ The homepage CTA navigated through the real browser to `/ai-planner`. The route 
 - No nested Git repository was found in the implementation scope.
 - Staging is selective and limited to the Web Design 0.2 implementation, approved Blueprint documentation, assets, API-client typing compatibility, verifier, lockfile, and reports.
 - The implementation commit message is `feat(web): implement adora editorial homepage design`.
-- Implementation commit SHA: `PENDING_AFTER_COMMIT` (replaced by the documentation closure immediately after Git assigns the immutable commit identifier).
+- Implementation commit SHA: `5d4f5a7824cc9d7e455c76555b8592b602947c41`.
+- Final working-tree status after the documentation closure: clean (`git status --short` returned no entries).
 
 ### 8. Deferred verification and remaining limitations
 
