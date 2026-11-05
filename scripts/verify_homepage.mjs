@@ -5,15 +5,15 @@ import { tmpdir } from "node:os";
 
 const chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const siteUrl = process.env.ADORA_WEB_URL ?? "http://127.0.0.1:3100";
-const outputDirectory = resolve("docs/reports/assets/web-design-0-2");
+const outputDirectory = resolve(process.env.ADORA_VERIFY_OUTPUT ?? "docs/reports/assets/web-design-0-2");
 const debugPort = 9224;
 const configuredViewports = [
-  { name: "360", width: 360, height: 800 },
+  { name: "360", width: 360, height: 800, heroOnly: true },
   { name: "mobile", width: 390, height: 844, screenshots: true },
-  { name: "768", width: 768, height: 1024 },
-  { name: "1024", width: 1024, height: 900 },
+  { name: "768", width: 768, height: 1024, heroOnly: true },
+  { name: "1024", width: 1024, height: 900, heroOnly: true },
   { name: "desktop", width: 1440, height: 900, screenshots: true },
-  { name: "1920", width: 1920, height: 1080 },
+  { name: "1920", width: 1920, height: 1080, heroOnly: true },
 ];
 const requestedViewport = process.env.ADORA_VERIFY_VIEWPORT;
 const viewports = requestedViewport
@@ -154,7 +154,7 @@ async function verifyViewport(viewport) {
   await client.send("Page.navigate", { url: siteUrl });
   await wait(2800);
   await evaluate(client, "document.fonts.ready.then(() => true)");
-  if (viewport.screenshots) await capture(client, `${viewport.name}-hero.png`, false);
+  if (viewport.screenshots || viewport.heroOnly) await capture(client, `${viewport.name}-hero.png`, false);
 
   let keyboardNavigation = null;
   if (viewport.width === 390) {

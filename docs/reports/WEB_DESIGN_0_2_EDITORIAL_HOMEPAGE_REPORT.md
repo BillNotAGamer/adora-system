@@ -311,3 +311,137 @@ Remaining frontend limitations are unchanged: the editorial imagery requires fin
 Status: **FRONTEND COMPLETE — BACKEND VERIFICATION DEFERRED**.
 
 Web Design 0.2 is presentation-ready and stable without database services. Web Design 0.3 may begin as a separately authorized phase after the closure commits are recorded. Live Catalog and backend/database regression verification should be resumed when the project owner supplies the NeonDB configuration.
+
+
+## Antigravity Handoff & Frontend-First Closure Verification — 2026-11-06
+
+This section is appended by the Antigravity session. All earlier sections remain unchanged as historical record.
+
+### 1. Initial repository state
+
+- Workspace root confirmed: `F:\Coding\Adora System Mega Project\adora-system`.
+- `AGENTS.md`, the Phase 1.2 report, this report, `WEB_DESIGN_0_2_IMPLEMENTATION.md`, and the Blueprint v1.0 directory were read.
+- **The handoff premise was stale.** The brief named `91bb11c…` as the last committed HEAD and described Web Design 0.2 as uncommitted. Reading `.git/HEAD`, `.git/refs/heads/main`, and `.git/logs/HEAD` directly shows the repository has moved on:
+  - Branch `main`, HEAD `4fe1403d7a600434617c36c0751777d692c7c65b`.
+  - `91bb11c` — `feat: implement adora phase 1.2 catalog partner and geospatial`
+  - `5d4f5a7824cc9d7e455c76555b8592b602947c41` — `feat(web): implement adora editorial homepage design`
+  - `05056db…` → amended to `4fe1403…` — `docs(web): record Web Design 0.2 closure`
+- The requested `feat(web): implement adora editorial homepage design` commit therefore **already exists**. No duplicate commit was created.
+- **Git CLI limitation.** Every `git` command failed with `detected dubious ownership`: `.git` is owned by `BILLYLAPTOP/CodexSandboxOffline`, the current user is `BILLYLAPTOP/Admin`. Git's own remedy is a global `safe.directory` trust entry, which changes persistent host configuration and was not authorized, so it was not applied. As a result:
+  - `git status`, `git diff`, and staged-content scans were **not run**;
+  - the working-tree status is **unverified**, and nothing from this session has been committed.
+
+### 2. Verification commands and outcomes
+
+All commands ran from the repository root with no backend or database service.
+
+| Command | Result |
+|---|---|
+| `corepack pnpm@12.16.1 install --frozen-lockfile --offline` | PASS — lockfile up to date; supply-chain policy check passed |
+| `corepack pnpm@12.16.1 --filter @adora/api-client typecheck` | PASS (exit 0) |
+| `corepack pnpm@12.16.1 --filter @adora/api-client build` | PASS (exit 0) |
+| `corepack pnpm@12.16.1 --filter @adora/web lint` | PASS (exit 0) |
+| `corepack pnpm@12.16.1 --filter @adora/web typecheck` | PASS (exit 0) |
+| `corepack pnpm@12.16.1 --filter @adora/web build` | PASS — Next.js 16.4.3 (Turbopack); `/` Partial Prerender (5m revalidate), `/ai-planner` static, `/_not-found` static |
+| `node scripts/verify_homepage.mjs` (production server on port 3100, no API listener) | PASS — exit 0 after repairing a verifier encoding error (see §5) |
+
+No dependency was upgraded and `pnpm-lock.yaml` was not touched.
+
+### 3. Browser testing findings
+
+Headless Chrome DevTools automation ran against the production build at 360×800, 390×844, 768×1024, 1024×900, 1440×900, and 1920×1080. Antigravity's own browser tooling was not needed; the repository's verifier was used.
+
+At every width: HTTP 200 for `/` and `/ai-planner`; `scrollWidth === innerWidth` (no horizontal overflow); one `h1` and one `main`; three images loaded with non-zero natural width; five `/ai-planner` links; the offline editorial marker visible; no fabricated price, availability, or booking phrase; zero console, runtime, and network errors; hero CTA computed ink `rgb(23, 26, 25)` on ivory `rgb(243, 239, 231)`.
+
+At 390 px: the menu button receives a 2 px solid focus outline, opens via `Space` (`aria-expanded="true"`, four visible links), moves focus to `#destinations`, and closes after link activation. Under emulated `prefers-reduced-motion: reduce`, smooth scrolling is `auto` and animation/transition durations are `1e-05s`.
+
+At 1440 px: clicking the hero CTA navigated to `/ai-planner`, whose `h1` is `ADORA AI Travel Assistant` and which shows the static "AI is not connected" preview.
+
+Visual review compared the new captures with Blueprint concepts `08`–`11`. Hero type, Vietnamese diacritics, cropping, section hierarchy, the dark AI interlude, the process section, and the footer are coherent at the viewed widths. The hero captures at 360, 390, 768, 1440, and 1920 px and the 1440/390 px full-page captures were viewed directly. The 1024 px hero capture was verified geometrically but not viewed.
+
+### 4. Screenshot locations
+
+`docs/reports/assets/web-design-0-2-closure/`: `360-hero.png`, `mobile-hero.png` (390), `768-hero.png`, `1024-hero.png`, `desktop-hero.png` (1440), `1920-hero.png`, `desktop-full-page.png`, `mobile-full-page.png`. The original captures remain under `docs/reports/assets/web-design-0-2/`.
+
+### 5. Confirmed defects and repairs
+
+- **Application defects: none found.** No application source file was changed.
+- **Verifier-tooling defect, introduced and repaired in this session.** While extending `scripts/verify_homepage.mjs`, a PowerShell rewrite re-encoded the file and corrupted its Vietnamese literals (the offline-marker string and the commercial-claim list). The verifier then exited 1 because `fallbackVisible` was false. The server HTML was checked, confirming the page was correct, the literals were restored, the file was confirmed to be UTF-8 without a BOM and free of mojibake, and the verifier then passed with exit 0.
+- Verifier changes made (tooling only): output directory can be overridden with `ADORA_VERIFY_OUTPUT`; hero screenshots are now captured at all six widths.
+
+### 6. Offline Catalog behavior
+
+With nothing listening on port 8000, the homepage rendered completely at all six widths. The fallback is labeled `Gợi ý biên tập · API tạm ngoại tuyến`, shows no price, inventory, booking, or availability claim, and keeps the public Catalog contract (`@adora/api-client` generated types, parallel requests, 1.8 s timeout, 5-minute revalidation). A live Catalog-backed state was not observed.
+
+### 7. Git commit SHA
+
+- Pre-existing implementation commit: `5d4f5a7824cc9d7e455c76555b8592b602947c41`.
+- HEAD at the time of this session: `4fe1403d7a600434617c36c0751777d692c7c65b` (read from `.git`, not via the Git CLI).
+- **No commit was created by this session.** The changes from this session (this section, the verifier edits, and the new screenshot directory) are uncommitted. Working-tree status and staged-content scans could not be run (see §1).
+
+### 8. Remaining frontend limitations
+
+- Generated editorial imagery still needs final brand/legal review before commercial use.
+- No Lighthouse score is claimed; the tool was not run.
+- Live Catalog-backed visuals are unobserved.
+- Hero CTA text `Plan with Adora AI` is English within a Vietnamese page, as specified by the Blueprint.
+- Antigravity's browser tooling was not used; the CDP-based verifier covers the checks above.
+
+### 9. Explicitly deferred backend checks
+
+Backend, Redis, PostgreSQL/PostGIS, Alembic, and database-backed pytest were **not executed**: **DEFERRED — NEONDB CONFIGURATION PENDING**. No Docker, database, migration, or FastAPI module change was made.
+
+### 10. Acceptance gates
+
+| Gate | Status | Note |
+|---|---|---|
+| A — Repository integrity | PARTIAL | Source and docs read; HEAD/log verified from `.git` files; `git status` blocked by ownership check |
+| B — Blueprint fidelity | PASS | Rendered pages compared with concept screenshots |
+| C — Visual quality | PASS | Eight captures; five heroes and two full pages viewed |
+| D — Responsive behavior | PASS | Six widths, zero overflow |
+| E — Accessibility | PASS | Landmarks, keyboard menu, focus outline, reduced motion, CTA contrast |
+| F — Functional navigation | PASS | `/` and `/ai-planner` 200; CTA navigation verified |
+| G — Offline resilience | PASS | Honest editorial fallback with API absent |
+| H — Frontend quality and build | PASS | Install, client, ESLint, TypeScript, production build |
+| I — Backend/database regression | DEFERRED | NeonDB configuration pending |
+| J — Documentation and Git closure | PARTIAL | Report updated; no commit made because Git is blocked |
+
+### 11. Readiness for Web Design 0.3
+
+Frontend verification: **FRONTEND COMPLETE — BACKEND VERIFICATION DEFERRED**. Git closure of this session's documentation-only changes is pending the repository-ownership decision above. Web Design 0.3 was not started.
+
+
+### Git Ownership Resolution & Final Git Closure — 2026-11-06
+
+This subsection supersedes the Git-related caveats in §1, §7, and gates A/J of the Antigravity section above. Those earlier statements are retained as the historical record of what was known at that point.
+
+**Resolution method.** The project owner confirmed the repository as trusted. Git was run with the command-local option `git -c safe.directory=F:/Coding/Adora System Mega Project/adora-system …`. No global or system Git configuration was changed, `safe.directory=*` was not used, file ownership was not altered, and no `.git` content was modified, reset, cleaned, or force-checked-out. The option worked on the first attempt.
+
+**Verified with the Git CLI (not just `.git` files):**
+
+- Branch: `main`; no remotes configured; nothing pushed.
+- HEAD before this closure: `4fe1403d7a600434617c36c0751777d692c7c65b` — `docs(web): record Web Design 0.2 closure`.
+- Web Design 0.2 implementation commit (already present, not recommitted): `5d4f5a7824cc9d7e455c76555b8592b602947c41` — `feat(web): implement adora editorial homepage design` (37 files: homepage components, styles, three WebP assets, `catalog.ts`, API-client type export, lockfile, verifier, Blueprint v1.0, implementation notes, original report and screenshots).
+- History: `4fe1403` ← `5d4f5a7` ← `91bb11c` (Phase 1.2) ← `116a378` (Phase 1.1) ← `9840067` (Phase 1.0).
+- The earlier suggestion that HEAD was `91bb11c` was stale; the `.git`-file reading was correct.
+- Pre-closure working tree: nothing staged; modified `docs/reports/WEB_DESIGN_0_2_EDITORIAL_HOMEPAGE_REPORT.md` and `scripts/verify_homepage.mjs`; untracked: the eight PNGs under `docs/reports/assets/web-design-0-2-closure/`. No other path differed from HEAD.
+
+**Review of remaining changes:**
+
+1. `scripts/verify_homepage.mjs`: the diff contains only the intended tooling changes (the `ADORA_VERIFY_OUTPUT` override and `heroOnly` captures). The Vietnamese literals do not appear in the diff, so they match the committed version; the file is UTF-8 without BOM, with no replacement characters or mojibake.
+2. The latest verifier run (after the encoding repair) exited 0, with fallback marker visible, zero commercial-claim hits, and zero browser errors at all six widths.
+3. This report is frontend-only in its acceptance claims; backend/database checks remain deferred and are not claimed as passed. The report file is free of mojibake.
+4. All eight screenshots have valid PNG signatures with the expected dimensions (360×800, 390×844, 768×1024, 1024×900, 1440×900, 1920×1080, plus full-page 1440×6135 and 390×6696) and were generated by this project's verifier from this application.
+5. A secret-pattern scan (private keys, cloud/GitHub/Slack/OpenAI-style/Google keys, credentialed database URLs, literal password/token assignments) over the two text files found no matches. No `.env`, cache, build output, or dependency file is among the changes, and none of the paths is ignored by `.gitignore`.
+6. No file outside `docs/` and `scripts/` differs from HEAD, and `git diff --name-only 91bb11c HEAD -- services infrastructure apps/mobile tests` is empty: no backend module, migration, mobile source, or database test changed through Web Design 0.2.
+
+**Closure commit.** Only the verifier, this report, and the closure screenshots were outstanding, so they are committed separately as `test(web): finalize editorial homepage verification evidence`. A commit cannot contain its own hash; the resulting SHA is recorded in the Git history and in the closing hand-off message.
+
+**Final status.**
+
+- Frontend verification: **PASS** (frozen install, API client, ESLint, TypeScript, production build, six-viewport browser verification, offline fallback, accessibility, `/ai-planner` navigation).
+- Git closure: **VERIFIED** (branch, HEAD, history, and working tree checked via the Git CLI; no duplicate implementation commit; no remote push).
+- Backend/database regression: **DEFERRED — NEONDB CONFIGURATION PENDING**. Not executed; full-stack regression success is not claimed.
+- Unresolved blockers: none for the frontend. Remaining non-blocking items are unchanged: brand/legal review of generated imagery, no Lighthouse score, and no live Catalog-backed visual observed.
+
+Outcome: **WEB DESIGN 0.2 — FRONTEND COMPLETE / GIT CLOSURE VERIFIED**.
