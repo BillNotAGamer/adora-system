@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { SiteHeader } from "@/components/home/site-header";
+import { SiteHeader } from "@/components/layout/site-header";
 
 export function EditorialHero() {
   return (
@@ -36,9 +36,9 @@ export function EditorialHero() {
               Plan with Adora AI
               <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
-            <a href="#destinations" className="editorial-link text-white/86">
+            <Link href="/destinations" className="editorial-link text-white/86">
               Khám phá điểm đến
-            </a>
+            </Link>
           </div>
         </div>
       </div>

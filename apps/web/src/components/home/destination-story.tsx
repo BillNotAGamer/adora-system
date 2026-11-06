@@ -1,5 +1,6 @@
 import { ArrowUpRight, MapPin } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 import type { HomepageCatalog } from "@/lib/catalog";
 
@@ -41,10 +42,10 @@ export function DestinationStory({ catalog }: Readonly<{ catalog: HomepageCatalo
             <p className="mt-7 max-w-xl text-sm leading-7 text-[var(--adora-text-secondary)] sm:text-base sm:leading-8">
               Một lát cắt biên tập để gợi mở nhịp đi chậm: buổi sớm qua rừng thông, cà phê ấm giữa khí trời cao nguyên và những con đường để cảm nhận thay vì vội đi qua.
             </p>
-            <a href="#experiences" className="editorial-link mt-9">
+            <Link href="/destinations/da-lat" className="editorial-link mt-9">
               Tiếp tục câu chuyện
               <ArrowUpRight className="size-4" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

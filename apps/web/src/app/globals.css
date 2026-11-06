@@ -117,6 +117,46 @@ input {
   color: var(--adora-ink);
 }
 
+.dark-cta {
+  background: var(--adora-ink);
+  color: var(--adora-paper);
+  transition: background-color var(--adora-transition);
+}
+
+.dark-cta:hover {
+  background: var(--adora-sage);
+  color: #ffffff;
+}
+
+.filter-chip {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border: 1px solid var(--adora-hairline);
+  padding-inline: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--adora-text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.filter-chip:hover {
+  border-color: var(--adora-ink);
+  color: var(--adora-ink);
+}
+
+.filter-chip[aria-pressed="true"] {
+  border-color: var(--adora-ink);
+  background: var(--adora-ink);
+  color: var(--adora-paper);
+}
+
 .image-reveal {
   overflow: hidden;
   background: var(--adora-mist);

@@ -1,4 +1,6 @@
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 import type { HomepageCatalog } from "@/lib/catalog";
 
@@ -36,6 +38,10 @@ export function ExperienceStory({ catalog }: Readonly<{ catalog: HomepageCatalog
             <p className="mt-5 text-[0.67rem] leading-5 font-semibold tracking-[0.1em] text-[var(--adora-text-secondary)] uppercase">
               {isCatalogBacked ? "Tên trải nghiệm từ danh mục công khai · dữ liệu demo có thể được sử dụng" : "Nội dung biên tập tạm thời · danh mục trực tiếp chưa khả dụng"}
             </p>
+            <Link href="/experiences" className="editorial-link mt-6">
+              Xem các trải nghiệm gợi ý
+              <ArrowUpRight className="size-4" aria-hidden="true" />
+            </Link>
           </div>
 
           <div className="order-1 lg:order-2 lg:translate-y-10">

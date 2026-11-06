@@ -7,7 +7,7 @@ import { DestinationStory } from "@/components/home/destination-story";
 import { EditorialHero } from "@/components/home/editorial-hero";
 import { ExperienceStory } from "@/components/home/experience-story";
 import { HowItWorks } from "@/components/home/how-it-works";
-import { SiteFooter } from "@/components/home/site-footer";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { EDITORIAL_CATALOG_FALLBACK, getHomepageCatalog } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -39,7 +39,7 @@ function CatalogStoriesFallback() {
 export default function Home() {
 
   return (
-    <main className="min-h-screen overflow-x-clip">
+    <main id="main-content" className="min-h-screen overflow-x-clip">
       <EditorialHero />
       <BrandPhilosophy />
       <Suspense fallback={<CatalogStoriesFallback />}>
