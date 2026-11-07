@@ -156,57 +156,6 @@ async function verifyViewport(viewport) {
   await evaluate(client, "document.fonts.ready.then(() => true)");
   if (viewport.screenshots || viewport.heroOnly) await capture(client, `${viewport.name}-hero.png`, false);
 
-  let keyboardNavigation = null;
-  if (viewport.width === 390) {
-    await evaluate(client, "document.activeElement?.blur(); document.body.focus(); true");
-    await pressKey(client, "Tab", "Tab", 9);
-    await pressKey(client, "Tab", "Tab", 9);
-    const focusedMenuButton = await evaluate(
-      client,
-      `(() => {
-        const element = document.activeElement;
-        const styles = element ? getComputedStyle(element) : null;
-        return {
-          control: element?.getAttribute('aria-controls') ?? null,
-          expanded: element?.getAttribute('aria-expanded') ?? null,
-          outlineStyle: styles?.outlineStyle ?? null,
-          outlineWidth: styles?.outlineWidth ?? null,
-        };
-      })()`
-    );
-    await pressKey(client, " ", "Space", 32, " ");
-    await wait(100);
-    const openedMenu = await evaluate(
-      client,
-      `(() => {
-        const button = document.querySelector('button[aria-controls="mobile-navigation"]');
-        const menu = document.querySelector('#mobile-navigation');
-        return {
-          expanded: button?.getAttribute('aria-expanded') ?? null,
-          display: menu ? getComputedStyle(menu).display : null,
-          visibleLinks: menu ? Array.from(menu.querySelectorAll('a')).filter((link) => getComputedStyle(link).display !== 'none').length : 0,
-        };
-      })()`
-    );
-    await pressKey(client, "Tab", "Tab", 9);
-    const firstMenuLink = await evaluate(client, "document.activeElement?.getAttribute('href') ?? null");
-    await pressKey(client, "Enter", "Enter", 13, "\r");
-    await wait(150);
-    const closedMenu = await evaluate(
-      client,
-      `(() => {
-        const button = document.querySelector('button[aria-controls="mobile-navigation"]');
-        const menu = document.querySelector('#mobile-navigation');
-        return {
-          expanded: button?.getAttribute('aria-expanded') ?? null,
-          display: menu ? getComputedStyle(menu).display : null,
-          hash: window.location.hash,
-        };
-      })()`
-    );
-    keyboardNavigation = { focusedMenuButton, openedMenu, firstMenuLink, closedMenu };
-  }
-
   await evaluate(
     client,
     `(async () => {
@@ -263,6 +212,7 @@ async function verifyViewport(viewport) {
   }
 
   let reducedMotion = null;
+  let keyboardNavigation = null;
   if (viewport.width === 390) {
     await client.send("Emulation.setEmulatedMedia", {
       features: [{ name: "prefers-reduced-motion", value: "reduce" }],
@@ -280,19 +230,137 @@ async function verifyViewport(viewport) {
         };
       })()`
     );
+    await client.send("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "no-preference" }],
+    });
+
+    await evaluate(client, "window.scrollTo(0, 0); document.activeElement?.blur(); document.body.focus(); true");
+    // Tab 1 -> skip-to-content link (#main-content)
+    await pressKey(client, "Tab", "Tab", 9);
+    const skipLink = await evaluate(
+      client,
+      `(() => {
+        const element = document.activeElement;
+        const rect = element ? element.getBoundingClientRect() : null;
+        return {
+          href: element?.getAttribute('href') ?? null,
+          visible: Boolean(element && element.checkVisibility() && rect && rect.width > 0 && rect.height > 0),
+        };
+      })()`
+    );
+    // Tab 2 -> ADORA home link (/), Tab 3 -> mobile menu toggle button
+    await pressKey(client, "Tab", "Tab", 9);
+    const brandLinkHref = await evaluate(client, "document.activeElement?.getAttribute('href') ?? null");
+    await pressKey(client, "Tab", "Tab", 9);
+    const focusedMenuButton = await evaluate(
+      client,
+      `(() => {
+        const element = document.activeElement;
+        const styles = element ? getComputedStyle(element) : null;
+        return {
+          control: element?.getAttribute('aria-controls') ?? null,
+          expanded: element?.getAttribute('aria-expanded') ?? null,
+          outlineStyle: styles?.outlineStyle ?? null,
+          outlineWidth: styles?.outlineWidth ?? null,
+        };
+      })()`
+    );
+    await pressKey(client, " ", "Space", 32, " ");
+    await wait(120);
+    const openedMenu = await evaluate(
+      client,
+      `(() => {
+        const button = Array.from(document.querySelectorAll('button[aria-controls="mobile-navigation"]')).find((el) => el.checkVisibility()) ?? null;
+        const menu = document.querySelector('#mobile-navigation');
+        return {
+          expanded: button?.getAttribute('aria-expanded') ?? null,
+          display: menu ? getComputedStyle(menu).display : null,
+          visibleLinks: menu ? Array.from(menu.querySelectorAll('a')).filter((link) => getComputedStyle(link).display !== 'none').length : 0,
+        };
+      })()`
+    );
+    await pressKey(client, "Tab", "Tab", 9);
+    const firstMenuLink = await evaluate(client, "document.activeElement?.getAttribute('href') ?? null");
+    await pressKey(client, "Enter", "Enter", 13, "\r");
+    await evaluate(
+      client,
+      `(async () => {
+        const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+        for (let i = 0; i < 30; i += 1) {
+          if (
+            window.location.pathname === '/destinations' &&
+            document.querySelector('[data-testid="destination-results"]')
+          ) {
+            break;
+          }
+          await delay(100);
+        }
+        return true;
+      })()`
+    );
+    const closedMenu = await evaluate(
+      client,
+      `(() => {
+        const visibleHeader = Array.from(document.querySelectorAll('header')).find((el) => el.checkVisibility()) ?? null;
+        const button = visibleHeader?.querySelector('button[aria-controls="mobile-navigation"]') ?? null;
+        const menu = visibleHeader?.querySelector('#mobile-navigation') ?? null;
+        const anyMenuExpanded = Array.from(document.querySelectorAll('button[aria-controls="mobile-navigation"]'))
+          .some((btn) => btn.getAttribute('aria-expanded') === 'true');
+        const visibleH1s = Array.from(document.querySelectorAll('h1')).filter((el) => el.checkVisibility());
+        return {
+          expanded: button?.getAttribute('aria-expanded') ?? null,
+          anyMenuExpanded,
+          display: menu ? getComputedStyle(menu).display : null,
+          pathname: window.location.pathname,
+          visibleH1Count: visibleH1s.length,
+          h1Text: visibleH1s[0]?.textContent?.replace(/\\s+/g, ' ').trim() ?? null,
+          destinationResultsVisible: Boolean(document.querySelector('[data-testid="destination-results"]')),
+        };
+      })()`
+    );
+    keyboardNavigation = { skipLink, brandLinkHref, focusedMenuButton, openedMenu, firstMenuLink, closedMenu };
   }
 
   let plannerNavigation = null;
   if (viewport.width === 1440) {
     await evaluate(client, "document.querySelector('.hero-primary-cta')?.click(); true");
-    await wait(700);
+    await evaluate(
+      client,
+      `(async () => {
+        const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+        for (let i = 0; i < 30; i += 1) {
+          const visibleH1s = Array.from(document.querySelectorAll('h1')).filter((el) => el.checkVisibility());
+          if (window.location.pathname === '/ai-planner' && visibleH1s.length > 0) {
+            break;
+          }
+          await delay(100);
+        }
+        return true;
+      })()`
+    );
     plannerNavigation = await evaluate(
       client,
-      `({
-        pathname: window.location.pathname,
-        h1Text: document.querySelector('h1')?.textContent?.trim() ?? null,
-        staticPreviewVisible: document.body.innerText.includes('AI is not connected'),
-      })`
+      `(() => {
+        const activeMain = Array.from(document.querySelectorAll('main')).find((el) => el.checkVisibility()) ?? null;
+        const visibleH1s = Array.from(document.querySelectorAll('h1')).filter((el) => el.checkVisibility());
+        const mainText = activeMain?.innerText ?? '';
+        const lowerText = mainText.toLocaleLowerCase('vi');
+        const forbiddenLiveAiClaims = [
+          'live ai',
+          'connected to gemini',
+          'connected to openai',
+          'đã kết nối mô hình ai',
+          'trợ lý ai trực tiếp',
+        ].filter((claim) => lowerText.includes(claim));
+        return {
+          pathname: window.location.pathname,
+          visibleH1Count: visibleH1s.length,
+          h1Text: visibleH1s[0]?.textContent?.trim() ?? null,
+          staticPreviewVisible: mainText.includes('ADORA chưa kết nối mô hình AI'),
+          headerDisclosureVisible: mainText.includes('chưa kết nối mô hình AI'),
+          forbiddenLiveAiClaims,
+        };
+      })()`
     );
   }
 
@@ -326,6 +394,7 @@ try {
   await mkdir(outputDirectory, { recursive: true });
   await waitForJsonVersion();
   const homepageResponse = await fetch(siteUrl);
+  const destinationsResponse = await fetch(`${siteUrl}/destinations`);
   const plannerResponse = await fetch(`${siteUrl}/ai-planner`);
   const results = [];
   for (const viewport of viewports) {
@@ -335,6 +404,7 @@ try {
 
   const summary = {
     homepageStatus: homepageResponse.status,
+    destinationsStatus: destinationsResponse.status,
     aiPlannerStatus: plannerResponse.status,
     results,
   };
@@ -342,6 +412,7 @@ try {
 
   const failed =
     homepageResponse.status !== 200 ||
+    destinationsResponse.status !== 200 ||
     plannerResponse.status !== 200 ||
     results.some(
       (result) =>
@@ -353,24 +424,35 @@ try {
         result.commercialClaims.length > 0 ||
         result.images.some((image) => !image.complete || image.naturalWidth === 0) ||
         (result.viewport === "390x844" &&
-          (result.keyboardNavigation?.focusedMenuButton.control !== "mobile-navigation" ||
+          (result.keyboardNavigation?.skipLink?.href !== "#main-content" ||
+            !result.keyboardNavigation?.skipLink?.visible ||
+            result.keyboardNavigation?.brandLinkHref !== "/" ||
+            result.keyboardNavigation?.focusedMenuButton.control !== "mobile-navigation" ||
+            result.keyboardNavigation?.focusedMenuButton.expanded !== "false" ||
             result.keyboardNavigation?.focusedMenuButton.outlineStyle === "none" ||
             result.keyboardNavigation?.focusedMenuButton.outlineWidth === "0px" ||
             result.keyboardNavigation?.openedMenu.expanded !== "true" ||
-            result.keyboardNavigation?.openedMenu.display === "none" ||
-            result.keyboardNavigation?.openedMenu.visibleLinks < 4 ||
-            result.keyboardNavigation?.firstMenuLink !== "#destinations" ||
+            result.keyboardNavigation?.openedMenu.display !== "grid" ||
+            result.keyboardNavigation?.openedMenu.visibleLinks < 5 ||
+            result.keyboardNavigation?.firstMenuLink !== "/destinations" ||
             result.keyboardNavigation?.closedMenu.expanded !== "false" ||
+            result.keyboardNavigation?.closedMenu.anyMenuExpanded ||
             result.keyboardNavigation?.closedMenu.display !== "none" ||
-            result.keyboardNavigation?.closedMenu.hash !== "#destinations" ||
+            result.keyboardNavigation?.closedMenu.pathname !== "/destinations" ||
+            result.keyboardNavigation?.closedMenu.visibleH1Count !== 1 ||
+            result.keyboardNavigation?.closedMenu.h1Text !== "Những miền đất để đi chậm." ||
+            !result.keyboardNavigation?.closedMenu.destinationResultsVisible ||
             !result.reducedMotion?.matches ||
             result.reducedMotion?.scrollBehavior !== "auto" ||
             result.reducedMotion?.animationDuration === "2.2s" ||
             result.reducedMotion?.transitionDuration === "1.2s")) ||
         (result.viewport === "1440x900" &&
           (result.plannerNavigation?.pathname !== "/ai-planner" ||
-            result.plannerNavigation?.h1Text !== "ADORA AI Travel Assistant" ||
-            !result.plannerNavigation?.staticPreviewVisible)) ||
+            result.plannerNavigation?.visibleH1Count !== 1 ||
+            result.plannerNavigation?.h1Text !== "ADORA AI Travel Planner" ||
+            !result.plannerNavigation?.staticPreviewVisible ||
+            !result.plannerNavigation?.headerDisclosureVisible ||
+            result.plannerNavigation?.forbiddenLiveAiClaims?.length > 0)) ||
         result.errors.length > 0
     );
   if (failed) process.exitCode = 1;
