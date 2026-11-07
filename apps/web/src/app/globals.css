@@ -13,7 +13,34 @@
   --adora-gutter: clamp(1.25rem, 4vw, 4.5rem);
   --adora-section-space: clamp(7rem, 10vw, 10rem);
   --adora-container: 85rem;
-  --adora-transition: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Motion foundation tokens (Specification v1.1 §B) */
+  --adora-duration-instant: 120ms;
+  --adora-duration-fast: 180ms;
+  --adora-duration-ui: 240ms;
+  --adora-duration-editorial: 420ms;
+  --adora-duration-reveal: 680ms;
+  --adora-duration-cinematic: 920ms;
+  --adora-duration-image-hover: 1200ms;
+
+  --adora-ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --adora-ease-ui: cubic-bezier(0.25, 1, 0.5, 1);
+  --adora-ease-ambient: cubic-bezier(0.37, 0, 0.63, 1);
+
+  --adora-distance-hero: 20px;
+  --adora-distance-reveal: 22px;
+  --adora-distance-card: 16px;
+  --adora-distance-ui: 6px;
+
+  --adora-scale-image-enter: 1.035;
+  --adora-scale-image-hover: 1.025;
+
+  --adora-stagger-tight: 60ms;
+  --adora-stagger-editorial: 90ms;
+  --adora-stagger-cap: 270ms;
+
+  /* Backward-compatible transition alias */
+  --adora-transition: var(--adora-duration-editorial) var(--adora-ease-editorial);
 }
 
 * {
@@ -163,11 +190,66 @@ input {
 }
 
 .image-reveal img {
-  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--adora-duration-image-hover) var(--adora-ease-editorial);
 }
 
-.image-reveal:hover img {
-  transform: scale(1.025);
+@media (hover: hover) and (pointer: fine) {
+  .image-reveal:hover img {
+    transform: scale(var(--adora-scale-image-hover));
+  }
+}
+
+/* Progressive scroll-reveal foundation (Specification v1.1 §C.2 + Errata E-2, E-3).
+   Composition contract (E-3a): because these rules are unlayered and beat Tailwind v4's
+   @layer utilities, <Reveal> wrappers may carry layout, grid placement, spacing, and
+   border classes, never opacity-*, transition-*, duration-*, ease-*, delay-*, or transform
+   utility classes. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) [data-reveal="pending"] {
+    opacity: 0;
+    transform: translate3d(0, var(--adora-distance-reveal), 0);
+  }
+
+  html:not([data-motion="off"]) [data-reveal="pending"][data-reveal-variant="card"] {
+    transform: translate3d(0, var(--adora-distance-card), 0);
+  }
+
+  html:not([data-motion="off"]) [data-reveal="pending"][data-reveal-variant="image"] {
+    transform: none;
+  }
+
+  html:not([data-motion="off"]) [data-reveal="pending"][data-reveal-variant="image"] img {
+    transform: scale(var(--adora-scale-image-enter));
+  }
+
+  html:not([data-motion="off"]) [data-reveal="visible"] {
+    opacity: 1;
+    transform: none;
+    transition-property: opacity, transform;
+    transition-duration: var(--adora-duration-reveal);
+    transition-timing-function: var(--adora-ease-editorial);
+    transition-delay: min(var(--reveal-delay, 0ms), var(--adora-stagger-cap));
+  }
+
+  html:not([data-motion="off"]) [data-reveal="pending"]:focus-within,
+  html:not([data-motion="off"]) [data-reveal="visible"]:focus-within,
+  html:not([data-motion="off"]) [data-reveal="visible"][data-reveal-instant] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  html:not([data-motion="off"]) [data-reveal="pending"][data-reveal-variant="image"]:focus-within img,
+  html:not([data-motion="off"]) [data-reveal="visible"][data-reveal-instant][data-reveal-variant="image"] img {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 47.999rem) {
+  html:not([data-motion="off"]) [data-reveal="visible"][data-reveal-stack] {
+    transition-delay: 0ms;
+  }
 }
 
 .hero-grain {
@@ -196,6 +278,15 @@ input {
 @media (max-width: 47.999rem) {
   :root {
     --adora-section-space: clamp(4rem, 12vw, 5.5rem);
+    --adora-distance-hero: 12px;
+    --adora-distance-reveal: 14px;
+    --adora-distance-card: 10px;
+    --adora-distance-ui: 6px;
+    --adora-scale-image-enter: 1.02;
+    --adora-scale-image-hover: 1;
+    --adora-stagger-tight: 40ms;
+    --adora-stagger-editorial: 0ms;
+    --adora-stagger-cap: 180ms;
   }
 
   .adora-eyebrow {
@@ -203,7 +294,68 @@ input {
   }
 }
 
+html[data-motion="off"] {
+  --adora-duration-instant: 0.01ms;
+  --adora-duration-fast: 0.01ms;
+  --adora-duration-ui: 0.01ms;
+  --adora-duration-editorial: 0.01ms;
+  --adora-duration-reveal: 0.01ms;
+  --adora-duration-cinematic: 0.01ms;
+  --adora-duration-image-hover: 0.01ms;
+  --adora-distance-hero: 0px;
+  --adora-distance-reveal: 0px;
+  --adora-distance-card: 0px;
+  --adora-distance-ui: 0px;
+  --adora-scale-image-enter: 1;
+  --adora-scale-image-hover: 1;
+  --adora-stagger-tight: 0ms;
+  --adora-stagger-editorial: 0ms;
+  --adora-stagger-cap: 0ms;
+  scroll-behavior: auto;
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-delay: 0ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+html[data-motion="off"] [data-reveal],
+html[data-motion="off"] [data-reveal="pending"],
+html[data-motion="off"] [data-reveal="visible"] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+html[data-motion="off"] [data-reveal="pending"][data-reveal-variant="image"] img {
+  transform: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --adora-duration-instant: 0.01ms;
+    --adora-duration-fast: 0.01ms;
+    --adora-duration-ui: 0.01ms;
+    --adora-duration-editorial: 0.01ms;
+    --adora-duration-reveal: 0.01ms;
+    --adora-duration-cinematic: 0.01ms;
+    --adora-duration-image-hover: 0.01ms;
+    --adora-distance-hero: 0px;
+    --adora-distance-reveal: 0px;
+    --adora-distance-card: 0px;
+    --adora-distance-ui: 0px;
+    --adora-scale-image-enter: 1;
+    --adora-scale-image-hover: 1;
+    --adora-stagger-tight: 0ms;
+    --adora-stagger-editorial: 0ms;
+    --adora-stagger-cap: 0ms;
+  }
+
   html {
     scroll-behavior: auto;
   }
@@ -214,6 +366,34 @@ input {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
+    transition-delay: 0ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  [data-reveal],
+  [data-reveal="pending"],
+  [data-reveal="visible"] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  [data-reveal="pending"][data-reveal-variant="image"] img {
+    transform: none !important;
+  }
+}
+
+@media print {
+  [data-reveal],
+  [data-reveal="pending"],
+  [data-reveal="visible"] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  [data-reveal="pending"][data-reveal-variant="image"] img {
+    transform: none !important;
+    transition: none !important;
   }
 }
