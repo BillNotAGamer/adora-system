@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +14,7 @@ export function EditorialHero() {
         fill
         preload
         sizes="100vw"
+        data-image-settle=""
         className="-z-30 object-cover object-[61%_center] sm:object-center"
       />
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,rgba(10,18,16,.82)_0%,rgba(10,18,16,.47)_43%,rgba(10,18,16,.1)_78%),linear-gradient(0deg,rgba(10,18,16,.7)_0%,transparent_44%)]" />
@@ -21,22 +23,30 @@ export function EditorialHero() {
 
       <div className="adora-container flex min-h-[47rem] items-end pb-16 pt-36 sm:min-h-[52rem] sm:pb-20 lg:min-h-screen lg:items-center lg:pb-12 lg:pt-40">
         <div className="max-w-[58rem]">
-          <p className="adora-eyebrow text-white/78">Du lịch, được thiết kế sâu hơn</p>
-          <h1 className="font-editorial mt-7 max-w-[13ch] text-[clamp(3.2rem,9.2vw,8.25rem)] leading-[0.89] font-medium tracking-[-0.055em] text-balance">
+          <p className="adora-eyebrow text-white/78 adora-hero-heading-rise">Du lịch, được thiết kế sâu hơn</p>
+          <h1 className="font-editorial mt-7 max-w-[13ch] text-[clamp(3.2rem,9.2vw,8.25rem)] leading-[0.89] font-medium tracking-[-0.055em] text-balance adora-hero-heading-rise">
             Đi xa hơn. <em className="font-normal text-[var(--adora-ivory)]">Hiểu sâu hơn.</em>
           </h1>
-          <p className="mt-7 max-w-[38rem] text-sm leading-7 text-white/76 sm:text-base sm:leading-8 lg:mt-9 lg:text-lg">
+          <p
+            style={{ "--stagger-index": 1 } as CSSProperties}
+            className="mt-7 max-w-[38rem] text-sm leading-7 text-white/76 sm:text-base sm:leading-8 lg:mt-9 lg:text-lg adora-load-rise"
+          >
             ADORA kết nối cảm hứng, dữ liệu điểm đến và trí tuệ nhân tạo để mỗi chuyến đi trở thành một hành trình có chủ đích.
           </p>
           <div className="mt-9 flex flex-col items-start gap-5 sm:flex-row sm:items-center lg:mt-11">
             <Link
               href="/ai-planner"
-              className="light-cta hero-primary-cta group inline-flex min-h-13 items-center gap-4 px-6 text-xs font-bold tracking-[0.11em] transition-colors"
+              style={{ "--stagger-index": 2 } as CSSProperties}
+              className="light-cta hero-primary-cta group inline-flex min-h-13 items-center gap-4 px-6 text-xs font-bold tracking-[0.11em] transition-colors adora-load-rise"
             >
               Plan with Adora AI
               <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
-            <Link href="/destinations" className="editorial-link text-white/86">
+            <Link
+              href="/destinations"
+              style={{ "--stagger-index": 3 } as CSSProperties}
+              className="editorial-link text-white/86 adora-load-rise"
+            >
               Khám phá điểm đến
             </Link>
           </div>
