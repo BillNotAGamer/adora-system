@@ -314,6 +314,40 @@ input {
   }
 }
 
+/* Application surface keyframes (Package D: INV-17, INV-18, INV-19 + Errata E-9, E-10, N-7).
+   Inside role="log" and on the mobile jumpbar, entrances are strictly opacity-only
+   (transform: none) so getBoundingClientRect() scroll anchoring is 100% geometry-invariant. */
+@keyframes adora-planner-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes adora-preview-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, var(--adora-distance-ui), 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes adora-panel-in {
+  0% {
+    opacity: 0.25;
+    transform: translate3d(0, var(--adora-distance-ui), 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-motion="off"]) .adora-image-settle,
   html:not([data-motion="off"]) [data-image-settle] {
@@ -335,6 +369,23 @@ input {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+
+  html:not([data-motion="off"]) [data-planner-enter="user"]:not([data-entered="true"]),
+  html:not([data-motion="off"]) [data-planner-enter="jumpbar"]:not([data-entered="true"]) {
+    animation: adora-planner-fade 160ms var(--adora-ease-ui) backwards;
+  }
+
+  html:not([data-motion="off"]) [data-planner-enter="reply"]:not([data-entered="true"]) {
+    animation: adora-planner-fade 200ms var(--adora-ease-ui) 80ms backwards;
+  }
+
+  html:not([data-motion="off"]) [data-planner-enter="preview"]:not([data-entered="true"]) {
+    animation: adora-preview-in 200ms var(--adora-ease-ui) 80ms backwards;
+  }
+
+  html:not([data-motion="off"]) [data-day-panel-enter]:not([data-entered="true"]) {
+    animation: adora-panel-in 220ms var(--adora-ease-ui) backwards;
   }
 }
 
@@ -417,7 +468,9 @@ html[data-motion="off"] [data-sample-bubble],
 html[data-motion="off"] .adora-image-settle,
 html[data-motion="off"] [data-image-settle],
 html[data-motion="off"] .adora-hero-heading-rise,
-html[data-motion="off"] .adora-load-rise {
+html[data-motion="off"] .adora-load-rise,
+html[data-motion="off"] [data-planner-enter],
+html[data-motion="off"] [data-day-panel-enter] {
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
@@ -469,7 +522,9 @@ html[data-motion="off"] [data-reveal="pending"][data-reveal-variant="image"] img
   .adora-image-settle,
   [data-image-settle],
   .adora-hero-heading-rise,
-  .adora-load-rise {
+  .adora-load-rise,
+  [data-planner-enter],
+  [data-day-panel-enter] {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
@@ -489,7 +544,9 @@ html[data-motion="off"] [data-reveal="pending"][data-reveal-variant="image"] img
   .adora-image-settle,
   [data-image-settle],
   .adora-hero-heading-rise,
-  .adora-load-rise {
+  .adora-load-rise,
+  [data-planner-enter],
+  [data-day-panel-enter] {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;

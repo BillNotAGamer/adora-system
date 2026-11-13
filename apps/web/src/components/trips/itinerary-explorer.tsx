@@ -2,11 +2,17 @@
 
 import { ChevronDown, MapPin } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type AnimationEvent, type KeyboardEvent } from "react";
 
 import { EXPERIENCE_CATEGORY_LABELS, getExperienceBySlug } from "@/lib/demo/experiences";
 import { PERIOD_LABELS, formatVnd, getTripBudgetTotalVnd } from "@/lib/demo/trips";
 import type { Trip } from "@/lib/demo/types";
+
+function markEnteredOnAnimationEnd(event: AnimationEvent<HTMLElement>) {
+  if (event.target === event.currentTarget) {
+    event.currentTarget.dataset.entered = "true";
+  }
+}
 
 /**
  * Client island for the itinerary: day tabs (WAI-ARIA tabs pattern) and an accordion of activities.
@@ -14,8 +20,20 @@ import type { Trip } from "@/lib/demo/types";
  */
 export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
   const [activeDay, setActiveDay] = useState(1);
+  const [hasSwitched, setHasSwitched] = useState(false);
   const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set(trip.days[0]?.activities[0]?.id ? [trip.days[0].activities[0].id] : []));
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const explorerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = explorerRef.current;
+    return () => {
+      if (!root) return;
+      for (const element of root.querySelectorAll<HTMLElement>("[data-day-panel-enter]")) {
+        element.dataset.entered = "true";
+      }
+    };
+  }, []);
 
   const day = trip.days.find((candidate) => candidate.day === activeDay) ?? trip.days[0];
   if (!day) return null;
@@ -23,6 +41,9 @@ export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
   function selectDay(next: number, focus = false) {
     const target = trip.days.find((candidate) => candidate.day === next);
     if (!target) return;
+    if (next !== activeDay) {
+      setHasSwitched(true);
+    }
     setActiveDay(next);
     const firstId = target.activities[0]?.id;
     if (firstId) setOpenIds((current) => (current.has(firstId) ? current : new Set(current).add(firstId)));
@@ -55,7 +76,7 @@ export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
   const total = getTripBudgetTotalVnd(trip);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-14">
+    <div ref={explorerRef} className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-14">
       <div className="min-w-0">
         <div role="tablist" aria-label="Chọn ngày trong lịch trình" className="grid auto-cols-fr grid-flow-col border border-[var(--adora-hairline)]">
           {trip.days.map((candidate, index) => {
@@ -74,7 +95,7 @@ export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
                 tabIndex={selected ? 0 : -1}
                 onClick={() => selectDay(candidate.day)}
                 onKeyDown={(event) => onTabKeyDown(event, index)}
-                className={`min-h-14 border-r border-[var(--adora-hairline)] px-3 py-2 text-left transition-colors last:border-r-0 sm:px-5 ${
+                className={`min-h-14 border-r border-[var(--adora-hairline)] px-3 py-2 text-left transition-colors duration-[var(--adora-duration-fast)] ease-[var(--adora-ease-ui)] last:border-r-0 sm:px-5 ${
                   selected ? "bg-[var(--adora-ink)] text-[var(--adora-paper)]" : "bg-transparent text-[var(--adora-ink)] hover:bg-[var(--adora-ivory)]"
                 }`}
               >
@@ -88,55 +109,78 @@ export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
         </div>
 
         <div role="tabpanel" id={`day-panel-${day.day}`} aria-labelledby={`day-tab-${day.day}`} tabIndex={0} className="mt-8" data-testid="day-panel">
-          <h3 className="font-editorial text-[clamp(1.9rem,3.4vw,3rem)] leading-[1.02] tracking-[-0.035em]">
-            Ngày {day.day}: {day.title}
-          </h3>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--adora-text-secondary)]">{day.summary}</p>
+          <div
+            key={day.day}
+            data-day-panel-enter={hasSwitched ? "" : undefined}
+            onAnimationEnd={markEnteredOnAnimationEnd}
+          >
+            <h3 className="font-editorial text-[clamp(1.9rem,3.4vw,3rem)] leading-[1.02] tracking-[-0.035em]">
+              Ngày {day.day}: {day.title}
+            </h3>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--adora-text-secondary)]">{day.summary}</p>
 
-          <ol className="mt-8 border-l border-[var(--adora-hairline)]">
-            {day.activities.map((activity) => {
-              const open = openIds.has(activity.id);
-              const experience = activity.experienceSlug ? getExperienceBySlug(activity.experienceSlug) : undefined;
-              return (
-                <li key={activity.id} className="relative pb-6 pl-6 last:pb-0 sm:pl-8">
-                  <span className="absolute top-2 -left-[5px] size-2.5 rounded-full border border-[var(--adora-gold)] bg-[var(--adora-paper)]" aria-hidden="true" />
-                  <p className="text-[0.68rem] font-bold tracking-[0.16em] text-[var(--adora-sage)] uppercase">{PERIOD_LABELS[activity.period]}</p>
-                  <div className="mt-2 border border-[var(--adora-hairline)] bg-white/50">
-                    <h4>
-                      <button
-                        type="button"
-                        aria-expanded={open}
-                        aria-controls={`activity-${activity.id}`}
-                        onClick={() => toggle(activity.id)}
-                        className="flex min-h-14 w-full items-center justify-between gap-4 px-4 py-3 text-left sm:px-5"
+            <ol className="mt-8 border-l border-[var(--adora-hairline)]">
+              {day.activities.map((activity) => {
+                const open = openIds.has(activity.id);
+                const experience = activity.experienceSlug ? getExperienceBySlug(activity.experienceSlug) : undefined;
+                return (
+                  <li key={activity.id} className="relative pb-6 pl-6 last:pb-0 sm:pl-8">
+                    <span className="absolute top-2 -left-[5px] size-2.5 rounded-full border border-[var(--adora-gold)] bg-[var(--adora-paper)]" aria-hidden="true" />
+                    <p className="text-[0.68rem] font-bold tracking-[0.16em] text-[var(--adora-sage)] uppercase">{PERIOD_LABELS[activity.period]}</p>
+                    <div className="mt-2 border border-[var(--adora-hairline)] bg-white/50">
+                      <h4>
+                        <button
+                          type="button"
+                          aria-expanded={open}
+                          aria-controls={`activity-${activity.id}`}
+                          onClick={() => toggle(activity.id)}
+                          className="flex min-h-14 w-full items-center justify-between gap-4 px-4 py-3 text-left sm:px-5"
+                        >
+                          <span>
+                            <span className="block text-base font-semibold">{activity.title}</span>
+                            <span className="mt-1 block text-sm leading-6 font-normal text-[var(--adora-text-secondary)]">{activity.summary}</span>
+                          </span>
+                          <ChevronDown
+                            className={`size-5 shrink-0 transition-transform duration-[var(--adora-duration-ui)] ease-[var(--adora-ease-ui)] ${
+                              open ? "rotate-180" : ""
+                            }`}
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </h4>
+                      <div
+                        className={`grid transition-[grid-template-rows,opacity] duration-[var(--adora-duration-ui)] ease-[var(--adora-ease-ui)] ${
+                          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                        }`}
                       >
-                        <span>
-                          <span className="block text-base font-semibold">{activity.title}</span>
-                          <span className="mt-1 block text-sm leading-6 font-normal text-[var(--adora-text-secondary)]">{activity.summary}</span>
-                        </span>
-                        <ChevronDown className={`size-5 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
-                      </button>
-                    </h4>
-                    {open ? (
-                      <div id={`activity-${activity.id}`} role="region" aria-label={activity.title} className="border-t border-[var(--adora-hairline)] px-4 py-5 sm:px-5">
-                        <p className="text-sm leading-7 text-[var(--adora-text-secondary)]">{activity.detail}</p>
-                        <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-[var(--adora-ink)]">
-                          <MapPin className="size-3.5 text-[var(--adora-gold)]" aria-hidden="true" />
-                          {activity.locationNote}
-                          <span className="font-normal text-[var(--adora-text-secondary)]">· khu vực đại diện, không phải địa chỉ</span>
-                        </p>
-                        {experience ? (
-                          <Link href={`/experiences/${experience.slug}`} className="editorial-link mt-4">
-                            Xem trải nghiệm · {EXPERIENCE_CATEGORY_LABELS[experience.category]}
-                          </Link>
-                        ) : null}
+                        <div
+                          id={`activity-${activity.id}`}
+                          role="region"
+                          aria-label={activity.title}
+                          inert={!open}
+                          className="min-h-0 overflow-hidden"
+                        >
+                          <div className="border-t border-[var(--adora-hairline)] px-4 py-5 sm:px-5">
+                            <p className="text-sm leading-7 text-[var(--adora-text-secondary)]">{activity.detail}</p>
+                            <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-[var(--adora-ink)]">
+                              <MapPin className="size-3.5 text-[var(--adora-gold)]" aria-hidden="true" />
+                              {activity.locationNote}
+                              <span className="font-normal text-[var(--adora-text-secondary)]">· khu vực đại diện, không phải địa chỉ</span>
+                            </p>
+                            {experience ? (
+                              <Link href={`/experiences/${experience.slug}`} className="editorial-link mt-4">
+                                Xem trải nghiệm · {EXPERIENCE_CATEGORY_LABELS[experience.category]}
+                              </Link>
+                            ) : null}
+                          </div>
+                        </div>
                       </div>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </div>
       </div>
 

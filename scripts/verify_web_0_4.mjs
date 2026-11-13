@@ -31,7 +31,20 @@ import { basename, join, resolve } from "node:path";
  *   sample bubbles (INV-09 / E-8b), HowItWorks static <li> dividers & mobile 0ms stack (INV-10 / E-7),
  *   and SiteFooter interior closing CTA reveal with static footer band & utility nav (INV-11).
  *
- * Later packages (D, C, E) extend this script additively without weakening Package A or B checks.
+ * Package D scope (Application Interactions — INV-17..INV-20, Errata E-9..E-10, P-6, N-4, N-7, B-5):
+ * - AI Planner: opacity-only message entrances (160ms user bubble at 0ms, 200ms scripted/unsupported reply
+ *   at +80ms on outer <article>), atomic non-streaming DOM insertion, scroll stability (|scrollTop(t=0) -
+ *   scrollTop(settled)| <= 1px, settled userBubble.top - log.top in [8, 16]px), desktop Trip Preview 6px
+ *   rise + opacity (keyed by preview.slug), mobile Trip Preview & Jumpbar opacity-only entrances, dynamic
+ *   reduced-motion Jumpbar scrolling, P-6/N-4 welcome suggestion focus (#planner-prompt for keyboard/mouse,
+ *   user turn <article tabIndex=-1> for touch), and Next.js <Activity> Back-navigation replay prevention.
+ * - Trip Itinerary: stable outer role="tabpanel" node with inner keyed [data-day-panel-enter] wrapper
+ *   suppressed on initial load via event-handler hasSwitched state (E-10), 220ms panel entrance with
+ *   opacity 0.25 -> 1 and 6px rise (N-7), synchronous aria-selected/focus/day-budget updates, <Activity>
+ *   replay prevention, and 3-layer CSS Grid activity accordion (0fr <-> 1fr, inert={!open} on role="region",
+ *   collapsed height <= 1px, synchronous aria-expanded, and no content remount).
+ *
+ * Later packages (C, E) extend this script additively without weakening Package A, B, or D checks.
  */
 
 const chromePath = process.env.ADORA_CHROME_PATH ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
@@ -41,10 +54,16 @@ const strictDevOnly = process.argv.includes("--strict-dev-only");
 const capturePackageBEvidenceOnly = process.argv.includes("--capture-package-b-evidence-only");
 const capturePackageBEvidenceFlag =
   capturePackageBEvidenceOnly || process.argv.includes("--capture-package-b-evidence");
+const capturePackageDEvidenceOnly = process.argv.includes("--capture-package-d-evidence-only");
+const capturePackageDEvidenceFlag =
+  capturePackageDEvidenceOnly || process.argv.includes("--capture-package-d-evidence");
 const CDP_COMMAND_TIMEOUT_MS = Number(process.env.ADORA_CDP_TIMEOUT_MS ?? "25000");
 const outputDirectory = resolve(process.env.ADORA_VERIFY_OUTPUT ?? "docs/reports/assets/web-design-0-4");
 const packageBEvidenceDirectory = resolve(
   process.env.ADORA_PACKAGE_B_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-b",
+);
+const packageDEvidenceDirectory = resolve(
+  process.env.ADORA_PACKAGE_D_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-d",
 );
 const debugPort = Number(process.env.ADORA_VERIFY_0_4_PORT ?? "9228");
 
@@ -2740,6 +2759,1275 @@ async function capturePackageBEvidence(browserClient, timelines) {
   };
 }
 
+async function runPackageDApplicationSuite(browserClient) {
+  // 1. Desktop (1440x900) AI Planner: initial visibility, keyboard welcome suggestion focus (P-6),
+  //    message entrance timing (INV-17), atomic DOM insert, scroll stability, desktop Trip Preview
+  //    entrance & preview.slug key switch (INV-18), unsupported reply (E-9), reset, and <Activity>
+  //    Back-navigation replay prevention.
+  const plannerDesktop = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900, mobile: false, touch: false },
+    async (session) => {
+      const externalRequests = [];
+      await session.send("Network.enable");
+      browserClient.on("Network.requestWillBeSent", (params) => {
+        const url = params?.request?.url ?? "";
+        if (url && !url.startsWith(siteUrl) && !url.startsWith("data:") && !url.startsWith("blob:")) {
+          externalRequests.push(url);
+        }
+      }, session.sessionId);
+
+      await navigateAndWaitReady(session, `${siteUrl}/ai-planner`, true);
+      await session.evaluate("document.fonts.ready.then(() => true)");
+
+      const initialCheck = await session.evaluate(`(() => {
+        const log = document.querySelector('[role="log"]');
+        const logRect = log.getBoundingClientRect();
+        const suggestions = Array.from(document.querySelectorAll('ul[aria-label="Gợi ý câu hỏi"] button'));
+        const openingArticle = document.querySelector('[role="log"] article[aria-label="ADORA Planner"]');
+        const openingRect = openingArticle.getBoundingClientRect();
+        const emptyPreview = document.querySelector('[data-testid="trip-preview-empty"]');
+        const liveRegions = document.querySelectorAll('[aria-live]');
+        return {
+          initialScrollTop: log.scrollTop,
+          suggestionCount: suggestions.length,
+          allSuggestionsVisibleInLog: suggestions.every((btn) => {
+            const r = btn.getBoundingClientRect();
+            return r.top >= logRect.top && r.bottom <= logRect.bottom;
+          }),
+          openingVisibleInLog: openingRect.top >= logRect.top && openingRect.bottom <= logRect.bottom,
+          emptyPreviewPresent: Boolean(emptyPreview && emptyPreview.checkVisibility()),
+          liveRegionCount: liveRegions.length,
+          ariaBusyCount: document.querySelectorAll('[aria-busy]').length,
+          activeAnimationsAtLoad: document.getAnimations().length,
+        };
+      })()`);
+
+      // Focus first welcome suggestion and activate via keyboard Enter (P-6)
+      await session.send("Page.bringToFront");
+      await session.evaluate(`(() => {
+        const firstBtn = document.querySelector('ul[aria-label="Gợi ý câu hỏi"] button');
+        firstBtn.focus();
+      })()`);
+      await session.send("Input.dispatchKeyEvent", {
+        type: "rawKeyDown",
+        key: "Enter",
+        code: "Enter",
+        windowsVirtualKeyCode: 13,
+        nativeVirtualKeyCode: 13,
+      });
+      await session.send("Input.dispatchKeyEvent", {
+        type: "char",
+        key: "Enter",
+        code: "Enter",
+        text: "\r",
+        unmodifiedText: "\r",
+        windowsVirtualKeyCode: 13,
+        nativeVirtualKeyCode: 13,
+      });
+      await session.send("Input.dispatchKeyEvent", {
+        type: "keyUp",
+        key: "Enter",
+        code: "Enter",
+        windowsVirtualKeyCode: 13,
+        nativeVirtualKeyCode: 13,
+      });
+
+      const turnAtT0 = await session.evaluate(`(() => {
+        const log = document.querySelector('[role="log"]');
+        const userBubble = log.querySelector('article[aria-label="Bạn"]');
+        const scriptedReply = log.querySelector('[data-testid="scripted-reply"]');
+        const preview = document.querySelector('[data-testid="trip-preview"]');
+        const userStyle = getComputedStyle(userBubble);
+        const replyStyle = getComputedStyle(scriptedReply);
+        const previewStyle = getComputedStyle(preview);
+        const demoLabels = Array.from(scriptedReply.querySelectorAll('span')).map((s) => s.textContent?.trim() ?? '');
+        return {
+          activeElementIdAtT0: document.activeElement?.id ?? null,
+          scrollTopAtT0: log.scrollTop,
+          ariaBusyCountAtT0: document.querySelectorAll('[aria-busy]').length,
+          replyTextLengthAtT0: scriptedReply.textContent?.length ?? 0,
+          hasDemoLabelAtT0: demoLabels.some((t) => t.includes('Phản hồi dựng sẵn · không phải AI')),
+          userAnim: {
+            name: userStyle.animationName,
+            duration: userStyle.animationDuration,
+            delay: userStyle.animationDelay,
+            fillMode: userStyle.animationFillMode,
+            transform: userStyle.transform,
+            tabIndex: userBubble.tabIndex,
+          },
+          replyAnim: {
+            name: replyStyle.animationName,
+            duration: replyStyle.animationDuration,
+            delay: replyStyle.animationDelay,
+            fillMode: replyStyle.animationFillMode,
+            transform: replyStyle.transform,
+          },
+          previewAnim: {
+            name: previewStyle.animationName,
+            duration: previewStyle.animationDuration,
+            delay: previewStyle.animationDelay,
+            fillMode: previewStyle.animationFillMode,
+          },
+        };
+      })()`);
+
+      const turnSettled = await session.evaluate(`(async () => {
+        await Promise.all(
+          document.getAnimations()
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const log = document.querySelector('[role="log"]');
+        const logRect = log.getBoundingClientRect();
+        const userBubble = log.querySelector('article[aria-label="Bạn"]');
+        const userRect = userBubble.getBoundingClientRect();
+        const scriptedReply = log.querySelector('[data-testid="scripted-reply"]');
+        const preview = document.querySelector('[data-testid="trip-preview"]');
+        return {
+          scrollTopAfterSettle: log.scrollTop,
+          userAnchorOffsetPx: Math.round((userRect.top - logRect.top) * 100) / 100,
+          replyTextLengthAfterSettle: scriptedReply.textContent?.length ?? 0,
+          userEnteredLatch: userBubble.dataset.entered === 'true',
+          replyEnteredLatch: scriptedReply.dataset.entered === 'true',
+          previewEnteredLatch: preview.dataset.entered === 'true',
+          userOpacity: getComputedStyle(userBubble).opacity,
+          userTransform: getComputedStyle(userBubble).transform,
+          replyOpacity: getComputedStyle(scriptedReply).opacity,
+          replyTransform: getComputedStyle(scriptedReply).transform,
+          previewOpacity: getComputedStyle(preview).opacity,
+          previewTransform: getComputedStyle(preview).transform,
+          previewHeading: preview.querySelector('h2')?.textContent?.trim() ?? '',
+          previewDaysCount: preview.querySelectorAll('ol li').length,
+          activeAnimationsAfterSettle: document.getAnimations().length,
+        };
+      })()`);
+
+      // Switch to 2-day scenario via sidebar button -> verify desktop Trip Preview remounts via key={preview.slug}
+      const secondScenarioSwitch = await session.evaluate(`(async () => {
+        const beforePreviewNode = document.querySelector('[data-testid="trip-preview"]');
+        const sidebarButtons = Array.from(document.querySelectorAll('aside[aria-label="Thanh bên AI Planner"] section button'));
+        const twoDayBtn = sidebarButtons.find((b) => b.textContent?.includes('2 ngày'));
+        twoDayBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        const afterPreviewNode = document.querySelector('[data-testid="trip-preview"]');
+        const previewRemountedByKey = Boolean(beforePreviewNode && afterPreviewNode && beforePreviewNode !== afterPreviewNode);
+        const newPreviewAnimName = getComputedStyle(afterPreviewNode).animationName;
+        await Promise.all(
+          document.getAnimations()
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        return {
+          previewRemountedByKey,
+          newPreviewAnimName,
+          previewDaysCount: afterPreviewNode.querySelectorAll('ol li').length,
+          previewEnteredLatch: afterPreviewNode.dataset.entered === 'true',
+          previewSettledOpacity: getComputedStyle(afterPreviewNode).opacity,
+          previewSettledTransform: getComputedStyle(afterPreviewNode).transform,
+        };
+      })()`);
+
+      // Submit unsupported prompt -> verify E-9 outer <article data-planner-enter="reply"> animation & atomic DemoLabel
+      const unsupportedTurn = await session.evaluate(`(async () => {
+        const textarea = document.querySelector('#planner-prompt');
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+        setter.call(textarea, 'Cho mình lịch trình đi sao Hoả');
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        await new Promise((r) => setTimeout(r, 0));
+        const form = textarea.closest('form');
+        form.requestSubmit();
+        await new Promise((r) => setTimeout(r, 0));
+
+        const unsupportedP = document.querySelector('[data-testid="unsupported-reply"]');
+        const unsupportedArticle = unsupportedP?.closest('article');
+        const styleAtT0 = unsupportedArticle ? getComputedStyle(unsupportedArticle) : null;
+        const hasDemoLabelAtT0 = Boolean(
+          unsupportedArticle &&
+            Array.from(unsupportedArticle.querySelectorAll('span')).some((s) =>
+              s.textContent?.includes('Thông báo hệ thống'),
+            ),
+        );
+        const animAtT0 = styleAtT0
+          ? {
+              dataPlannerEnter: unsupportedArticle.getAttribute('data-planner-enter'),
+              name: styleAtT0.animationName,
+              duration: styleAtT0.animationDuration,
+              delay: styleAtT0.animationDelay,
+              transform: styleAtT0.transform,
+            }
+          : null;
+
+        await Promise.all(
+          document.getAnimations()
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        return {
+          hasDemoLabelAtT0,
+          animAtT0,
+          settledOpacity: unsupportedArticle ? getComputedStyle(unsupportedArticle).opacity : null,
+          settledTransform: unsupportedArticle ? getComputedStyle(unsupportedArticle).transform : null,
+          enteredLatch: unsupportedArticle?.dataset.entered === 'true',
+        };
+      })()`);
+
+      // Next.js <Activity> Back-navigation replay check from /ai-planner -> /trips/... -> history.back()
+      const scrollTopBeforeNav = await session.evaluate(
+        "document.querySelector('[role=\"log\"]').scrollTop",
+      );
+      await session.evaluate(`(() => {
+        const link = document.querySelector('[data-testid="trip-preview"] a[href^="/trips/"]');
+        link.click();
+      })()`);
+      for (let i = 0; i < 50; i += 1) {
+        const onTrip = await session.evaluate(
+          "window.location.pathname.startsWith('/trips/') && Boolean(document.querySelector('[data-testid=\"day-panel\"]'))",
+        );
+        if (onTrip) break;
+        await wait(60);
+      }
+
+      await session.evaluate("window.history.back(); true");
+      for (let i = 0; i < 50; i += 1) {
+        const backOnPlanner = await session.evaluate(
+          "window.location.pathname === '/ai-planner' && Boolean(document.querySelector('[role=\"log\"]'))",
+        );
+        if (backOnPlanner) break;
+        await wait(60);
+      }
+
+      const activityBackCheck = await session.evaluate(`(() => {
+        const log = document.querySelector('[role="log"]');
+        const enterNodes = Array.from(document.querySelectorAll('[data-planner-enter]'));
+        const runningPlannerAnims = enterNodes.flatMap((el) => el.getAnimations());
+        return {
+          restoredPathname: window.location.pathname,
+          enterNodeCount: enterNodes.length,
+          allLatched: enterNodes.every((el) => el.dataset.entered === 'true'),
+          runningPlannerAnimsCount: runningPlannerAnims.length,
+          restoredScrollTop: log.scrollTop,
+        };
+      })()`);
+
+      // Conversation reset check ("Cuộc trò chuyện demo mới") + fine-pointer mouse click on welcome suggestion
+      const resetAndMouseSuggestion = await session.evaluate(`(async () => {
+        const resetBtn = Array.from(document.querySelectorAll('aside[aria-label="Thanh bên AI Planner"] button')).find(
+          (b) => b.textContent?.includes('Cuộc trò chuyện demo mới'),
+        );
+        resetBtn.click();
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const log = document.querySelector('[role="log"]');
+        const afterReset = {
+          scrollTopAfterReset: log.scrollTop,
+          emptyPreviewRestored: Boolean(document.querySelector('[data-testid="trip-preview-empty"]')),
+          activeElementAfterReset: document.activeElement?.id ?? null,
+        };
+
+        const welcomeBtn = document.querySelector('ul[aria-label="Gợi ý câu hỏi"] button');
+        welcomeBtn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' }));
+        welcomeBtn.click();
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        await Promise.all(
+          document.getAnimations()
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        return {
+          afterReset,
+          activeElementAfterMouseWelcomeClick: document.activeElement?.id ?? null,
+        };
+      })()`);
+
+      return {
+        initialCheck,
+        turnAtT0,
+        turnSettled,
+        secondScenarioSwitch,
+        unsupportedTurn,
+        activityBackCheck: {
+          ...activityBackCheck,
+          scrollDeltaAfterBack: Math.abs(activityBackCheck.restoredScrollTop - scrollTopBeforeNav),
+        },
+        resetAndMouseSuggestion,
+        externalRequests,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 2. Mobile (390x844) AI Planner: touch welcome suggestion focus (N-4), mobile jumpbar & mobile preview
+  //    opacity-only entrances (INV-18 / E-9), jumpbar smooth vs reduced-motion auto scrolling.
+  const plannerMobile = await withIsolatedSession(
+    browserClient,
+    { width: 390, height: 844, deviceScaleFactor: 2, mobile: true, touch: true },
+    async (session) => {
+      await navigateAndWaitReady(session, `${siteUrl}/ai-planner`, true);
+      await session.evaluate("document.fonts.ready.then(() => true)");
+
+      const touchWelcomeAndMobileTurn = await session.evaluate(`(async () => {
+        const log = document.querySelector('[role="log"]');
+        const welcomeBtn = document.querySelector('ul[aria-label="Gợi ý câu hỏi"] button');
+        welcomeBtn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
+        welcomeBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+
+        const userBubble = log.querySelector('article[aria-label="Bạn"]');
+        const jumpbar = document.querySelector('[data-testid="mobile-planner-jumpbar"]');
+        const mobilePreview = document.querySelector('[data-testid="trip-preview-mobile"]');
+        const jumpbarStyle = getComputedStyle(jumpbar);
+        const mobilePreviewStyle = getComputedStyle(mobilePreview);
+
+        const activeAtT0 = {
+          activeIsUserTurn: document.activeElement === userBubble,
+          activeIsNotPrompt: document.activeElement?.id !== 'planner-prompt',
+          activeIsNotBody: document.activeElement !== document.body,
+          scrollTopAtT0: log.scrollTop,
+          jumpbarAnim: {
+            name: jumpbarStyle.animationName,
+            duration: jumpbarStyle.animationDuration,
+            delay: jumpbarStyle.animationDelay,
+            transform: jumpbarStyle.transform,
+          },
+          mobilePreviewAnim: {
+            name: mobilePreviewStyle.animationName,
+            duration: mobilePreviewStyle.animationDuration,
+            delay: mobilePreviewStyle.animationDelay,
+            transform: mobilePreviewStyle.transform,
+          },
+        };
+
+        await Promise.all(
+          document.getAnimations()
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        const logRect = log.getBoundingClientRect();
+        const userRect = userBubble.getBoundingClientRect();
+        return {
+          ...activeAtT0,
+          scrollTopAfterSettle: log.scrollTop,
+          userAnchorOffsetPx: Math.round((userRect.top - logRect.top) * 100) / 100,
+          jumpbarEnteredLatch: jumpbar.dataset.entered === 'true',
+          mobilePreviewEnteredLatch: mobilePreview.dataset.entered === 'true',
+          mobilePreviewOpacity: getComputedStyle(mobilePreview).opacity,
+          mobilePreviewTransform: getComputedStyle(mobilePreview).transform,
+        };
+      })()`);
+
+      // Test Jumpbar under html[data-motion="off"] -> immediate auto scroll at t=0ms
+      const jumpbarScrollCheck = await session.evaluate(`(async () => {
+        const log = document.querySelector('[role="log"]');
+        const jumpbarButtons = Array.from(
+          document.querySelectorAll('[data-testid="mobile-planner-jumpbar"] button'),
+        );
+        const previewBtn = jumpbarButtons.find((b) => b.textContent?.includes('Xem trước'));
+        const replyBtn = jumpbarButtons.find((b) => b.textContent?.includes('Phản hồi kịch bản'));
+
+        document.documentElement.dataset.motion = 'off';
+        previewBtn.click();
+        const scrollTopAtT0Preview = log.scrollTop;
+        const logRect = log.getBoundingClientRect();
+        const previewRect = document.querySelector('[data-testid="trip-preview-mobile"]').getBoundingClientRect();
+        const previewOffsetPx = Math.round((previewRect.top - logRect.top) * 100) / 100;
+        const previewVisibleInLog =
+          scrollTopAtT0Preview > 300 &&
+          previewRect.top >= logRect.top &&
+          previewRect.bottom <= logRect.bottom + 2;
+
+        replyBtn.click();
+        const scrollTopAtT0Reply = log.scrollTop;
+        const userRect = log.querySelector('article[aria-label="Bạn"]').getBoundingClientRect();
+        const replyOffsetPx = Math.round((userRect.top - logRect.top) * 100) / 100;
+        delete document.documentElement.dataset.motion;
+
+        return {
+          scrollTopAtT0Preview,
+          previewOffsetPx,
+          previewVisibleInLog,
+          scrollTopAtT0Reply,
+          replyOffsetPx,
+        };
+      })()`);
+
+      return {
+        touchWelcomeAndMobileTurn,
+        jumpbarScrollCheck,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 3. Trip Itinerary (/trips & /trips/da-lat-3-ngay): initial-load suppression (E-10), day-tab click &
+  //    keyboard navigation, 220ms panel entrance with initial opacity >= 0.2 (N-7) and <= 6px rise (INV-19),
+  //    <Activity> Back-navigation replay prevention, and 3-layer CSS Grid accordion (INV-20 / B-5).
+  const itineraryDesktop = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900, mobile: false, touch: false },
+    async (session) => {
+      // Check /trips index TripCard transition tokenization
+      await navigateAndWaitReady(session, `${siteUrl}/trips`, true);
+      const tripsIndexCheck = await session.evaluate(`(() => {
+        const card = document.querySelector('main article');
+        const style = card ? getComputedStyle(card) : null;
+        const imgReveal = card?.querySelector('.image-reveal img');
+        return {
+          cardCount: document.querySelectorAll('main article').length,
+          cardTransitionDuration: style?.transitionDuration ?? null,
+          imgRevealTransitionDuration: imgReveal ? getComputedStyle(imgReveal).transitionDuration : null,
+        };
+      })()`);
+
+      await navigateAndWaitReady(session, `${siteUrl}/trips/da-lat-3-ngay`, true);
+      await session.evaluate("document.fonts.ready.then(() => true)");
+
+      const initialLoadCheck = await session.evaluate(`(() => {
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const enterNode = panel.querySelector('[data-day-panel-enter]');
+        const panelAnims = panel.getAnimations({ subtree: true });
+        const dayBudget = document.querySelector('[data-testid="day-budget"]')?.textContent?.trim() ?? '';
+        const buttons = Array.from(panel.querySelectorAll('button[aria-expanded]'));
+        const regions = Array.from(panel.querySelectorAll('[role="region"]'));
+        const allAriaControlsResolve = buttons.every((btn) => {
+          const targetId = btn.getAttribute('aria-controls');
+          return Boolean(targetId && document.getElementById(targetId));
+        });
+        const collapsedRegions = regions.filter((_, idx) => buttons[idx]?.getAttribute('aria-expanded') === 'false');
+        const collapsedCheck = collapsedRegions.every((reg) => {
+          const gridWrapper = reg.parentElement;
+          const rect = gridWrapper.getBoundingClientRect();
+          return reg.inert === true && reg.hasAttribute('inert') && rect.height <= 1;
+        });
+
+        window.__adoraInitialDayPanel = panel;
+        window.__adoraFirstRegionNode = regions[0];
+
+        return {
+          hasDayPanelEnterOnInitialLoad: Boolean(enterNode),
+          panelAnimsOnInitialLoad: panelAnims.length,
+          day1Budget: dayBudget,
+          activityButtonCount: buttons.length,
+          regionCount: regions.length,
+          allAriaControlsResolve,
+          collapsedCheck,
+        };
+      })()`);
+
+      // Genuine user day switch to Day 2 via click -> verify E-10, INV-19, N-7
+      const day2SwitchCheck = await session.evaluate(`(async () => {
+        const tab2 = document.getElementById('day-tab-2');
+        tab2.click();
+        await new Promise((r) => setTimeout(r, 0));
+
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const stablePanelNode = panel === window.__adoraInitialDayPanel;
+        const innerEnter = panel.querySelector('[data-day-panel-enter]');
+        const anims = innerEnter ? innerEnter.getAnimations() : [];
+        if (anims[0]) {
+          anims[0].pause();
+          anims[0].currentTime = 0;
+        }
+        const styleAtT0 = innerEnter ? getComputedStyle(innerEnter) : null;
+        const matrixMatch = styleAtT0?.transform?.match(/^matrix\\(([^)]+)\\)$/);
+        const tyAtT0 = matrixMatch ? Number(matrixMatch[1].split(',')[5].trim()) : 0;
+        const opacityAtT0 = styleAtT0 ? Number(styleAtT0.opacity) : 0;
+        const animMeta = styleAtT0
+          ? {
+              name: styleAtT0.animationName,
+              duration: styleAtT0.animationDuration,
+              fillMode: styleAtT0.animationFillMode,
+              opacityAtT0: Math.round(opacityAtT0 * 1000) / 1000,
+              tyAtT0: Math.round(tyAtT0 * 100) / 100,
+            }
+          : null;
+
+        const tab2SelectedAtT0 = tab2.getAttribute('aria-selected') === 'true';
+        const day2BudgetAtT0 = document.querySelector('[data-testid="day-budget"]')?.textContent?.trim() ?? '';
+
+        for (const a of anims) a.play();
+        await Promise.all(anims.map((a) => a.finished.catch(() => {})));
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        return {
+          stablePanelNode,
+          hasInnerEnterAttr: Boolean(innerEnter),
+          tab2SelectedAtT0,
+          day2BudgetAtT0,
+          animMeta,
+          settledOpacity: innerEnter ? getComputedStyle(innerEnter).opacity : null,
+          settledTransform: innerEnter ? getComputedStyle(innerEnter).transform : null,
+          enteredLatch: innerEnter?.dataset.entered === 'true',
+          activeAnimsAfterSettle: panel.getAnimations({ subtree: true }).length,
+        };
+      })()`);
+
+      // Keyboard navigation across tabs: ArrowRight (Day 2 -> Day 3), Home (Day 1), End (Day 3), ArrowLeft (Day 2)
+      const keyboardTabsCheck = await session.evaluate(`(async () => {
+        const tab2 = document.getElementById('day-tab-2');
+        tab2.focus();
+        const dispatchKey = async (el, key) => {
+          el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+          await new Promise((r) => setTimeout(r, 0));
+        };
+
+        await dispatchKey(tab2, 'ArrowRight');
+        const afterRight = {
+          activeId: document.activeElement?.id ?? null,
+          selected: document.getElementById('day-tab-3')?.getAttribute('aria-selected'),
+          budget: document.querySelector('[data-testid="day-budget"]')?.textContent?.trim() ?? '',
+        };
+
+        await dispatchKey(document.activeElement, 'Home');
+        const afterHome = {
+          activeId: document.activeElement?.id ?? null,
+          selected: document.getElementById('day-tab-1')?.getAttribute('aria-selected'),
+          budget: document.querySelector('[data-testid="day-budget"]')?.textContent?.trim() ?? '',
+        };
+
+        await dispatchKey(document.activeElement, 'End');
+        const afterEnd = {
+          activeId: document.activeElement?.id ?? null,
+          selected: document.getElementById('day-tab-3')?.getAttribute('aria-selected'),
+        };
+
+        await dispatchKey(document.activeElement, 'ArrowLeft');
+        const afterLeft = {
+          activeId: document.activeElement?.id ?? null,
+          selected: document.getElementById('day-tab-2')?.getAttribute('aria-selected'),
+        };
+
+        // Return to Day 1 and wait for settle so we can test the accordion on Day 1
+        await dispatchKey(document.activeElement, 'Home');
+        await Promise.all(
+          document.getAnimations()
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        return {
+          stablePanelNodeAfterKeyboard: document.querySelector('[data-testid="day-panel"]') === window.__adoraInitialDayPanel,
+          afterRight,
+          afterHome,
+          afterEnd,
+          afterLeft,
+        };
+      })()`);
+
+      // Three-layer activity accordion verification (INV-20 / B-5)
+      const accordionCheck = await session.evaluate(`(async () => {
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const buttons = Array.from(panel.querySelectorAll('button[aria-expanded]'));
+        const firstBtn = buttons[0];
+        const secondBtn = buttons[1];
+        const firstRegion = document.getElementById(firstBtn.getAttribute('aria-controls'));
+        const secondRegion = document.getElementById(secondBtn.getAttribute('aria-controls'));
+        const firstGrid = firstRegion.parentElement;
+        const secondGrid = secondRegion.parentElement;
+
+        // Collapse first activity and expand second activity
+        firstBtn.click();
+        secondBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+
+        const syncState = {
+          firstExpandedAtT0: firstBtn.getAttribute('aria-expanded'),
+          secondExpandedAtT0: secondBtn.getAttribute('aria-expanded'),
+          firstInertAtT0: firstRegion.inert,
+          secondInertAtT0: secondRegion.inert,
+          sameFirstRegionNode: firstRegion === window.__adoraFirstRegionNode || firstRegion.id === 'activity-d1-a1',
+        };
+
+        const beforeReopenNode = firstRegion;
+        await Promise.all(
+          panel
+            .getAnimations({ subtree: true })
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => setTimeout(r, 280));
+
+        const firstCollapsedHeight = Math.round(firstGrid.getBoundingClientRect().height * 100) / 100;
+        const secondExpandedHeight = Math.round(secondGrid.getBoundingClientRect().height * 100) / 100;
+        const firstGridStyle = getComputedStyle(firstGrid);
+
+        // Verify reopening first activity preserves the exact same DOM node (no remount)
+        firstBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        const sameRegionNodeAcrossToggle =
+          document.getElementById(firstBtn.getAttribute('aria-controls')) === beforeReopenNode;
+        // Collapse first activity again so we can test keyboard Tab order skipping collapsed links
+        firstBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        await Promise.all(
+          panel
+            .getAnimations({ subtree: true })
+            .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => {})),
+        );
+        await new Promise((r) => setTimeout(r, 280));
+
+        return {
+          ...syncState,
+          sameRegionNodeAcrossToggle,
+          firstCollapsedHeight,
+          secondExpandedHeight,
+          firstCollapsedOpacity: firstGridStyle.opacity,
+          firstCollapsedGridRows: firstGridStyle.gridTemplateRows,
+          secondHasLinkInDom: Boolean(secondRegion.querySelector('a[href^="/experiences/"]')),
+        };
+      })()`);
+
+      // Real CDP Tab key test: collapse secondBtn (which contains an <a href="/experiences/..."> link),
+      // focus secondBtn, and press Tab -> focus must land on buttons[2], skipping the link inside collapsed secondRegion!
+      await session.evaluate(`(async () => {
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const buttons = Array.from(panel.querySelectorAll('button[aria-expanded]'));
+        // Collapse buttons[1] (which is currently expanded) and expand buttons[2] (so we have an open link for Activity nav test)
+        buttons[1].click();
+        buttons[2].click();
+        await new Promise((r) => setTimeout(r, 0));
+        buttons[1].focus();
+      })()`);
+      await session.send("Input.dispatchKeyEvent", {
+        type: "keyDown",
+        key: "Tab",
+        code: "Tab",
+        windowsVirtualKeyCode: 9,
+        nativeVirtualKeyCode: 9,
+      });
+      await session.send("Input.dispatchKeyEvent", {
+        type: "keyUp",
+        key: "Tab",
+        code: "Tab",
+        windowsVirtualKeyCode: 9,
+        nativeVirtualKeyCode: 9,
+      });
+
+      const tabSkipCollapsedLinkCheck = await session.evaluate(`(() => {
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const buttons = Array.from(panel.querySelectorAll('button[aria-expanded]'));
+        const secondRegion = document.getElementById(buttons[1].getAttribute('aria-controls'));
+        return {
+          secondRegionHasLink: Boolean(secondRegion.querySelector('a[href^="/experiences/"]')),
+          secondRegionInert: secondRegion.inert === true,
+          activeIsThirdButton: document.activeElement === buttons[2],
+          activeInsideCollapsedSecondRegion: secondRegion.contains(document.activeElement),
+        };
+      })()`);
+
+      // Next.js <Activity> Back-navigation replay check from /trips/da-lat-3-ngay -> /experiences/... -> history.back()
+      await session.evaluate(`(() => {
+        const openRegion = Array.from(document.querySelectorAll('[data-testid="day-panel"] [role="region"]')).find(
+          (r) => !r.inert,
+        );
+        const expLink = openRegion.querySelector('a[href^="/experiences/"]');
+        expLink.click();
+      })()`);
+      for (let i = 0; i < 50; i += 1) {
+        const onExp = await session.evaluate("window.location.pathname.startsWith('/experiences/')");
+        if (onExp) break;
+        await wait(60);
+      }
+
+      await session.evaluate("window.history.back(); true");
+      for (let i = 0; i < 50; i += 1) {
+        const backOnTrip = await session.evaluate(
+          "window.location.pathname === '/trips/da-lat-3-ngay' && Boolean(document.querySelector('[data-testid=\"day-panel\"]'))",
+        );
+        if (backOnTrip) break;
+        await wait(60);
+      }
+
+      const itineraryActivityBackCheck = await session.evaluate(`(() => {
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const innerEnter = panel.querySelector('[data-day-panel-enter]');
+        return {
+          restoredPathname: window.location.pathname,
+          enteredLatch: innerEnter?.dataset.entered === 'true',
+          runningPanelAnims: panel.getAnimations({ subtree: true }).length,
+        };
+      })()`);
+
+      return {
+        tripsIndexCheck,
+        initialLoadCheck,
+        day2SwitchCheck,
+        keyboardTabsCheck,
+        accordionCheck,
+        tabSkipCollapsedLinkCheck,
+        itineraryActivityBackCheck,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 4. Reduced-motion & 6-viewport responsive matrix across /ai-planner, /trips, and /trips/da-lat-3-ngay
+  const reducedMotionApplicationCheck = await withIsolatedSession(
+    browserClient,
+    { width: 390, height: 844, deviceScaleFactor: 2, mobile: true, touch: true, reducedMotion: true },
+    async (session) => {
+      await navigateAndWaitReady(session, `${siteUrl}/ai-planner`, true);
+      const plannerReduced = await session.evaluate(`(async () => {
+        const welcomeBtn = document.querySelector('ul[aria-label="Gợi ý câu hỏi"] button');
+        welcomeBtn.click();
+        await new Promise((r) => setTimeout(r, 0));
+        const log = document.querySelector('[role="log"]');
+        const userBubble = log.querySelector('article[aria-label="Bạn"]');
+        const reply = log.querySelector('[data-testid="scripted-reply"]');
+        const jumpbar = document.querySelector('[data-testid="mobile-planner-jumpbar"]');
+        const previewBtn = Array.from(jumpbar.querySelectorAll('button')).find((b) =>
+          b.textContent?.includes('Xem trước'),
+        );
+        previewBtn.click();
+        const logRect = log.getBoundingClientRect();
+        const previewRect = document.querySelector('[data-testid="trip-preview-mobile"]').getBoundingClientRect();
+        return {
+          userAnimName: getComputedStyle(userBubble).animationName,
+          userOpacity: getComputedStyle(userBubble).opacity,
+          replyAnimName: getComputedStyle(reply).animationName,
+          replyOpacity: getComputedStyle(reply).opacity,
+          instantPreviewJumpOffsetPx: Math.round((previewRect.top - logRect.top) * 100) / 100,
+          instantPreviewVisibleInLog:
+            log.scrollTop > 300 &&
+            previewRect.top >= logRect.top &&
+            previewRect.bottom <= logRect.bottom + 2,
+        };
+      })()`);
+
+      await navigateAndWaitReady(session, `${siteUrl}/trips/da-lat-3-ngay`, true);
+      const itineraryReduced = await session.evaluate(`(async () => {
+        const tab2 = document.getElementById('day-tab-2');
+        tab2.click();
+        await new Promise((r) => setTimeout(r, 0));
+        const panel = document.querySelector('[data-testid="day-panel"]');
+        const innerEnter = panel.querySelector('[data-day-panel-enter]');
+        const firstGrid = panel.querySelector('[role="region"]').parentElement;
+        return {
+          panelAnimName: innerEnter ? getComputedStyle(innerEnter).animationName : null,
+          panelOpacity: innerEnter ? getComputedStyle(innerEnter).opacity : null,
+          accordionTransitionDuration: getComputedStyle(firstGrid).transitionDuration,
+        };
+      })()`);
+
+      return { plannerReduced, itineraryReduced, errors: session.errors };
+    },
+  );
+
+  const viewportMatrix = [];
+  for (const vp of configuredViewports) {
+    const vpCheck = await withIsolatedSession(
+      browserClient,
+      {
+        width: vp.width,
+        height: vp.height,
+        deviceScaleFactor: vp.width <= 390 ? 2 : 1,
+        mobile: vp.width < 768,
+        touch: vp.width < 768,
+      },
+      async (session) => {
+        const routes = ["/ai-planner", "/trips", "/trips/da-lat-3-ngay"];
+        const routeResults = {};
+        for (const route of routes) {
+          await navigateAndWaitReady(session, `${siteUrl}${route}`, true);
+          routeResults[route] = await session.evaluate(`(() => ({
+            innerWidth: window.innerWidth,
+            scrollWidth: document.documentElement.scrollWidth,
+            nonAutoWillChange: Array.from(document.querySelectorAll('*')).filter(
+              (el) => getComputedStyle(el).willChange !== 'auto',
+            ).length,
+          }))()`);
+        }
+        return {
+          viewport: `${vp.width}x${vp.height}`,
+          routeResults,
+          errors: session.errors,
+        };
+      },
+    );
+    viewportMatrix.push(vpCheck);
+  }
+
+  const allViewportsClean = viewportMatrix.every(
+    (v) =>
+      v.errors.length === 0 &&
+      Object.values(v.routeResults).every(
+        (r) => r.scrollWidth <= r.innerWidth && r.nonAutoWillChange === 0,
+      ),
+  );
+
+  const passed =
+    // Desktop Planner
+    plannerDesktop.initialCheck.initialScrollTop === 0 &&
+    plannerDesktop.initialCheck.suggestionCount === 2 &&
+    plannerDesktop.initialCheck.allSuggestionsVisibleInLog &&
+    plannerDesktop.initialCheck.openingVisibleInLog &&
+    plannerDesktop.initialCheck.emptyPreviewPresent &&
+    plannerDesktop.initialCheck.liveRegionCount === 1 &&
+    plannerDesktop.initialCheck.ariaBusyCount === 0 &&
+    plannerDesktop.initialCheck.activeAnimationsAtLoad === 0 &&
+    plannerDesktop.turnAtT0.activeElementIdAtT0 === "planner-prompt" &&
+    plannerDesktop.turnAtT0.ariaBusyCountAtT0 === 0 &&
+    plannerDesktop.turnAtT0.hasDemoLabelAtT0 &&
+    plannerDesktop.turnAtT0.replyTextLengthAtT0 > 100 &&
+    plannerDesktop.turnAtT0.replyTextLengthAtT0 === plannerDesktop.turnSettled.replyTextLengthAfterSettle &&
+    plannerDesktop.turnAtT0.userAnim.name === "adora-planner-fade" &&
+    plannerDesktop.turnAtT0.userAnim.duration === "0.16s" &&
+    plannerDesktop.turnAtT0.userAnim.delay === "0s" &&
+    plannerDesktop.turnAtT0.userAnim.transform === "none" &&
+    plannerDesktop.turnAtT0.userAnim.tabIndex === -1 &&
+    plannerDesktop.turnAtT0.replyAnim.name === "adora-planner-fade" &&
+    plannerDesktop.turnAtT0.replyAnim.duration === "0.2s" &&
+    plannerDesktop.turnAtT0.replyAnim.delay === "0.08s" &&
+    plannerDesktop.turnAtT0.replyAnim.transform === "none" &&
+    plannerDesktop.turnAtT0.previewAnim.name === "adora-preview-in" &&
+    plannerDesktop.turnAtT0.previewAnim.duration === "0.2s" &&
+    plannerDesktop.turnAtT0.previewAnim.delay === "0.08s" &&
+    Math.abs(plannerDesktop.turnAtT0.scrollTopAtT0 - plannerDesktop.turnSettled.scrollTopAfterSettle) <= 1 &&
+    plannerDesktop.turnSettled.userAnchorOffsetPx >= 8 &&
+    plannerDesktop.turnSettled.userAnchorOffsetPx <= 16 &&
+    plannerDesktop.turnSettled.userEnteredLatch &&
+    plannerDesktop.turnSettled.replyEnteredLatch &&
+    plannerDesktop.turnSettled.previewEnteredLatch &&
+    plannerDesktop.turnSettled.userOpacity === "1" &&
+    plannerDesktop.turnSettled.replyOpacity === "1" &&
+    plannerDesktop.turnSettled.previewOpacity === "1" &&
+    plannerDesktop.turnSettled.previewTransform === "none" &&
+    plannerDesktop.turnSettled.previewDaysCount === 3 &&
+    plannerDesktop.turnSettled.activeAnimationsAfterSettle === 0 &&
+    plannerDesktop.secondScenarioSwitch.previewRemountedByKey &&
+    plannerDesktop.secondScenarioSwitch.newPreviewAnimName === "adora-preview-in" &&
+    plannerDesktop.secondScenarioSwitch.previewDaysCount === 2 &&
+    plannerDesktop.secondScenarioSwitch.previewEnteredLatch &&
+    plannerDesktop.secondScenarioSwitch.previewSettledOpacity === "1" &&
+    plannerDesktop.secondScenarioSwitch.previewSettledTransform === "none" &&
+    plannerDesktop.unsupportedTurn.hasDemoLabelAtT0 &&
+    plannerDesktop.unsupportedTurn.animAtT0?.dataPlannerEnter === "reply" &&
+    plannerDesktop.unsupportedTurn.animAtT0?.name === "adora-planner-fade" &&
+    plannerDesktop.unsupportedTurn.animAtT0?.duration === "0.2s" &&
+    plannerDesktop.unsupportedTurn.animAtT0?.delay === "0.08s" &&
+    plannerDesktop.unsupportedTurn.animAtT0?.transform === "none" &&
+    plannerDesktop.unsupportedTurn.settledOpacity === "1" &&
+    plannerDesktop.unsupportedTurn.enteredLatch &&
+    plannerDesktop.activityBackCheck.restoredPathname === "/ai-planner" &&
+    plannerDesktop.activityBackCheck.allLatched &&
+    plannerDesktop.activityBackCheck.runningPlannerAnimsCount === 0 &&
+    plannerDesktop.activityBackCheck.scrollDeltaAfterBack <= 1 &&
+    plannerDesktop.resetAndMouseSuggestion.afterReset.scrollTopAfterReset === 0 &&
+    plannerDesktop.resetAndMouseSuggestion.afterReset.emptyPreviewRestored &&
+    plannerDesktop.resetAndMouseSuggestion.afterReset.activeElementAfterReset === "planner-prompt" &&
+    plannerDesktop.resetAndMouseSuggestion.activeElementAfterMouseWelcomeClick === "planner-prompt" &&
+    plannerDesktop.externalRequests.length === 0 &&
+    plannerDesktop.errors.length === 0 &&
+    plannerDesktop.hydrationWarnings.length === 0 &&
+    // Mobile Planner
+    plannerMobile.touchWelcomeAndMobileTurn.activeIsUserTurn &&
+    plannerMobile.touchWelcomeAndMobileTurn.activeIsNotPrompt &&
+    plannerMobile.touchWelcomeAndMobileTurn.activeIsNotBody &&
+    plannerMobile.touchWelcomeAndMobileTurn.jumpbarAnim.name === "adora-planner-fade" &&
+    plannerMobile.touchWelcomeAndMobileTurn.jumpbarAnim.duration === "0.16s" &&
+    plannerMobile.touchWelcomeAndMobileTurn.jumpbarAnim.transform === "none" &&
+    plannerMobile.touchWelcomeAndMobileTurn.mobilePreviewAnim.name === "adora-planner-fade" &&
+    plannerMobile.touchWelcomeAndMobileTurn.mobilePreviewAnim.duration === "0.2s" &&
+    plannerMobile.touchWelcomeAndMobileTurn.mobilePreviewAnim.delay === "0.08s" &&
+    plannerMobile.touchWelcomeAndMobileTurn.mobilePreviewAnim.transform === "none" &&
+    Math.abs(
+      plannerMobile.touchWelcomeAndMobileTurn.scrollTopAtT0 -
+        plannerMobile.touchWelcomeAndMobileTurn.scrollTopAfterSettle,
+    ) <= 1 &&
+    plannerMobile.touchWelcomeAndMobileTurn.userAnchorOffsetPx >= 8 &&
+    plannerMobile.touchWelcomeAndMobileTurn.userAnchorOffsetPx <= 16 &&
+    plannerMobile.touchWelcomeAndMobileTurn.jumpbarEnteredLatch &&
+    plannerMobile.touchWelcomeAndMobileTurn.mobilePreviewEnteredLatch &&
+    plannerMobile.jumpbarScrollCheck.previewVisibleInLog &&
+    plannerMobile.jumpbarScrollCheck.replyOffsetPx >= 8 &&
+    plannerMobile.jumpbarScrollCheck.replyOffsetPx <= 16 &&
+    plannerMobile.errors.length === 0 &&
+    plannerMobile.hydrationWarnings.length === 0 &&
+    // Itinerary Desktop
+    itineraryDesktop.tripsIndexCheck.cardCount >= 2 &&
+    itineraryDesktop.tripsIndexCheck.cardTransitionDuration === "0.18s" &&
+    itineraryDesktop.tripsIndexCheck.imgRevealTransitionDuration === "1.2s" &&
+    !itineraryDesktop.initialLoadCheck.hasDayPanelEnterOnInitialLoad &&
+    itineraryDesktop.initialLoadCheck.panelAnimsOnInitialLoad === 0 &&
+    itineraryDesktop.initialLoadCheck.allAriaControlsResolve &&
+    itineraryDesktop.initialLoadCheck.collapsedCheck &&
+    itineraryDesktop.day2SwitchCheck.stablePanelNode &&
+    itineraryDesktop.day2SwitchCheck.hasInnerEnterAttr &&
+    itineraryDesktop.day2SwitchCheck.tab2SelectedAtT0 &&
+    itineraryDesktop.day2SwitchCheck.day2BudgetAtT0 !== itineraryDesktop.initialLoadCheck.day1Budget &&
+    itineraryDesktop.day2SwitchCheck.animMeta?.name === "adora-panel-in" &&
+    itineraryDesktop.day2SwitchCheck.animMeta?.duration === "0.22s" &&
+    itineraryDesktop.day2SwitchCheck.animMeta?.opacityAtT0 >= 0.2 &&
+    itineraryDesktop.day2SwitchCheck.animMeta?.tyAtT0 > 0 &&
+    itineraryDesktop.day2SwitchCheck.animMeta?.tyAtT0 <= 6.5 &&
+    itineraryDesktop.day2SwitchCheck.settledOpacity === "1" &&
+    itineraryDesktop.day2SwitchCheck.settledTransform === "none" &&
+    itineraryDesktop.day2SwitchCheck.enteredLatch &&
+    itineraryDesktop.day2SwitchCheck.activeAnimsAfterSettle === 0 &&
+    itineraryDesktop.keyboardTabsCheck.stablePanelNodeAfterKeyboard &&
+    itineraryDesktop.keyboardTabsCheck.afterRight.activeId === "day-tab-3" &&
+    itineraryDesktop.keyboardTabsCheck.afterRight.selected === "true" &&
+    itineraryDesktop.keyboardTabsCheck.afterHome.activeId === "day-tab-1" &&
+    itineraryDesktop.keyboardTabsCheck.afterHome.selected === "true" &&
+    itineraryDesktop.keyboardTabsCheck.afterEnd.activeId === "day-tab-3" &&
+    itineraryDesktop.keyboardTabsCheck.afterLeft.activeId === "day-tab-2" &&
+    itineraryDesktop.accordionCheck.firstExpandedAtT0 === "false" &&
+    itineraryDesktop.accordionCheck.secondExpandedAtT0 === "true" &&
+    itineraryDesktop.accordionCheck.firstInertAtT0 === true &&
+    itineraryDesktop.accordionCheck.secondInertAtT0 === false &&
+    itineraryDesktop.accordionCheck.sameRegionNodeAcrossToggle &&
+    itineraryDesktop.accordionCheck.firstCollapsedHeight <= 1 &&
+    itineraryDesktop.accordionCheck.secondExpandedHeight > 80 &&
+    itineraryDesktop.accordionCheck.firstCollapsedOpacity === "0" &&
+    itineraryDesktop.accordionCheck.firstCollapsedGridRows === "0px" &&
+    itineraryDesktop.accordionCheck.secondHasLinkInDom &&
+    itineraryDesktop.tabSkipCollapsedLinkCheck.secondRegionHasLink &&
+    itineraryDesktop.tabSkipCollapsedLinkCheck.secondRegionInert &&
+    itineraryDesktop.tabSkipCollapsedLinkCheck.activeIsThirdButton &&
+    !itineraryDesktop.tabSkipCollapsedLinkCheck.activeInsideCollapsedSecondRegion &&
+    itineraryDesktop.itineraryActivityBackCheck.restoredPathname === "/trips/da-lat-3-ngay" &&
+    itineraryDesktop.itineraryActivityBackCheck.enteredLatch &&
+    itineraryDesktop.itineraryActivityBackCheck.runningPanelAnims === 0 &&
+    itineraryDesktop.errors.length === 0 &&
+    itineraryDesktop.hydrationWarnings.length === 0 &&
+    // Reduced Motion & 6-Viewport Matrix
+    reducedMotionApplicationCheck.plannerReduced.userAnimName === "none" &&
+    reducedMotionApplicationCheck.plannerReduced.userOpacity === "1" &&
+    reducedMotionApplicationCheck.plannerReduced.replyAnimName === "none" &&
+    reducedMotionApplicationCheck.plannerReduced.replyOpacity === "1" &&
+    reducedMotionApplicationCheck.plannerReduced.instantPreviewVisibleInLog &&
+    reducedMotionApplicationCheck.itineraryReduced.panelAnimName === "none" &&
+    reducedMotionApplicationCheck.itineraryReduced.panelOpacity === "1" &&
+    reducedMotionApplicationCheck.errors.length === 0 &&
+    allViewportsClean;
+
+  return {
+    executed: true,
+    passed,
+    plannerDesktop,
+    plannerMobile,
+    itineraryDesktop,
+    reducedMotionApplicationCheck,
+    viewportMatrix,
+  };
+}
+
+async function capturePackageDEvidence(browserClient, packageDSuites) {
+  await mkdir(packageDEvidenceDirectory, { recursive: true });
+  const files = [];
+
+  for (const profile of [
+    { prefix: "desktop", width: 1440, height: 900, mobile: false },
+    { prefix: "mobile", width: 390, height: 844, mobile: true },
+  ]) {
+    await withIsolatedSession(
+      browserClient,
+      {
+        width: profile.width,
+        height: profile.height,
+        deviceScaleFactor: 1,
+        mobile: profile.mobile,
+        touch: profile.mobile,
+      },
+      async (session) => {
+        // 01. Initial /ai-planner state
+        await navigateAndWaitReady(session, `${siteUrl}/ai-planner`, true);
+        await session.evaluate("document.fonts.ready.then(() => true)");
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-01-planner-initial.png`,
+            false,
+          ),
+        );
+
+        // 02. Mid-entrance of first scripted scenario turn (t = 100ms: user bubble fading in, reply & preview in backwards fill)
+        await session.evaluate(`(async () => {
+          const welcomeBtn = document.querySelector('ul[aria-label="Gợi ý câu hỏi"] button');
+          welcomeBtn.click();
+          await new Promise((r) => setTimeout(r, 0));
+          for (const anim of document.getAnimations()) {
+            anim.pause();
+            anim.currentTime = 100;
+          }
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-02-planner-turn-mid.png`,
+            false,
+          ),
+        );
+
+        // 03. Settled 3-day Đà Lạt scripted reply + Desktop Trip Preview / Mobile Jumpbar
+        await session.evaluate(`(async () => {
+          for (const anim of document.getAnimations()) anim.play();
+          await Promise.all(
+            document.getAnimations()
+              .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+              .map((a) => a.finished.catch(() => {})),
+          );
+          const imgs = Array.from(document.querySelectorAll('img')).filter((img) => img.checkVisibility());
+          for (const img of imgs) img.loading = 'eager';
+          await Promise.all(
+            imgs.map((img) =>
+              img.complete
+                ? Promise.resolve()
+                : new Promise((r) => {
+                    img.addEventListener('load', r, { once: true });
+                    img.addEventListener('error', r, { once: true });
+                  }),
+            ),
+          );
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-03-planner-scripted-settled.png`,
+            false,
+          ),
+        );
+
+        if (profile.mobile) {
+          // 04 (Mobile). Jumpbar scrolled to inline mobile Trip Preview
+          await session.evaluate(`(async () => {
+            document.documentElement.dataset.motion = 'off';
+            const previewBtn = Array.from(
+              document.querySelectorAll('[data-testid="mobile-planner-jumpbar"] button'),
+            ).find((b) => b.textContent?.includes('Xem trước'));
+            previewBtn.click();
+            delete document.documentElement.dataset.motion;
+            await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          })()`);
+          files.push(
+            await captureScreenshotFile(
+              session,
+              packageDEvidenceDirectory,
+              "mobile-04-planner-preview-jumped.png",
+              false,
+            ),
+          );
+        } else {
+          // 04 (Desktop). Second scenario (2-day Đà Lạt) preview switch settled
+          await session.evaluate(`(async () => {
+            const sidebarButtons = Array.from(
+              document.querySelectorAll('aside[aria-label="Thanh bên AI Planner"] section button'),
+            );
+            const twoDayBtn = sidebarButtons.find((b) => b.textContent?.includes('2 ngày'));
+            twoDayBtn.click();
+            await new Promise((r) => setTimeout(r, 0));
+            await Promise.all(
+              document.getAnimations()
+                .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+                .map((a) => a.finished.catch(() => {})),
+            );
+            const imgs = Array.from(document.querySelectorAll('img')).filter((img) => img.checkVisibility());
+            for (const img of imgs) img.loading = 'eager';
+            await Promise.all(
+              imgs.map((img) =>
+                img.complete
+                  ? Promise.resolve()
+                  : new Promise((r) => {
+                      img.addEventListener('load', r, { once: true });
+                      img.addEventListener('error', r, { once: true });
+                    }),
+              ),
+            );
+            await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          })()`);
+          files.push(
+            await captureScreenshotFile(
+              session,
+              packageDEvidenceDirectory,
+              "desktop-04-planner-2day-preview-settled.png",
+              false,
+            ),
+          );
+        }
+
+        // 05. Unsupported prompt fallback settled
+        await session.evaluate(`(async () => {
+          const textarea = document.querySelector('#planner-prompt');
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+          setter.call(textarea, 'Cho mình lịch trình đi sao Hoả');
+          textarea.dispatchEvent(new Event('input', { bubbles: true }));
+          await new Promise((r) => setTimeout(r, 0));
+          textarea.closest('form').requestSubmit();
+          await new Promise((r) => setTimeout(r, 0));
+          await Promise.all(
+            document.getAnimations()
+              .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+              .map((a) => a.finished.catch(() => {})),
+          );
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-05-planner-unsupported-settled.png`,
+            false,
+          ),
+        );
+
+        // 06. /trips index settled
+        await navigateAndWaitReady(session, `${siteUrl}/trips`, true);
+        await session.evaluate(`(async () => {
+          await document.fonts.ready;
+          const imgs = Array.from(document.querySelectorAll('img')).filter((img) => img.checkVisibility());
+          for (const img of imgs) img.loading = 'eager';
+          await Promise.all(
+            imgs.map((img) =>
+              img.complete
+                ? Promise.resolve()
+                : new Promise((r) => {
+                    img.addEventListener('load', r, { once: true });
+                    img.addEventListener('error', r, { once: true });
+                  }),
+            ),
+          );
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-06-trips-index-settled.png`,
+            false,
+          ),
+        );
+
+        // 07. /trips/da-lat-3-ngay Day 1 initial state (scrolled to ItineraryExplorer)
+        await navigateAndWaitReady(session, `${siteUrl}/trips/da-lat-3-ngay`, true);
+        await session.evaluate(`(async () => {
+          await document.fonts.ready;
+          const tablist = document.querySelector('[role="tablist"]');
+          tablist.scrollIntoView({ block: 'start', behavior: 'instant' });
+          window.scrollBy(0, -24);
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-07-itinerary-day1-initial.png`,
+            false,
+          ),
+        );
+
+        // 08. /trips/da-lat-3-ngay Day 2 switch mid-entrance (t = 70ms)
+        await session.evaluate(`(async () => {
+          const tab2 = document.getElementById('day-tab-2');
+          tab2.click();
+          await new Promise((r) => setTimeout(r, 0));
+          const panel = document.querySelector('[data-testid="day-panel"]');
+          for (const anim of panel.getAnimations({ subtree: true })) {
+            anim.pause();
+            anim.currentTime = 70;
+          }
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-08-itinerary-day2-mid.png`,
+            false,
+          ),
+        );
+
+        // 09. /trips/da-lat-3-ngay Day 2 settled
+        await session.evaluate(`(async () => {
+          const panel = document.querySelector('[data-testid="day-panel"]');
+          for (const anim of panel.getAnimations({ subtree: true })) anim.play();
+          await Promise.all(
+            panel
+              .getAnimations({ subtree: true })
+              .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+              .map((a) => a.finished.catch(() => {})),
+          );
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-09-itinerary-day2-settled.png`,
+            false,
+          ),
+        );
+
+        // 10. /trips/da-lat-3-ngay Day 2 with first activity collapsed (0px) and second activity expanded
+        await session.evaluate(`(async () => {
+          const panel = document.querySelector('[data-testid="day-panel"]');
+          const buttons = Array.from(panel.querySelectorAll('button[aria-expanded]'));
+          buttons[0].click();
+          buttons[1].click();
+          await Promise.all(
+            panel
+              .getAnimations({ subtree: true })
+              .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+              .map((a) => a.finished.catch(() => {})),
+          );
+          await new Promise((r) => setTimeout(r, 280));
+        })()`);
+        files.push(
+          await captureScreenshotFile(
+            session,
+            packageDEvidenceDirectory,
+            `${profile.prefix}-10-itinerary-accordion-expanded.png`,
+            false,
+          ),
+        );
+      },
+    );
+  }
+
+  if (packageDSuites) {
+    const telemetryPath = join(packageDEvidenceDirectory, "package-d-motion-telemetry.json");
+    await writeFile(
+      telemetryPath,
+      JSON.stringify(
+        {
+          capturedAt: new Date().toISOString(),
+          siteUrl,
+          description:
+            "Package D Application Interactions telemetry (INV-17..INV-20, Errata E-9..E-10, P-6, N-4, N-7, B-5) across Desktop 1440x900, Mobile 390x844, and 6-viewport responsive matrix.",
+          plannerDesktop: packageDSuites.plannerDesktop,
+          plannerMobile: packageDSuites.plannerMobile,
+          itineraryDesktop: packageDSuites.itineraryDesktop,
+          reducedMotionApplicationCheck: packageDSuites.reducedMotionApplicationCheck,
+          viewportMatrix: packageDSuites.viewportMatrix,
+        },
+        null,
+        2,
+      ) + "\n",
+    );
+    files.push(telemetryPath);
+  }
+
+  return {
+    captured: true,
+    directory: packageDEvidenceDirectory,
+    fileCount: files.length,
+    files,
+  };
+}
+
 const profileDirectory = await mkdtemp(join(tmpdir(), "adora-web-0-4-chrome-"));
 const chrome = spawn(
   chromePath,
@@ -2849,6 +4137,22 @@ try {
       evidenceCapture,
     };
     console.log(JSON.stringify(summary, null, 2));
+  } else if (capturePackageDEvidenceOnly) {
+    console.error("Package D Focused Reproduction: Capturing desktop & mobile application interaction screenshots only...");
+    const packageDSuites = await runPackageDApplicationSuite(browserClient);
+    const evidenceCapture = await capturePackageDEvidence(browserClient, packageDSuites);
+    summary = {
+      browser: versionInfo.Browser,
+      mode: "capture-package-d-evidence-only",
+      siteUrl,
+      packageD: {
+        executed: true,
+        passed: packageDSuites.passed,
+      },
+      evidenceCapture,
+    };
+    console.log(JSON.stringify(summary, null, 2));
+    if (!packageDSuites.passed) process.exitCode = 1;
   } else {
     console.error("Package A [1/4]: Verifying SSR & No-JS fail-visible contract...");
     const ssrAndNoJs = await runSsrAndNoJsSuite(browserClient);
@@ -2872,6 +4176,15 @@ try {
       evidenceCapture = await capturePackageBEvidence(browserClient, packageBSuites.timelines);
     }
 
+    console.error("Package D [1/1]: Verifying Application Interactions (INV-17..INV-20, E-9..E-10, P-6, N-4, N-7, B-5)...");
+    const packageDSuites = await runPackageDApplicationSuite(browserClient);
+
+    let packageDEvidenceCapture = { captured: false };
+    if (capturePackageDEvidenceFlag) {
+      console.error("Package D Evidence: Capturing desktop & mobile screenshot sequence + motion telemetry...");
+      packageDEvidenceCapture = await capturePackageDEvidence(browserClient, packageDSuites);
+    }
+
     const packageAPassed =
       ssrAndNoJs.passed &&
       intersectionObserver.passed &&
@@ -2880,6 +4193,7 @@ try {
       responsiveAndCss.passed;
 
     const packageBPassed = packageBSuites.passed;
+    const packageDPassed = packageDSuites.passed;
 
     summary = {
       browser: versionInfo.Browser,
@@ -2905,15 +4219,25 @@ try {
         sampleBubbleFailVisible: packageBSuites.sampleBubbleFailVisible,
         evidenceCapture,
       },
+      packageD: {
+        implemented: true,
+        executed: true,
+        passed: packageDPassed,
+        plannerDesktop: packageDSuites.plannerDesktop,
+        plannerMobile: packageDSuites.plannerMobile,
+        itineraryDesktop: packageDSuites.itineraryDesktop,
+        reducedMotionApplicationCheck: packageDSuites.reducedMotionApplicationCheck,
+        viewportMatrix: packageDSuites.viewportMatrix,
+        evidenceCapture: packageDEvidenceCapture,
+      },
       futurePackages: {
-        packageD: { implemented: false, executed: false },
         packageC: { implemented: false, executed: false },
         packageE: { implemented: false, executed: false },
       },
     };
 
     console.log(JSON.stringify(summary, null, 2));
-    if (!packageAPassed || !packageBPassed) process.exitCode = 1;
+    if (!packageAPassed || !packageBPassed || !packageDPassed) process.exitCode = 1;
   }
 
   browserClient.close();

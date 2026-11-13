@@ -12,7 +12,7 @@ export function TripCard({ trip, eager = false }: Readonly<{ trip: Trip; eager?:
   const activityCount = trip.days.reduce((total, day) => total + day.activities.length, 0);
 
   return (
-    <article className="group border border-[var(--adora-hairline)] bg-white/50 transition-colors hover:border-[var(--adora-ink)]">
+    <article className="group border border-[var(--adora-hairline)] bg-white/50 transition-colors duration-[var(--adora-duration-fast)] ease-[var(--adora-ease-ui)] hover:border-[var(--adora-ink)]">
       <Link href={`/trips/${trip.slug}`} className="grid sm:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)]">
         <div className="image-reveal relative aspect-[16/10] w-full sm:aspect-auto sm:min-h-56">
           <Image

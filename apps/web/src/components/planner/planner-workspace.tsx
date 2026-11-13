@@ -3,7 +3,15 @@
 import { Bot, Compass, MapPin, Menu, MessageSquarePlus, Send, UserRound, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type AnimationEvent,
+  type FormEvent,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 
 import { UNSUPPORTED_PROMPT_REPLY, matchScenario } from "@/lib/demo/planner-scenarios";
 import type { DemoImage, PlannerScenario } from "@/lib/demo/types";
@@ -45,6 +53,12 @@ function DemoLabel({ children }: Readonly<{ children: string }>) {
   );
 }
 
+function markEnteredOnAnimationEnd(event: AnimationEvent<HTMLElement>) {
+  if (event.target === event.currentTarget) {
+    event.currentTarget.dataset.entered = "true";
+  }
+}
+
 /**
  * Scripted planner demonstration. Local React state only: no network request, persistence, or model
  * is involved. Only exact matches of predefined prompts produce a scripted reply.
@@ -55,15 +69,28 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
   const [draft, setDraft] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const nextId = useRef(1);
+  const workspaceRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const latestTurnRef = useRef<HTMLElement>(null);
   const mobilePreviewRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastWelcomePointerTypeRef = useRef<string | null>(null);
+  const pendingSuggestionFocusRef = useRef<"prompt" | "turn" | null>(null);
 
   const activeScenario = scenarios.find((scenario) => scenario.id === activeScenarioId) ?? null;
   const preview = activeScenario ? previews[activeScenario.tripSlug] : undefined;
+
+  useEffect(() => {
+    const root = workspaceRef.current;
+    return () => {
+      if (!root) return;
+      for (const element of root.querySelectorAll<HTMLElement>("[data-planner-enter]")) {
+        element.dataset.entered = "true";
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const log = logRef.current;
@@ -81,6 +108,16 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
     } else {
       log.scrollTop = log.scrollHeight;
     }
+
+    const pendingFocus = pendingSuggestionFocusRef.current;
+    if (pendingFocus) {
+      pendingSuggestionFocusRef.current = null;
+      if (pendingFocus === "turn") {
+        latestTurnRef.current?.focus({ preventScroll: true });
+      } else {
+        textareaRef.current?.focus({ preventScroll: true });
+      }
+    }
   }, [messages]);
 
   function scrollToElement(element: HTMLElement | null) {
@@ -88,7 +125,15 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
     if (!log || !element) return;
     const logRect = log.getBoundingClientRect();
     const targetRect = element.getBoundingClientRect();
-    log.scrollTop = Math.max(0, log.scrollTop + (targetRect.top - logRect.top) - 12);
+    const top = Math.max(0, log.scrollTop + (targetRect.top - logRect.top) - 12);
+    const reduced =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      document.documentElement.dataset.motion === "off";
+    if (typeof log.scrollTo === "function") {
+      log.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+    } else {
+      log.scrollTop = top;
+    }
   }
 
   useEffect(() => {
@@ -117,11 +162,23 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
     setDraft("");
   }
 
+  function onWelcomeSuggestionPointerDown(event: PointerEvent<HTMLButtonElement>) {
+    lastWelcomePointerTypeRef.current = event.pointerType || "mouse";
+  }
+
+  function onWelcomeSuggestionClick(prompt: string) {
+    const pointerType = lastWelcomePointerTypeRef.current;
+    lastWelcomePointerTypeRef.current = null;
+    pendingSuggestionFocusRef.current = pointerType === "touch" ? "turn" : "prompt";
+    submit(prompt);
+  }
+
   function startNewConversation() {
     setMessages([]);
     setActiveScenarioId(null);
     setDraft("");
     nextId.current = 1;
+    pendingSuggestionFocusRef.current = null;
     closeMenu(false);
     textareaRef.current?.focus();
   }
@@ -142,7 +199,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-dvh w-full overflow-hidden bg-[var(--adora-paper)] text-[var(--adora-ink)]">
+    <div ref={workspaceRef} className="flex h-dvh w-full overflow-hidden bg-[var(--adora-paper)] text-[var(--adora-ink)]">
       <aside
         aria-label="Thanh bên AI Planner"
         onKeyDown={(event) => {
@@ -247,6 +304,8 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
             <nav
               aria-label="Điều hướng kịch bản và xem trước lịch trình"
               data-testid="mobile-planner-jumpbar"
+              data-planner-enter="jumpbar"
+              onAnimationEnd={markEnteredOnAnimationEnd}
               className="flex items-center justify-between gap-2 border-b border-[var(--adora-hairline)] bg-[var(--adora-ivory)]/80 px-4 py-1.5 text-[0.72rem] xl:hidden sm:px-7 sm:text-xs"
             >
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -298,7 +357,8 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
                       <li key={scenario.id}>
                         <button
                           type="button"
-                          onClick={() => submit(scenario.prompt)}
+                          onPointerDown={onWelcomeSuggestionPointerDown}
+                          onClick={() => onWelcomeSuggestionClick(scenario.prompt)}
                           className="group flex w-full items-start gap-3 border border-[var(--adora-hairline)] bg-white/50 p-3.5 text-left transition-colors hover:border-[var(--adora-ink)] sm:min-h-20 sm:flex-col sm:p-4"
                         >
                           <Compass className="mt-0.5 size-4 shrink-0 text-[var(--adora-gold)] sm:mt-0 sm:size-5" aria-hidden="true" />
@@ -329,7 +389,10 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
                       key={message.id}
                       ref={isLatestUserMessage ? latestTurnRef : undefined}
                       aria-label="Bạn"
-                      className="ml-auto max-w-[90%] border border-[var(--adora-hairline)] bg-[var(--adora-ivory)] px-4 py-3 text-sm leading-6 sm:max-w-[80%] sm:px-5 sm:py-3.5"
+                      tabIndex={-1}
+                      data-planner-enter="user"
+                      onAnimationEnd={markEnteredOnAnimationEnd}
+                      className="ml-auto max-w-[90%] border border-[var(--adora-hairline)] bg-[var(--adora-ivory)] px-4 py-3 text-sm leading-6 outline-none sm:max-w-[80%] sm:px-5 sm:py-3.5"
                     >
                       <div className="mb-1 flex flex-wrap items-center gap-2">
                         <span className="text-[0.66rem] font-bold tracking-[0.14em] text-[var(--adora-text-secondary)] uppercase">Bạn</span>
@@ -342,7 +405,13 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
 
                 if (message.kind === "unsupported") {
                   return (
-                    <article key={message.id} aria-label="ADORA Planner" className="max-w-xl border border-dashed border-[var(--adora-gold)] bg-white/60 p-4 text-sm leading-6 sm:p-5 sm:leading-7">
+                    <article
+                      key={message.id}
+                      aria-label="ADORA Planner"
+                      data-planner-enter="reply"
+                      onAnimationEnd={markEnteredOnAnimationEnd}
+                      className="max-w-xl border border-dashed border-[var(--adora-gold)] bg-white/60 p-4 text-sm leading-6 sm:p-5 sm:leading-7"
+                    >
                       <div className="mb-2.5 flex flex-wrap items-center gap-2">
                         <span className="text-[0.68rem] font-bold tracking-[0.14em] uppercase">ADORA Planner</span>
                         <DemoLabel>Thông báo hệ thống</DemoLabel>
@@ -369,7 +438,14 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
                 const trip = scenario ? previews[scenario.tripSlug] : undefined;
                 if (!scenario || !trip) return null;
                 return (
-                  <article key={message.id} aria-label="ADORA Planner" className="max-w-2xl border border-[var(--adora-hairline)] bg-white/60 p-3.5 text-sm leading-6 sm:p-5 sm:leading-7" data-testid="scripted-reply">
+                  <article
+                    key={message.id}
+                    aria-label="ADORA Planner"
+                    data-testid="scripted-reply"
+                    data-planner-enter="reply"
+                    onAnimationEnd={markEnteredOnAnimationEnd}
+                    className="max-w-2xl border border-[var(--adora-hairline)] bg-white/60 p-3.5 text-sm leading-6 sm:p-5 sm:leading-7"
+                  >
                     <div className="mb-1.5 flex flex-wrap items-center gap-2 sm:mb-2">
                       <span className="text-[0.68rem] font-bold tracking-[0.14em] uppercase">ADORA Planner</span>
                       <DemoLabel>Phản hồi dựng sẵn · không phải AI</DemoLabel>
@@ -406,9 +482,12 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
 
               {preview ? (
                 <section
+                  key={preview.slug}
                   ref={mobilePreviewRef}
                   aria-label="Xem trước lịch trình"
                   data-testid="trip-preview-mobile"
+                  data-planner-enter="reply"
+                  onAnimationEnd={markEnteredOnAnimationEnd}
                   className="border border-[var(--adora-hairline)] bg-[var(--adora-ivory)] p-4 sm:p-5 xl:hidden"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -472,7 +551,12 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
 
         <aside aria-label="Xem trước lịch trình" className="hidden w-[22rem] shrink-0 flex-col overflow-y-auto border-l border-[var(--adora-hairline)] bg-[var(--adora-ivory)] xl:flex">
           {preview ? (
-            <div data-testid="trip-preview">
+            <div
+              key={preview.slug}
+              data-testid="trip-preview"
+              data-planner-enter="preview"
+              onAnimationEnd={markEnteredOnAnimationEnd}
+            >
               <div className="image-reveal relative aspect-[16/10] w-full">
                 <Image
                   src={preview.cover.src}

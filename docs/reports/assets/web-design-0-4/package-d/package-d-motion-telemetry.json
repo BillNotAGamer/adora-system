@@ -1,0 +1,361 @@
+{
+  "capturedAt": "2026-11-12T11:09:44.305Z",
+  "siteUrl": "http://127.0.0.1:3100",
+  "description": "Package D Application Interactions telemetry (INV-17..INV-20, Errata E-9..E-10, P-6, N-4, N-7, B-5) across Desktop 1440x900, Mobile 390x844, and 6-viewport responsive matrix.",
+  "plannerDesktop": {
+    "initialCheck": {
+      "initialScrollTop": 0,
+      "suggestionCount": 2,
+      "allSuggestionsVisibleInLog": true,
+      "openingVisibleInLog": true,
+      "emptyPreviewPresent": true,
+      "liveRegionCount": 1,
+      "ariaBusyCount": 0,
+      "activeAnimationsAtLoad": 0
+    },
+    "turnAtT0": {
+      "activeElementIdAtT0": "planner-prompt",
+      "scrollTopAtT0": 196,
+      "ariaBusyCountAtT0": 0,
+      "replyTextLengthAtT0": 804,
+      "hasDemoLabelAtT0": true,
+      "userAnim": {
+        "name": "adora-planner-fade",
+        "duration": "0.16s",
+        "delay": "0s",
+        "fillMode": "backwards",
+        "transform": "none",
+        "tabIndex": -1
+      },
+      "replyAnim": {
+        "name": "adora-planner-fade",
+        "duration": "0.2s",
+        "delay": "0.08s",
+        "fillMode": "backwards",
+        "transform": "none"
+      },
+      "previewAnim": {
+        "name": "adora-preview-in",
+        "duration": "0.2s",
+        "delay": "0.08s",
+        "fillMode": "backwards"
+      }
+    },
+    "turnSettled": {
+      "scrollTopAfterSettle": 196,
+      "userAnchorOffsetPx": 12,
+      "replyTextLengthAfterSettle": 804,
+      "userEnteredLatch": true,
+      "replyEnteredLatch": true,
+      "previewEnteredLatch": true,
+      "userOpacity": "1",
+      "userTransform": "none",
+      "replyOpacity": "1",
+      "replyTransform": "none",
+      "previewOpacity": "1",
+      "previewTransform": "none",
+      "previewHeading": "Đà Lạt — 3 ngày chậm",
+      "previewDaysCount": 3,
+      "activeAnimationsAfterSettle": 0
+    },
+    "secondScenarioSwitch": {
+      "previewRemountedByKey": true,
+      "newPreviewAnimName": "adora-preview-in",
+      "previewDaysCount": 2,
+      "previewEnteredLatch": true,
+      "previewSettledOpacity": "1",
+      "previewSettledTransform": "none"
+    },
+    "unsupportedTurn": {
+      "hasDemoLabelAtT0": true,
+      "animAtT0": {
+        "dataPlannerEnter": "reply",
+        "name": "adora-planner-fade",
+        "duration": "0.2s",
+        "delay": "0.08s",
+        "transform": "none"
+      },
+      "settledOpacity": "1",
+      "settledTransform": "none",
+      "enteredLatch": true
+    },
+    "activityBackCheck": {
+      "restoredPathname": "/ai-planner",
+      "enterNodeCount": 9,
+      "allLatched": true,
+      "runningPlannerAnimsCount": 0,
+      "restoredScrollTop": 1231,
+      "scrollDeltaAfterBack": 0
+    },
+    "resetAndMouseSuggestion": {
+      "afterReset": {
+        "scrollTopAfterReset": 0,
+        "emptyPreviewRestored": true,
+        "activeElementAfterReset": "planner-prompt"
+      },
+      "activeElementAfterMouseWelcomeClick": "planner-prompt"
+    },
+    "externalRequests": [],
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "plannerMobile": {
+    "touchWelcomeAndMobileTurn": {
+      "activeIsUserTurn": true,
+      "activeIsNotPrompt": true,
+      "activeIsNotBody": true,
+      "scrollTopAtT0": 210,
+      "jumpbarAnim": {
+        "name": "adora-planner-fade",
+        "duration": "0.16s",
+        "delay": "0s",
+        "transform": "none"
+      },
+      "mobilePreviewAnim": {
+        "name": "adora-planner-fade",
+        "duration": "0.2s",
+        "delay": "0.08s",
+        "transform": "none"
+      },
+      "scrollTopAfterSettle": 210,
+      "userAnchorOffsetPx": 12,
+      "jumpbarEnteredLatch": true,
+      "mobilePreviewEnteredLatch": true,
+      "mobilePreviewOpacity": "1",
+      "mobilePreviewTransform": "none"
+    },
+    "jumpbarScrollCheck": {
+      "scrollTopAtT0Preview": 518,
+      "previewOffsetPx": 186,
+      "previewVisibleInLog": true,
+      "scrollTopAtT0Reply": 210,
+      "replyOffsetPx": 12
+    },
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "itineraryDesktop": {
+    "tripsIndexCheck": {
+      "cardCount": 2,
+      "cardTransitionDuration": "0.18s",
+      "imgRevealTransitionDuration": "1.2s"
+    },
+    "initialLoadCheck": {
+      "hasDayPanelEnterOnInitialLoad": false,
+      "panelAnimsOnInitialLoad": 0,
+      "day1Budget": "1.200.000 ₫",
+      "activityButtonCount": 3,
+      "regionCount": 3,
+      "allAriaControlsResolve": true,
+      "collapsedCheck": true
+    },
+    "day2SwitchCheck": {
+      "stablePanelNode": true,
+      "hasInnerEnterAttr": true,
+      "tab2SelectedAtT0": true,
+      "day2BudgetAtT0": "1.500.000 ₫",
+      "animMeta": {
+        "name": "adora-panel-in",
+        "duration": "0.22s",
+        "fillMode": "backwards",
+        "opacityAtT0": 0.25,
+        "tyAtT0": 6
+      },
+      "settledOpacity": "1",
+      "settledTransform": "none",
+      "enteredLatch": true,
+      "activeAnimsAfterSettle": 0
+    },
+    "keyboardTabsCheck": {
+      "stablePanelNodeAfterKeyboard": true,
+      "afterRight": {
+        "activeId": "day-tab-3",
+        "selected": "true",
+        "budget": "900.000 ₫"
+      },
+      "afterHome": {
+        "activeId": "day-tab-1",
+        "selected": "true",
+        "budget": "1.200.000 ₫"
+      },
+      "afterEnd": {
+        "activeId": "day-tab-3",
+        "selected": "true"
+      },
+      "afterLeft": {
+        "activeId": "day-tab-2",
+        "selected": "true"
+      }
+    },
+    "accordionCheck": {
+      "firstExpandedAtT0": "false",
+      "secondExpandedAtT0": "true",
+      "firstInertAtT0": true,
+      "secondInertAtT0": false,
+      "sameFirstRegionNode": false,
+      "sameRegionNodeAcrossToggle": true,
+      "firstCollapsedHeight": 0,
+      "secondExpandedHeight": 189,
+      "firstCollapsedOpacity": "0",
+      "firstCollapsedGridRows": "0px",
+      "secondHasLinkInDom": true
+    },
+    "tabSkipCollapsedLinkCheck": {
+      "secondRegionHasLink": true,
+      "secondRegionInert": true,
+      "activeIsThirdButton": true,
+      "activeInsideCollapsedSecondRegion": false
+    },
+    "itineraryActivityBackCheck": {
+      "restoredPathname": "/trips/da-lat-3-ngay",
+      "enteredLatch": true,
+      "runningPanelAnims": 0
+    },
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "reducedMotionApplicationCheck": {
+    "plannerReduced": {
+      "userAnimName": "none",
+      "userOpacity": "1",
+      "replyAnimName": "none",
+      "replyOpacity": "1",
+      "instantPreviewJumpOffsetPx": 186,
+      "instantPreviewVisibleInLog": true
+    },
+    "itineraryReduced": {
+      "panelAnimName": "none",
+      "panelOpacity": "1",
+      "accordionTransitionDuration": "1e-05s"
+    },
+    "errors": []
+  },
+  "viewportMatrix": [
+    {
+      "viewport": "360x800",
+      "routeResults": {
+        "/ai-planner": {
+          "innerWidth": 360,
+          "scrollWidth": 360,
+          "nonAutoWillChange": 0
+        },
+        "/trips": {
+          "innerWidth": 360,
+          "scrollWidth": 360,
+          "nonAutoWillChange": 0
+        },
+        "/trips/da-lat-3-ngay": {
+          "innerWidth": 360,
+          "scrollWidth": 360,
+          "nonAutoWillChange": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "390x844",
+      "routeResults": {
+        "/ai-planner": {
+          "innerWidth": 390,
+          "scrollWidth": 390,
+          "nonAutoWillChange": 0
+        },
+        "/trips": {
+          "innerWidth": 390,
+          "scrollWidth": 390,
+          "nonAutoWillChange": 0
+        },
+        "/trips/da-lat-3-ngay": {
+          "innerWidth": 390,
+          "scrollWidth": 390,
+          "nonAutoWillChange": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "768x1024",
+      "routeResults": {
+        "/ai-planner": {
+          "innerWidth": 768,
+          "scrollWidth": 768,
+          "nonAutoWillChange": 0
+        },
+        "/trips": {
+          "innerWidth": 768,
+          "scrollWidth": 768,
+          "nonAutoWillChange": 0
+        },
+        "/trips/da-lat-3-ngay": {
+          "innerWidth": 768,
+          "scrollWidth": 768,
+          "nonAutoWillChange": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "1024x900",
+      "routeResults": {
+        "/ai-planner": {
+          "innerWidth": 1024,
+          "scrollWidth": 1024,
+          "nonAutoWillChange": 0
+        },
+        "/trips": {
+          "innerWidth": 1024,
+          "scrollWidth": 1024,
+          "nonAutoWillChange": 0
+        },
+        "/trips/da-lat-3-ngay": {
+          "innerWidth": 1024,
+          "scrollWidth": 1024,
+          "nonAutoWillChange": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "1440x900",
+      "routeResults": {
+        "/ai-planner": {
+          "innerWidth": 1440,
+          "scrollWidth": 1440,
+          "nonAutoWillChange": 0
+        },
+        "/trips": {
+          "innerWidth": 1440,
+          "scrollWidth": 1440,
+          "nonAutoWillChange": 0
+        },
+        "/trips/da-lat-3-ngay": {
+          "innerWidth": 1440,
+          "scrollWidth": 1440,
+          "nonAutoWillChange": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "1920x1080",
+      "routeResults": {
+        "/ai-planner": {
+          "innerWidth": 1920,
+          "scrollWidth": 1920,
+          "nonAutoWillChange": 0
+        },
+        "/trips": {
+          "innerWidth": 1920,
+          "scrollWidth": 1920,
+          "nonAutoWillChange": 0
+        },
+        "/trips/da-lat-3-ngay": {
+          "innerWidth": 1920,
+          "scrollWidth": 1920,
+          "nonAutoWillChange": 0
+        }
+      },
+      "errors": []
+    }
+  ]
+}
