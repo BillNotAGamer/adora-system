@@ -4676,11 +4676,17 @@ async function capturePackageCEvidence(browserClient, packageCSuites) {
           const chips = Array.from(document.querySelectorAll("button.filter-chip"));
           const chip = chips.find((b) => b.getAttribute("aria-pressed") === "false");
           chip?.click();
+          const fieldset = chip?.closest("fieldset");
+          const topTarget = fieldset ?? document.querySelector('[data-testid="destination-count"]');
+          if (topTarget) {
+            const y = topTarget.getBoundingClientRect().top + window.scrollY - 24;
+            window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
+          }
         })()`);
-        await wait(300);
+        await wait(320);
         files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-destinations-filtered.png`, false));
 
-        // 2. /experiences initial + keyboard focus-visible + settled grid
+        // 2. /experiences initial + keyboard focus-visible + filtered browser + settled grid
         await navigateAndWaitReady(session, `${siteUrl}/experiences`, false);
         await wait(600);
         if (!profile.mobile) {
@@ -4697,6 +4703,20 @@ async function capturePackageCEvidence(browserClient, packageCSuites) {
         } else {
           files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-experiences-top.png`, false));
         }
+
+        await session.evaluate(`(() => {
+          const chips = Array.from(document.querySelectorAll("button.filter-chip"));
+          const chip = chips.find((b) => b.textContent?.includes("Ẩm thực")) ?? chips.find((b) => b.getAttribute("aria-pressed") === "false");
+          chip?.click();
+          const fieldset = chip?.closest("fieldset");
+          const topTarget = fieldset ?? document.querySelector('[data-testid="experience-count"]');
+          if (topTarget) {
+            const y = topTarget.getBoundingClientRect().top + window.scrollY - 24;
+            window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
+          }
+        })()`);
+        await wait(320);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-experiences-filtered.png`, false));
 
         // 3. /destinations/da-lat hero & highlights/trip reveal
         await navigateAndWaitReady(session, `${siteUrl}/destinations/da-lat`, false);

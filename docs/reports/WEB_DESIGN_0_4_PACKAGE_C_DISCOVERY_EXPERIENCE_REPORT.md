@@ -4,6 +4,8 @@
 - **Repository:** `F:\Coding\Adora System Mega Project\adora-system`
 - **Branch:** `main`
 - **Base Commit (Package D):** `6702a227c73c534e4485e2ba2ff203c765caa5b9` (`feat(web): refine adora planner and itinerary interactions`)
+- **Primary Package C Commit:** `103dccf9b124611bcedf31b5420dd8485a1fa0cf` (`feat(web): extend editorial motion across adora discovery`)
+- **Closure Follow-Up:** Separate evidence/report closure commit on top of `103dccf9b124611bcedf31b5420dd8485a1fa0cf` (`apps/web/**` unchanged; `103dccf9b124611bcedf31b5420dd8485a1fa0cf` not amended)
 - **Authoritative Contracts:**
   - `docs/design/ADORA_MOTION_DESIGN_SPECIFICATION_V1_1.md` (`INV-12` through `INV-16`, `D-1`, Gates `G0` and Package C acceptance gates)
   - `docs/reports/WEB_DESIGN_0_4_SPEC_V1_1_FINAL_APPROVAL.md` (Mandatory Errata `E-6`, `E-7`, `E-11`, `E-12`; Advisory Notes `N-5`, `N-6`; Bug Fix `B-7`)
@@ -60,7 +62,7 @@ Package C extends the ADORA Web Design 0.4 editorial motion language across the 
 | `apps/web/src/app/destinations/[slug]/page.tsx` | Hero load entrance + `data-image-settle`, heading/list-group reveals, inner-`<li>` reveals for highlights & trip days (`E-7`), opt-in `<ExperienceGrid reveal />`, static prose & disclaimer (`N-6`) |
 | `apps/web/src/app/experiences/[slug]/page.tsx` | `0ms` hero `h1` + `DemoBadge` entrance + `data-image-settle`, static prose & `<aside>` / `role="note"` (`N-6`, `B-7`), related card grid `<Reveal>` |
 | `scripts/verify_web_0_4.mjs` | Added `runPackageCDiscoverySuite`, `capturePackageCEvidence`, `--capture-package-c-evidence`, `--capture-package-c-evidence-only`, and `summary.packageC` |
-| `docs/reports/assets/web-design-0-4/package-c/*` | 16 desktop (`1440x900`) & mobile (`390x844`) PNG screenshots + `package-c-telemetry.json` |
+| `docs/reports/assets/web-design-0-4/package-c/*` | 18 desktop (`1440x900`) & mobile (`390x844`) PNG screenshots + `package-c-telemetry.json` (19 files total) |
 | `docs/reports/WEB_DESIGN_0_4_PACKAGE_C_DISCOVERY_EXPERIENCE_REPORT.md` | This Package C engineering & verification report |
 
 ---
@@ -158,18 +160,32 @@ Measured using the unmodified `scripts/collect_web_motion_metrics.mjs --runs 5 -
 
 Cumulative compressed JS delta across Packages A + B + D + C remains `<= +2,938 B` (`+2.9 kB` on routes up to `203,792 B`), CLS remained `0` across all 16 route/profile cells, `will-change` stayed `0`, desktop discovery LCP improved or stayed within `4ms` (`-4ms` on `/destinations` and `/experiences`, `-8ms` on `/experiences/ca-phe-nho-giot-cao-nguyen`), and mobile 4x-throttled image-LCP routes (`/destinations`, `/destinations/da-lat`) moved `+24ms` / `+12ms` (`< 1%`) relative to A0.
 
+### 6.3 Package E Performance Monitoring Items (Non-Blocking)
+
+The following measurements against immutable `docs/reports/baseline_0_3_metrics.json` are retained for Package E monitoring and audit follow-up (without attributing synthetic lab timing deltas to motion alone):
+
+- `/destinations` mobile LCP: `2,972ms` baseline -> `2,996ms` Package C
+- `/destinations/da-lat` mobile LCP: `2,952ms` baseline -> `2,964ms` Package C
+- `/experiences` mobile LCP: `1,052ms` baseline -> `1,180ms` Package C
+- `/destinations/da-lat` mobile TBT: `454ms` baseline -> `607ms` Package C
+- Maximum cumulative compressed JavaScript transfer delta: `+2,938` bytes
+
 ---
 
 ## 7. Visual Evidence Index (`docs/reports/assets/web-design-0-4/package-c/`)
 
-- Desktop (`1440x900`): `desktop-destinations-top.png`, `desktop-destinations-featured.png`, `desktop-destinations-filtered.png`, `desktop-experiences-focus.png`, `desktop-da-lat-hero.png`, `desktop-da-lat-highlights.png`, `desktop-experience-detail-story.png`, `desktop-experience-detail-related.png`
-- Mobile (`390x844`): `mobile-destinations-top.png`, `mobile-destinations-featured.png`, `mobile-destinations-filtered.png`, `mobile-experiences-top.png`, `mobile-da-lat-hero.png`, `mobile-da-lat-highlights.png`, `mobile-experience-detail-story.png`, `mobile-experience-detail-related.png`
+- Desktop (`1440x900`): `desktop-destinations-top.png`, `desktop-destinations-featured.png`, `desktop-destinations-filtered.png`, `desktop-experiences-focus.png`, `desktop-experiences-filtered.png`, `desktop-da-lat-hero.png`, `desktop-da-lat-highlights.png`, `desktop-experience-detail-story.png`, `desktop-experience-detail-related.png`
+- Mobile (`390x844`): `mobile-destinations-top.png`, `mobile-destinations-featured.png`, `mobile-destinations-filtered.png`, `mobile-experiences-top.png`, `mobile-experiences-filtered.png`, `mobile-da-lat-hero.png`, `mobile-da-lat-highlights.png`, `mobile-experience-detail-story.png`, `mobile-experience-detail-related.png`
 - Machine Telemetry: `docs/reports/assets/web-design-0-4/package-c/package-c-telemetry.json`
 
-Representative desktop and mobile captures (`desktop-destinations-top.png`, `desktop-destinations-featured.png`, `desktop-experiences-focus.png`, `desktop-da-lat-highlights.png`, `mobile-da-lat-hero.png`, `mobile-experience-detail-story.png`) were visually inspected: `PageIntro` columns and `DemoBadge` align cleanly at full contrast, the Featured Đà Lạt frame and overlapping paper card remain crisp without transform drift, keyboard `:focus-visible` shifts and tints `<ArrowUpRight>` gold, and detail highlights and `<aside>` disclosures maintain balanced editorial spacing.
+Visual closure corrections completed after `103dccf9b124611bcedf31b5420dd8485a1fa0cf`:
+- Corrected viewport scroll framing in `scripts/verify_web_0_4.mjs` (`capturePackageCEvidence`) so `desktop-destinations-filtered.png` and `mobile-destinations-filtered.png` capture the active filter chip (`Cao nguyên`), result count (`Hiển thị 1 / 4 điểm đến`), and filtered `Đà Lạt` list row instead of the Featured Đà Lạt band above it.
+- Added `desktop-experiences-filtered.png` and `mobile-experiences-filtered.png` capturing the active `Ẩm thực & cà phê (2)` category chip, result count (`Hiển thị 2 / 6 trải nghiệm`), and filtered Experience Grid cards on both desktop and mobile.
+- Re-executed full Gate 7 (`node scripts/verify_web_0_4.mjs`) after the verifier update with `exit 0` (`packageA.passed: true`, `packageB.passed: true`, `packageC.passed: true`, `packageD.passed: true`, `apps/web/**` source state unchanged from `103dccf9b124611bcedf31b5420dd8485a1fa0cf`).
+- Working tree note: pre-existing user-owned archive `docs/reports/assets/web-design-0-4.zip` remains untracked and untouched.
 
 ---
 
 ## 8. Verdict
 
-**PACKAGE C — DISCOVERY EXPERIENCE COMPLETE / READY FOR PACKAGE E**
+**PACKAGE C — VERIFIED AND CLOSED / READY FOR PACKAGE E**
