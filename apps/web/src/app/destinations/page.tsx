@@ -48,6 +48,7 @@ export default function DestinationsPage() {
                     alt={featured.image.alt}
                     fill
                     preload
+                    data-image-settle="featured"
                     sizes="(max-width: 1023px) 100vw, 66vw"
                     className="object-cover"
                   />

@@ -74,9 +74,14 @@ export function ExperienceBrowser({ experiences }: Readonly<{ experiences: Exper
 
       <div className="mt-10">
         {results.length > 0 ? (
-          <ExperienceGrid experiences={results} eagerFirst />
+          <ExperienceGrid experiences={results} eagerFirst filterSettleKey={filter.category} />
         ) : (
-          <div className="border border-dashed border-[var(--adora-hairline)] p-8 text-center sm:p-12" data-testid="experience-empty">
+          <div
+            key={`${filter.category}-empty`}
+            data-filter-settle=""
+            className="border border-dashed border-[var(--adora-hairline)] p-8 text-center sm:p-12"
+            data-testid="experience-empty"
+          >
             <p className="font-editorial text-3xl tracking-[-0.03em]">Chưa có trải nghiệm phù hợp.</p>
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[var(--adora-text-secondary)]">
               Bộ gợi ý biên tập hiện còn nhỏ. Hãy thử một từ khoá khác hoặc xoá bộ lọc.

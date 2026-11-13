@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { Reveal } from "@/components/ui/reveal";
 
 type PlannerCtaProps = {
   heading: string;
@@ -10,7 +11,7 @@ type PlannerCtaProps = {
 export function PlannerCta({ heading, body }: Readonly<PlannerCtaProps>) {
   return (
     <section aria-labelledby="planner-cta-heading" className="bg-[var(--adora-ink)] text-[var(--adora-ivory)]">
-      <div className="adora-container grid gap-10 py-20 sm:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
+      <Reveal className="adora-container grid gap-10 py-20 sm:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
         <div>
           <p className="adora-eyebrow text-[var(--adora-gold)]">ADORA AI · bản demo</p>
           <h2 id="planner-cta-heading" className="font-editorial mt-6 max-w-[16ch] text-[clamp(2.6rem,5vw,5rem)] leading-[0.98] tracking-[-0.045em]">
@@ -25,7 +26,7 @@ export function PlannerCta({ heading, body }: Readonly<PlannerCtaProps>) {
           </Link>
           <p className="mt-4 text-[0.66rem] leading-5 tracking-[0.08em] text-white/50 uppercase">Kịch bản dựng sẵn · chưa kết nối mô hình AI</p>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

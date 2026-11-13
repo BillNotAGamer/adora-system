@@ -92,8 +92,10 @@ export function DestinationBrowser({ destinations }: Readonly<{ destinations: De
         Hiển thị {results.length} / {destinations.length} điểm đến
       </p>
 
-      {results.length > 0 ? (
-        <ol className="mt-4 border-t border-[var(--adora-hairline)]" data-testid="destination-results">
+      {(() => {
+        const chipSettleKey = `${filter.region}-${filter.availability}`;
+        return results.length > 0 ? (
+          <ol key={chipSettleKey} data-filter-settle="" className="mt-4 border-t border-[var(--adora-hairline)]" data-testid="destination-results">
           {results.map((destination, index) => (
             <li key={destination.slug} className="border-b border-[var(--adora-hairline)]">
               {destination.status === "available" ? (
@@ -121,7 +123,7 @@ export function DestinationBrowser({ destinations }: Readonly<{ destinations: De
                     </span>
                   </span>
                   <ArrowUpRight
-                    className="size-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    className="size-5 transition-[transform,translate,color] duration-[260ms] ease-[var(--adora-ease-editorial)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--adora-gold)] group-focus-visible:-translate-y-0.5 group-focus-visible:translate-x-0.5 group-focus-visible:text-[var(--adora-gold)]"
                     aria-hidden="true"
                   />
                 </Link>
@@ -146,19 +148,25 @@ export function DestinationBrowser({ destinations }: Readonly<{ destinations: De
             </li>
           ))}
         </ol>
-      ) : (
-        <div className="mt-6 border border-dashed border-[var(--adora-hairline)] p-8 text-center sm:p-12" data-testid="destination-empty">
-          <p className="font-editorial text-3xl tracking-[-0.03em]">Chưa có điểm đến phù hợp.</p>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[var(--adora-text-secondary)]">
-            ADORA mới có một bộ nhỏ nội dung biên tập. Hãy thử từ khoá khác hoặc xoá bộ lọc.
-          </p>
-          {isFiltered ? (
-            <button type="button" className="editorial-link mt-6" onClick={() => setFilter(DEFAULT_DESTINATION_FILTER)}>
-              Xoá bộ lọc
-            </button>
-          ) : null}
-        </div>
-      )}
+        ) : (
+          <div
+            key={`${chipSettleKey}-empty`}
+            data-filter-settle=""
+            className="mt-6 border border-dashed border-[var(--adora-hairline)] p-8 text-center sm:p-12"
+            data-testid="destination-empty"
+          >
+            <p className="font-editorial text-3xl tracking-[-0.03em]">Chưa có điểm đến phù hợp.</p>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[var(--adora-text-secondary)]">
+              ADORA mới có một bộ nhỏ nội dung biên tập. Hãy thử từ khoá khác hoặc xoá bộ lọc.
+            </p>
+            {isFiltered ? (
+              <button type="button" className="editorial-link mt-6" onClick={() => setFilter(DEFAULT_DESTINATION_FILTER)}>
+                Xoá bộ lọc
+              </button>
+            ) : null}
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { DemoBadge } from "@/components/ui/demo-badge";
+import { Reveal } from "@/components/ui/reveal";
 import {
   EXPERIENCES,
   EXPERIENCE_CATEGORY_LABELS,
@@ -51,15 +52,15 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
           />
           <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(16rem,.7fr)] lg:items-end lg:gap-[clamp(3rem,7vw,8rem)]">
             <div>
-              <p className="adora-eyebrow text-[var(--adora-sage)]">
+              <p className="adora-eyebrow adora-load-rise text-[var(--adora-sage)]">
                 {EXPERIENCE_CATEGORY_LABELS[experience.category]}
                 {destination ? ` · ${destination.name}` : ""}
               </p>
-              <h1 className="font-editorial mt-7 max-w-[16ch] text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.94] font-medium tracking-[-0.05em] text-balance">
+              <h1 className="font-editorial adora-hero-heading-rise mt-7 max-w-[16ch] text-[clamp(2.8rem,7vw,6.5rem)] leading-[0.94] font-medium tracking-[-0.05em] text-balance">
                 {experience.name}
               </h1>
             </div>
-            <div>
+            <div className="adora-load-rise">
               <p className="font-editorial text-xl leading-snug text-[var(--adora-sage)] italic sm:text-2xl">{experience.tagline}</p>
               <div className="mt-6">
                 <DemoBadge provenance={experience.provenance} />
@@ -75,6 +76,7 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
               alt={experience.image.alt}
               fill
               preload
+              data-image-settle=""
               sizes="(max-width: 1360px) 100vw, 1360px"
               className="object-cover"
               style={{ objectPosition: experience.image.position ?? "center" }}
@@ -85,9 +87,11 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
         <section aria-labelledby="story-heading" className="adora-section">
           <div className="adora-container grid gap-14 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,.8fr)] lg:gap-[clamp(3rem,7vw,8rem)]">
             <div className="max-w-2xl">
-              <h2 id="story-heading" className="adora-eyebrow text-[var(--adora-sage)]">
-                Về trải nghiệm này
-              </h2>
+              <Reveal>
+                <h2 id="story-heading" className="adora-eyebrow text-[var(--adora-sage)]">
+                  Về trải nghiệm này
+                </h2>
+              </Reveal>
               <div className="mt-8 space-y-6 text-base leading-8 text-[var(--adora-text-secondary)] sm:text-lg sm:leading-9">
                 {experience.description.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
@@ -162,14 +166,16 @@ export default async function ExperienceDetailPage({ params }: PageProps) {
         {related.length > 0 ? (
           <section aria-labelledby="related-heading" className="bg-[var(--adora-ivory)] py-16 sm:py-24">
             <div className="adora-container">
-              <h2 id="related-heading" className="font-editorial text-[clamp(2.2rem,4vw,3.6rem)] leading-none tracking-[-0.04em]">
-                Trải nghiệm liên quan
-              </h2>
+              <Reveal>
+                <h2 id="related-heading" className="font-editorial text-[clamp(2.2rem,4vw,3.6rem)] leading-none tracking-[-0.04em]">
+                  Trải nghiệm liên quan
+                </h2>
+              </Reveal>
               <ul className="mt-12 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-                {related.map((item) => (
-                  <li key={item.slug}>
+                {related.map((item, index) => (
+                  <Reveal as="li" key={item.slug} variant="card" delayMs={index * 90} stackOnMobile>
                     <ExperienceCard experience={item} shape="square" />
-                  </li>
+                  </Reveal>
                 ))}
               </ul>
             </div>

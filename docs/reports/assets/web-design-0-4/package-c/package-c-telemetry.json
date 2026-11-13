@@ -1,0 +1,288 @@
+{
+  "passed": true,
+  "destinationsDesktop": {
+    "passed": true,
+    "loadProbe": {
+      "h1AnimationName": "adora-intro-heading-rise",
+      "h1Duration": "0.48s",
+      "h1Delay": "0s",
+      "h1Opacity": "1",
+      "eyebrowDelay": "0s",
+      "rightColAnimationName": "adora-intro-rise",
+      "rightColDelay": "0s",
+      "hasBadgeInRightCol": true,
+      "featuredImgAnimationName": "adora-featured-settle",
+      "featuredImgDuration": "0.76s",
+      "featuredImgOpacity": "1",
+      "featuredFrameTransform": "none",
+      "featuredCardTransform": "none"
+    },
+    "settledProbe": {
+      "h1Opacity": "1",
+      "rightColOpacity": "1",
+      "featuredImgOpacity": "1",
+      "featuredCardTransform": "none"
+    },
+    "filterProbe": {
+      "chipChangedNode": true,
+      "chipHasAttr": true,
+      "chipAnimName": "adora-filter-settle",
+      "chipAnimDuration": "0.22s",
+      "chipAnimSeen": true,
+      "chipTransform": "none",
+      "activeBefore": true,
+      "activePreserved": true,
+      "typingRemounted": false,
+      "typingRestartedSettle": false,
+      "emptyHasAttr": true,
+      "emptyAnimName": "adora-filter-settle",
+      "emptySettledOpacity": "1"
+    },
+    "onDetail": "/destinations/da-lat",
+    "backProbe": {
+      "pathname": "/destinations",
+      "h1Visible": true,
+      "rightColVisible": true,
+      "featuredImgVisible": true
+    },
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "experiencesDesktop": {
+    "passed": true,
+    "focusAndStaticCheck": {
+      "isExperienceLink": true,
+      "matchesFocusVisible": true,
+      "svgTransform": "none",
+      "svgTranslate": "2px -2px",
+      "svgColor": "rgb(179, 154, 112)",
+      "svgTransitionDuration": "0.26s",
+      "indexCardCount": 6,
+      "indexRevealNodes": 0
+    },
+    "filterCheck": {
+      "chipChangedNode": true,
+      "chipHasAttr": true,
+      "chipAnimName": "adora-filter-settle",
+      "chipAnimDuration": "0.22s",
+      "chipTransform": "none",
+      "typingRemounted": false,
+      "emptyHasAttr": true,
+      "emptyAnimName": "adora-filter-settle",
+      "emptySettledOpacity": "1"
+    },
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "destinationDetailDesktop": {
+    "passed": true,
+    "loadProbe": {
+      "heroImgSettle": true,
+      "heroImgOpacity": "1",
+      "h1Opacity": "1",
+      "h1Delay": "0s",
+      "badgeDelay": "0s",
+      "proseReveals": 0,
+      "proseParentReveal": false,
+      "highlightLiWithReveal": 0,
+      "highlightInnerReveals": 4,
+      "tripLiWithReveal": 0,
+      "tripInnerReveals": 3,
+      "gridLiReveals": 6,
+      "ctaSectionHasReveal": false,
+      "ctaInnerHasReveal": true
+    },
+    "afterScroll": {
+      "pendingCount": 0,
+      "visibleCount": 18,
+      "hiddenVisibleCheck": 0,
+      "horizontalOverflowPx": 0
+    },
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "experienceDetailDesktop": {
+    "passed": true,
+    "loadProbe": {
+      "heroImgSettle": true,
+      "heroImgOpacity": "1",
+      "h1Opacity": "1",
+      "h1Delay": "0s",
+      "rightHeroDelay": "0s",
+      "proseReveals": 0,
+      "asideReveals": 0,
+      "asideHasReveal": false,
+      "noteOpacity": "1",
+      "relatedReveals": 3
+    },
+    "afterScroll": {
+      "pendingCount": 0,
+      "visibleCount": 6,
+      "hiddenVisibleCheck": 0,
+      "horizontalOverflowPx": 0
+    },
+    "errors": [],
+    "hydrationWarnings": []
+  },
+  "overridesAndTouch": {
+    "passed": true,
+    "reducedMetrics": {
+      "h1Opacity": "1",
+      "h1AnimName": "none",
+      "h1AnimDuration": "0s",
+      "imgOpacity": "1",
+      "imgTransform": "none"
+    },
+    "touchMetrics": {
+      "matchesHoverHover": false,
+      "imgTransitionDuration": "1e-05s"
+    },
+    "errors": []
+  },
+  "viewportMatrix": [
+    {
+      "viewport": "360",
+      "width": 360,
+      "passed": true,
+      "results": {
+        "destinations": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "destination-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experiences": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experience-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "passed": true,
+      "results": {
+        "destinations": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "destination-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experiences": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experience-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "768",
+      "width": 768,
+      "passed": true,
+      "results": {
+        "destinations": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "destination-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experiences": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experience-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "1024",
+      "width": 1024,
+      "passed": true,
+      "results": {
+        "destinations": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "destination-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experiences": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experience-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "passed": true,
+      "results": {
+        "destinations": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "destination-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experiences": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experience-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        }
+      },
+      "errors": []
+    },
+    {
+      "viewport": "1920",
+      "width": 1920,
+      "passed": true,
+      "results": {
+        "destinations": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "destination-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experiences": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        },
+        "experience-detail": {
+          "horizontalOverflowPx": 0,
+          "pendingCount": 0
+        }
+      },
+      "errors": []
+    }
+  ]
+}

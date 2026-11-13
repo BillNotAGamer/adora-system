@@ -29,8 +29,8 @@ type ExperienceCardProps = {
 /** Editorial experience tile. Server-renderable; also used inside client filter islands. */
 export function ExperienceCard({ experience, shape = "wide", eager = false }: Readonly<ExperienceCardProps>) {
   return (
-    <article className="group">
-      <Link href={`/experiences/${experience.slug}`} className="block">
+    <article>
+      <Link href={`/experiences/${experience.slug}`} className="group block">
         <div className={`image-reveal relative w-full ${SHAPE_CLASS[shape]}`}>
           <Image
             src={experience.image.src}
@@ -48,7 +48,7 @@ export function ExperienceCard({ experience, shape = "wide", eager = false }: Re
         <h3 className="font-editorial mt-3 flex items-start justify-between gap-4 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.05] tracking-[-0.035em]">
           <span>{experience.name}</span>
           <ArrowUpRight
-            className="mt-1 size-5 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            className="mt-1 size-5 shrink-0 transition-[transform,translate,color] duration-[260ms] ease-[var(--adora-ease-editorial)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--adora-gold)] group-focus-visible:-translate-y-0.5 group-focus-visible:translate-x-0.5 group-focus-visible:text-[var(--adora-gold)]"
             aria-hidden="true"
           />
         </h3>

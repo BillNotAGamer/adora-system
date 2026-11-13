@@ -31,6 +31,17 @@ import { basename, join, resolve } from "node:path";
  *   sample bubbles (INV-09 / E-8b), HowItWorks static <li> dividers & mobile 0ms stack (INV-10 / E-7),
  *   and SiteFooter interior closing CTA reveal with static footer band & utility nav (INV-11).
  *
+ * Package C scope (Discovery Experience — INV-12..INV-16, Errata E-6, E-7, E-11, E-12, N-5, N-6):
+ * - INV-12 (E-6, E-12): PageIntro pure-CSS load entrance (0ms delay on both columns including DemoBadge,
+ *   LCP-safe opacity: 1 h1 heading rise, Server Component <Activity> Back visibility preserved)
+ * - INV-13: /destinations Featured Đà Lạt image scale(1.02) -> none settle (760ms, opacity 1 from 0ms,
+ *   stationary outer frame & static overlapping lg:col-start-8 paper card)
+ * - INV-14 (N-5): DestinationBrowser & ExperienceBrowser chip-scoped 220ms opacity 0.5 -> 1 settle
+ *   (excluding search filter.query typing + covering empty states)
+ * - INV-15 (E-11): ExperienceCard keyboard :focus-visible ArrowUpRight parity + touch hover guard
+ * - INV-16 (E-7, N-6, B-7): Destination/Experience detail reveals (<Reveal> inside ruled <li> items,
+ *   opt-in ExperienceGrid reveal, static prose & <aside>, PlannerCta inner reveal)
+ *
  * Package D scope (Application Interactions — INV-17..INV-20, Errata E-9..E-10, P-6, N-4, N-7, B-5):
  * - AI Planner: opacity-only message entrances (160ms user bubble at 0ms, 200ms scripted/unsupported reply
  *   at +80ms on outer <article>), atomic non-streaming DOM insertion, scroll stability (|scrollTop(t=0) -
@@ -44,7 +55,7 @@ import { basename, join, resolve } from "node:path";
  *   replay prevention, and 3-layer CSS Grid activity accordion (0fr <-> 1fr, inert={!open} on role="region",
  *   collapsed height <= 1px, synchronous aria-expanded, and no content remount).
  *
- * Later packages (C, E) extend this script additively without weakening Package A, B, or D checks.
+ * Package E extends this script additively without weakening Package A, B, C, or D checks.
  */
 
 const chromePath = process.env.ADORA_CHROME_PATH ?? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
@@ -54,6 +65,9 @@ const strictDevOnly = process.argv.includes("--strict-dev-only");
 const capturePackageBEvidenceOnly = process.argv.includes("--capture-package-b-evidence-only");
 const capturePackageBEvidenceFlag =
   capturePackageBEvidenceOnly || process.argv.includes("--capture-package-b-evidence");
+const capturePackageCEvidenceOnly = process.argv.includes("--capture-package-c-evidence-only");
+const capturePackageCEvidenceFlag =
+  capturePackageCEvidenceOnly || process.argv.includes("--capture-package-c-evidence");
 const capturePackageDEvidenceOnly = process.argv.includes("--capture-package-d-evidence-only");
 const capturePackageDEvidenceFlag =
   capturePackageDEvidenceOnly || process.argv.includes("--capture-package-d-evidence");
@@ -61,6 +75,9 @@ const CDP_COMMAND_TIMEOUT_MS = Number(process.env.ADORA_CDP_TIMEOUT_MS ?? "25000
 const outputDirectory = resolve(process.env.ADORA_VERIFY_OUTPUT ?? "docs/reports/assets/web-design-0-4");
 const packageBEvidenceDirectory = resolve(
   process.env.ADORA_PACKAGE_B_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-b",
+);
+const packageCEvidenceDirectory = resolve(
+  process.env.ADORA_PACKAGE_C_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-c",
 );
 const packageDEvidenceDirectory = resolve(
   process.env.ADORA_PACKAGE_D_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-d",
@@ -4028,6 +4045,711 @@ async function capturePackageDEvidence(browserClient, packageDSuites) {
   };
 }
 
+async function runPackageCDiscoverySuite(browserClient) {
+  const destinationsUrl = `${siteUrl}/destinations`;
+  const experiencesUrl = `${siteUrl}/experiences`;
+  const destinationDetailUrl = `${siteUrl}/destinations/da-lat`;
+  const experienceDetailUrl = `${siteUrl}/experiences/ca-phe-nho-giot-cao-nguyen`;
+
+  // 1. /destinations: INV-12 (PageIntro + E-12 + E-6 Back), INV-13 (Featured Da Lat), INV-14 (chip vs typing + empty)
+  const destinationsDesktop = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900, initScript: OBSERVER_TRACKER_INIT_SCRIPT },
+    async (session) => {
+      await session.send("Page.navigate", { url: destinationsUrl });
+      await wait(120);
+
+      const loadProbe = await session.evaluate(`(() => {
+        const h1 = document.querySelector("h1.adora-intro-heading-rise");
+        const eyebrow = document.querySelector("p.adora-intro-rise");
+        const rightCol = document.querySelector(".adora-intro-rise:not(p)");
+        const badge = rightCol?.querySelector(".demo-badge, [class*='border']");
+        const featuredImg = document.querySelector('[data-image-settle="featured"]');
+        const featuredFrame = featuredImg?.closest(".image-reveal");
+        const featuredCard = document.querySelector('[aria-labelledby="featured-heading"] [class*="lg:col-start-8"]');
+        const h1Cs = h1 ? getComputedStyle(h1) : null;
+        const rightCs = rightCol ? getComputedStyle(rightCol) : null;
+        const imgCs = featuredImg ? getComputedStyle(featuredImg) : null;
+        const frameCs = featuredFrame ? getComputedStyle(featuredFrame) : null;
+        const cardCs = featuredCard ? getComputedStyle(featuredCard) : null;
+        return {
+          h1AnimationName: h1Cs?.animationName ?? null,
+          h1Duration: h1Cs?.animationDuration ?? null,
+          h1Delay: h1Cs?.animationDelay ?? null,
+          h1Opacity: h1Cs?.opacity ?? null,
+          eyebrowDelay: eyebrow ? getComputedStyle(eyebrow).animationDelay : null,
+          rightColAnimationName: rightCs?.animationName ?? null,
+          rightColDelay: rightCs?.animationDelay ?? null,
+          hasBadgeInRightCol: Boolean(rightCol && rightCol.textContent?.includes("bản") || rightCol?.querySelector("span")),
+          featuredImgAnimationName: imgCs?.animationName ?? null,
+          featuredImgDuration: imgCs?.animationDuration ?? null,
+          featuredImgOpacity: imgCs?.opacity ?? null,
+          featuredFrameTransform: frameCs?.transform ?? null,
+          featuredCardTransform: cardCs?.transform ?? null,
+        };
+      })()`);
+
+      await wait(900);
+
+      const settledProbe = await session.evaluate(`(() => {
+        const h1 = document.querySelector("h1");
+        const rightCol = document.querySelector(".adora-intro-rise:not(p)");
+        const featuredImg = document.querySelector('[data-image-settle="featured"]');
+        const featuredCard = document.querySelector('[aria-labelledby="featured-heading"] [class*="lg:col-start-8"]');
+        return {
+          h1Opacity: h1 ? getComputedStyle(h1).opacity : null,
+          rightColOpacity: rightCol ? getComputedStyle(rightCol).opacity : null,
+          featuredImgOpacity: featuredImg ? getComputedStyle(featuredImg).opacity : null,
+          featuredCardTransform: featuredCard ? getComputedStyle(featuredCard).transform : null,
+        };
+      })()`);
+
+      // INV-14 + N-5: chip vs typing & empty state
+      const filterProbe = await session.evaluate(`(async () => {
+        const waitMs = (ms) => new Promise((r) => setTimeout(r, ms));
+        const waitRaf = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const listBefore = document.querySelector('[data-testid="destination-results"]');
+        const chips = Array.from(document.querySelectorAll("button.filter-chip"));
+        const targetChip = chips.find((btn) => btn.getAttribute("aria-pressed") === "false");
+        targetChip.click();
+        await waitRaf();
+        const listAfterChip = document.querySelector('[data-testid="destination-results"]');
+        const chipHasAttr = listAfterChip?.hasAttribute("data-filter-settle") ?? false;
+        const chipCs = listAfterChip ? getComputedStyle(listAfterChip) : null;
+        const chipAnimName = chipCs?.animationName ?? null;
+        const chipAnimDuration = chipCs?.animationDuration ?? null;
+        const chipTransform = chipCs?.transform ?? null;
+        const chipAnim = document.getAnimations().find(
+          (a) => a.effect?.target === listAfterChip && a.animationName === "adora-filter-settle",
+        );
+
+        await waitMs(300);
+        // Reset first chip to get full list, then test typing stability without remount
+        const allChip = document.querySelector('button.filter-chip');
+        allChip.click();
+        await waitRaf();
+        await waitMs(300);
+
+        const listBeforeType = document.querySelector('[data-testid="destination-results"]');
+        const search = document.querySelector('input[type="search"]');
+        search.focus();
+        const activeBefore = document.activeElement === search;
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+        setter.call(search, "Da");
+        search.dispatchEvent(new Event("input", { bubbles: true }));
+        await waitRaf();
+        const listAfterType = document.querySelector('[data-testid="destination-results"]');
+        const typingRemounted = listBeforeType !== listAfterType;
+        const typingRestartedSettle = document.getAnimations().some(
+          (a) => a.effect?.target === listAfterType && a.animationName === "adora-filter-settle" && a.playState === "running",
+        );
+
+        // N-5: Empty state settle
+        setter.call(search, "zzzz-khong-co");
+        search.dispatchEvent(new Event("input", { bubbles: true }));
+        await waitRaf();
+        const emptyNode = document.querySelector('[data-testid="destination-empty"]');
+        const emptyHasAttr = emptyNode?.hasAttribute("data-filter-settle") ?? false;
+        const emptyCs = emptyNode ? getComputedStyle(emptyNode) : null;
+        const emptyAnimName = emptyCs?.animationName ?? null;
+        await waitMs(280);
+        const emptySettledOpacity = emptyNode ? getComputedStyle(emptyNode).opacity : null;
+        const activePreserved = document.activeElement === search;
+
+        // Clear back cleanly
+        const resetBtn = emptyNode?.querySelector("button");
+        resetBtn?.click();
+        await waitMs(260);
+
+        return {
+          chipChangedNode: listBefore !== listAfterChip,
+          chipHasAttr,
+          chipAnimName,
+          chipAnimDuration,
+          chipAnimSeen: Boolean(chipAnim),
+          chipTransform,
+          activeBefore,
+          activePreserved,
+          typingRemounted,
+          typingRestartedSettle,
+          emptyHasAttr,
+          emptyAnimName,
+          emptySettledOpacity,
+        };
+      })()`);
+
+      // INV-12 / E-6: Server Component PageIntro survives Next.js <Activity> navigation & Back
+      await session.evaluate(`(() => {
+        const link = document.querySelector('a[href="/destinations/da-lat"]');
+        link?.click();
+      })()`);
+      await wait(900);
+      const onDetail = await session.evaluate(`location.pathname`);
+      await session.evaluate(`history.back()`);
+      await wait(700);
+      const backProbe = await session.evaluate(`(() => {
+        const h1 = document.querySelector("h1.adora-intro-heading-rise");
+        const rightCol = document.querySelector(".adora-intro-rise:not(p)");
+        const featuredImg = document.querySelector('[data-image-settle="featured"]');
+        return {
+          pathname: location.pathname,
+          h1Visible: Boolean(h1?.checkVisibility?.()) && getComputedStyle(h1).opacity === "1",
+          rightColVisible: Boolean(rightCol?.checkVisibility?.()) && getComputedStyle(rightCol).opacity === "1",
+          featuredImgVisible: Boolean(featuredImg?.checkVisibility?.()) && getComputedStyle(featuredImg).opacity === "1",
+        };
+      })()`);
+
+      const passed =
+        loadProbe.h1AnimationName === "adora-intro-heading-rise" &&
+        loadProbe.h1Duration === "0.48s" &&
+        loadProbe.h1Delay === "0s" &&
+        loadProbe.h1Opacity === "1" &&
+        loadProbe.rightColAnimationName === "adora-intro-rise" &&
+        loadProbe.rightColDelay === "0s" &&
+        loadProbe.featuredImgAnimationName === "adora-featured-settle" &&
+        loadProbe.featuredImgDuration === "0.76s" &&
+        loadProbe.featuredImgOpacity === "1" &&
+        loadProbe.featuredFrameTransform === "none" &&
+        loadProbe.featuredCardTransform === "none" &&
+        settledProbe.h1Opacity === "1" &&
+        settledProbe.rightColOpacity === "1" &&
+        settledProbe.featuredImgOpacity === "1" &&
+        settledProbe.featuredCardTransform === "none" &&
+        filterProbe.chipChangedNode &&
+        filterProbe.chipHasAttr &&
+        filterProbe.chipAnimName === "adora-filter-settle" &&
+        filterProbe.chipAnimDuration === "0.22s" &&
+        filterProbe.chipTransform === "none" &&
+        filterProbe.activeBefore &&
+        filterProbe.activePreserved &&
+        !filterProbe.typingRemounted &&
+        !filterProbe.typingRestartedSettle &&
+        filterProbe.emptyHasAttr &&
+        filterProbe.emptyAnimName === "adora-filter-settle" &&
+        filterProbe.emptySettledOpacity === "1" &&
+        onDetail === "/destinations/da-lat" &&
+        backProbe.pathname === "/destinations" &&
+        backProbe.h1Visible &&
+        backProbe.rightColVisible &&
+        backProbe.featuredImgVisible &&
+        session.errors.length === 0 &&
+        session.hydrationWarnings.length === 0;
+
+      return {
+        passed,
+        loadProbe,
+        settledProbe,
+        filterProbe,
+        onDetail,
+        backProbe,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 2. /experiences: INV-12, INV-14 (filterSettleKey + empty), INV-15 / E-11 (ArrowUpRight keyboard focus parity + index reveal=false)
+  const experiencesDesktop = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900 },
+    async (session) => {
+      await navigateAndWaitReady(session, experiencesUrl, false);
+      await wait(600);
+
+      // Focus first experience card link using real keyboard Tab so :focus-visible engages
+      await session.evaluate(`(() => {
+        const firstLink = document.querySelector('[data-testid="experience-results"] a[href^="/experiences/"]');
+        const prev = firstLink?.closest("div")?.parentElement;
+        const focusable = Array.from(document.querySelectorAll('a[href], button:not([disabled]), input'));
+        const idx = focusable.indexOf(firstLink);
+        if (idx > 0) focusable[idx - 1].focus();
+      })()`);
+      await session.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+      await session.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+      await wait(340);
+
+      const focusAndStaticCheck = await session.evaluate(`(() => {
+        const active = document.activeElement;
+        const isExperienceLink = Boolean(active?.matches('[data-testid="experience-results"] a[href^="/experiences/"]'));
+        const matchesFocusVisible = Boolean(active?.matches(":focus-visible"));
+        const svg = active?.querySelector("svg");
+        const svgCs = svg ? getComputedStyle(svg) : null;
+        const listItems = Array.from(document.querySelectorAll('[data-testid="experience-results"] > li'));
+        const indexRevealNodes = listItems.filter((li) => li.hasAttribute("data-reveal")).length;
+        return {
+          isExperienceLink,
+          matchesFocusVisible,
+          svgTransform: svgCs?.transform ?? null,
+          svgTranslate: svgCs?.translate ?? null,
+          svgColor: svgCs?.color ?? null,
+          svgTransitionDuration: svgCs?.transitionDuration ?? null,
+          indexCardCount: listItems.length,
+          indexRevealNodes,
+        };
+      })()`);
+
+      const filterCheck = await session.evaluate(`(async () => {
+        const waitMs = (ms) => new Promise((r) => setTimeout(r, ms));
+        const waitRaf = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const listBefore = document.querySelector('[data-testid="experience-results"]');
+        const chips = Array.from(document.querySelectorAll("button.filter-chip"));
+        const targetChip = chips.find((b) => b.getAttribute("aria-pressed") === "false");
+        targetChip.click();
+        await waitRaf();
+        const listAfterChip = document.querySelector('[data-testid="experience-results"]');
+        const chipHasAttr = listAfterChip?.hasAttribute("data-filter-settle") ?? false;
+        const chipCs = listAfterChip ? getComputedStyle(listAfterChip) : null;
+        const chipAnimName = chipCs?.animationName ?? null;
+        const chipAnimDuration = chipCs?.animationDuration ?? null;
+        const chipTransform = chipCs?.transform ?? null;
+        await waitMs(280);
+
+        chips[0].click();
+        await waitRaf();
+        await waitMs(280);
+
+        const listBeforeType = document.querySelector('[data-testid="experience-results"]');
+        const search = document.querySelector('input[type="search"]');
+        search.focus();
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+        setter.call(search, "cà phê");
+        search.dispatchEvent(new Event("input", { bubbles: true }));
+        await waitRaf();
+        const listAfterType = document.querySelector('[data-testid="experience-results"]');
+        const typingRemounted = listBeforeType !== listAfterType;
+
+        setter.call(search, "zzzz-khong-co");
+        search.dispatchEvent(new Event("input", { bubbles: true }));
+        await waitRaf();
+        const emptyNode = document.querySelector('[data-testid="experience-empty"]');
+        const emptyHasAttr = emptyNode?.hasAttribute("data-filter-settle") ?? false;
+        const emptyCs = emptyNode ? getComputedStyle(emptyNode) : null;
+        const emptyAnimName = emptyCs?.animationName ?? null;
+        await waitMs(280);
+        const emptySettledOpacity = emptyNode ? getComputedStyle(emptyNode).opacity : null;
+
+        return {
+          chipChangedNode: listBefore !== listAfterChip,
+          chipHasAttr,
+          chipAnimName,
+          chipAnimDuration,
+          chipTransform,
+          typingRemounted,
+          emptyHasAttr,
+          emptyAnimName,
+          emptySettledOpacity,
+        };
+      })()`);
+
+      const passed =
+        focusAndStaticCheck.isExperienceLink &&
+        focusAndStaticCheck.matchesFocusVisible &&
+        (focusAndStaticCheck.svgTranslate !== "none" || focusAndStaticCheck.svgTransform !== "none") &&
+        focusAndStaticCheck.indexCardCount > 0 &&
+        focusAndStaticCheck.indexRevealNodes === 0 &&
+        filterCheck.chipChangedNode &&
+        filterCheck.chipHasAttr &&
+        filterCheck.chipAnimName === "adora-filter-settle" &&
+        filterCheck.chipAnimDuration === "0.22s" &&
+        filterCheck.chipTransform === "none" &&
+        !filterCheck.typingRemounted &&
+        filterCheck.emptyHasAttr &&
+        filterCheck.emptyAnimName === "adora-filter-settle" &&
+        filterCheck.emptySettledOpacity === "1" &&
+        session.errors.length === 0 &&
+        session.hydrationWarnings.length === 0;
+
+      return {
+        passed,
+        focusAndStaticCheck,
+        filterCheck,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 3. /destinations/da-lat: INV-16, E-7, N-6
+  const destinationDetailDesktop = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900, initScript: OBSERVER_TRACKER_INIT_SCRIPT },
+    async (session) => {
+      await navigateAndWaitReady(session, destinationDetailUrl, false);
+
+      const loadProbe = await session.evaluate(`(() => {
+        const heroImg = document.querySelector('main section:first-of-type img[data-image-settle]');
+        const h1 = document.querySelector('h1.adora-hero-heading-rise');
+        const badgeParent = document.querySelector('main section:first-of-type .adora-load-rise:has(.border)');
+        const proseReveals = document.querySelectorAll('[aria-labelledby="intro-heading"] div.max-w-3xl [data-reveal]').length;
+        const proseParentReveal = Boolean(document.querySelector('[aria-labelledby="intro-heading"] div.max-w-3xl[data-reveal]'));
+        const highlightLiWithReveal = document.querySelectorAll('[aria-labelledby="highlights-heading"] ol > li[data-reveal]').length;
+        const highlightInnerReveals = document.querySelectorAll('[aria-labelledby="highlights-heading"] ol > li > [data-reveal]').length;
+        const tripLiWithReveal = document.querySelectorAll('[aria-labelledby="trip-heading"] ol > li[data-reveal]').length;
+        const tripInnerReveals = document.querySelectorAll('[aria-labelledby="trip-heading"] ol > li > [data-reveal]').length;
+        const gridLiReveals = document.querySelectorAll('[aria-labelledby="experiences-heading"] [data-testid="experience-results"] > li[data-reveal]').length;
+        const ctaSection = document.querySelector('[aria-labelledby="planner-cta-heading"]');
+        const ctaInner = ctaSection?.querySelector('.adora-container[data-reveal]');
+        return {
+          heroImgSettle: Boolean(heroImg),
+          heroImgOpacity: heroImg ? getComputedStyle(heroImg).opacity : null,
+          h1Opacity: h1 ? getComputedStyle(h1).opacity : null,
+          h1Delay: h1 ? getComputedStyle(h1).animationDelay : null,
+          badgeDelay: badgeParent ? getComputedStyle(badgeParent).animationDelay : null,
+          proseReveals,
+          proseParentReveal,
+          highlightLiWithReveal,
+          highlightInnerReveals,
+          tripLiWithReveal,
+          tripInnerReveals,
+          gridLiReveals,
+          ctaSectionHasReveal: ctaSection?.hasAttribute("data-reveal") ?? false,
+          ctaInnerHasReveal: Boolean(ctaInner),
+        };
+      })()`);
+
+      await session.evaluate(`(async () => {
+        const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+        document.documentElement.style.scrollBehavior = "auto";
+        const pageHeight = document.documentElement.scrollHeight;
+        for (let y = 0; y <= pageHeight; y += Math.max(window.innerHeight * 0.6, 360)) {
+          window.scrollTo(0, y);
+          await delay(120);
+        }
+        window.scrollTo(0, pageHeight);
+        await delay(950);
+      })()`);
+
+      const afterScroll = await session.evaluate(`(() => ({
+        pendingCount: document.querySelectorAll('[data-reveal="pending"]').length,
+        visibleCount: document.querySelectorAll('[data-reveal="visible"]').length,
+        hiddenVisibleCheck: Array.from(document.querySelectorAll('[data-reveal]')).filter((el) => getComputedStyle(el).opacity !== "1").length,
+        horizontalOverflowPx: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+      }))()`);
+
+      const passed =
+        loadProbe.heroImgSettle &&
+        loadProbe.heroImgOpacity === "1" &&
+        loadProbe.h1Opacity === "1" &&
+        loadProbe.h1Delay === "0s" &&
+        loadProbe.badgeDelay === "0s" &&
+        loadProbe.proseReveals === 0 &&
+        !loadProbe.proseParentReveal &&
+        loadProbe.highlightLiWithReveal === 0 &&
+        loadProbe.highlightInnerReveals >= 4 &&
+        loadProbe.tripLiWithReveal === 0 &&
+        loadProbe.tripInnerReveals === 3 &&
+        loadProbe.gridLiReveals >= 1 &&
+        !loadProbe.ctaSectionHasReveal &&
+        loadProbe.ctaInnerHasReveal &&
+        afterScroll.pendingCount === 0 &&
+        afterScroll.visibleCount >= 8 &&
+        afterScroll.hiddenVisibleCheck === 0 &&
+        afterScroll.horizontalOverflowPx === 0 &&
+        session.errors.length === 0 &&
+        session.hydrationWarnings.length === 0;
+
+      return {
+        passed,
+        loadProbe,
+        afterScroll,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 4. /experiences/ca-phe-nho-giot-cao-nguyen: INV-16, N-6, B-7
+  const experienceDetailDesktop = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900, initScript: OBSERVER_TRACKER_INIT_SCRIPT },
+    async (session) => {
+      await navigateAndWaitReady(session, experienceDetailUrl, false);
+
+      const loadProbe = await session.evaluate(`(() => {
+        const heroImg = document.querySelector('img[data-image-settle]');
+        const h1 = document.querySelector('h1.adora-hero-heading-rise');
+        const rightHero = document.querySelector('.adora-load-rise:has([class*="italic"])');
+        const proseReveals = document.querySelectorAll('[aria-labelledby="story-heading"] p[data-reveal], [aria-labelledby="story-heading"] div.space-y-6[data-reveal]').length;
+        const aside = document.querySelector('aside[aria-label="Thông tin gợi ý"]');
+        const asideReveals = aside ? aside.querySelectorAll('[data-reveal]').length : -1;
+        const asideHasReveal = aside?.hasAttribute("data-reveal") ?? false;
+        const noteOpacity = aside?.querySelector('[role="note"]') ? getComputedStyle(aside.querySelector('[role="note"]')).opacity : null;
+        const relatedReveals = document.querySelectorAll('[aria-labelledby="related-heading"] ul > li[data-reveal]').length;
+        return {
+          heroImgSettle: Boolean(heroImg),
+          heroImgOpacity: heroImg ? getComputedStyle(heroImg).opacity : null,
+          h1Opacity: h1 ? getComputedStyle(h1).opacity : null,
+          h1Delay: h1 ? getComputedStyle(h1).animationDelay : null,
+          rightHeroDelay: rightHero ? getComputedStyle(rightHero).animationDelay : null,
+          proseReveals,
+          asideReveals,
+          asideHasReveal,
+          noteOpacity,
+          relatedReveals,
+        };
+      })()`);
+
+      await session.evaluate(`(async () => {
+        const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+        document.documentElement.style.scrollBehavior = "auto";
+        const pageHeight = document.documentElement.scrollHeight;
+        for (let y = 0; y <= pageHeight; y += Math.max(window.innerHeight * 0.6, 360)) {
+          window.scrollTo(0, y);
+          await delay(120);
+        }
+        window.scrollTo(0, pageHeight);
+        await delay(950);
+      })()`);
+
+      const afterScroll = await session.evaluate(`(() => ({
+        pendingCount: document.querySelectorAll('[data-reveal="pending"]').length,
+        visibleCount: document.querySelectorAll('[data-reveal="visible"]').length,
+        hiddenVisibleCheck: Array.from(document.querySelectorAll('[data-reveal]')).filter((el) => getComputedStyle(el).opacity !== "1").length,
+        horizontalOverflowPx: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+      }))()`);
+
+      const passed =
+        loadProbe.heroImgSettle &&
+        loadProbe.heroImgOpacity === "1" &&
+        loadProbe.h1Opacity === "1" &&
+        loadProbe.h1Delay === "0s" &&
+        loadProbe.rightHeroDelay === "0s" &&
+        loadProbe.proseReveals === 0 &&
+        loadProbe.asideReveals === 0 &&
+        !loadProbe.asideHasReveal &&
+        loadProbe.noteOpacity === "1" &&
+        loadProbe.relatedReveals >= 1 &&
+        afterScroll.pendingCount === 0 &&
+        afterScroll.visibleCount >= 4 &&
+        afterScroll.hiddenVisibleCheck === 0 &&
+        afterScroll.horizontalOverflowPx === 0 &&
+        session.errors.length === 0 &&
+        session.hydrationWarnings.length === 0;
+
+      return {
+        passed,
+        loadProbe,
+        afterScroll,
+        errors: session.errors,
+        hydrationWarnings: session.hydrationWarnings,
+      };
+    },
+  );
+
+  // 5. Reduced Motion + data-motion="off" fail-visible + Touch hover guard on Discovery
+  const overridesAndTouch = await withIsolatedSession(
+    browserClient,
+    { width: 390, height: 844, mobile: true, touch: true, reducedMotion: true },
+    async (session) => {
+      await navigateAndWaitReady(session, destinationsUrl, false);
+      const reducedMetrics = await session.evaluate(`(() => {
+        const h1 = document.querySelector("h1");
+        const img = document.querySelector('[data-image-settle="featured"]');
+        return {
+          h1Opacity: h1 ? getComputedStyle(h1).opacity : null,
+          h1AnimName: h1 ? getComputedStyle(h1).animationName : null,
+          h1AnimDuration: h1 ? getComputedStyle(h1).animationDuration : null,
+          imgOpacity: img ? getComputedStyle(img).opacity : null,
+          imgTransform: img ? getComputedStyle(img).transform : null,
+        };
+      })()`);
+
+      await navigateAndWaitReady(session, experiencesUrl, false);
+      const touchMetrics = await session.evaluate(`(() => {
+        const img = document.querySelector('.image-reveal img');
+        return {
+          matchesHoverHover: matchMedia("(hover: hover) and (pointer: fine)").matches,
+          imgTransitionDuration: img ? getComputedStyle(img).transitionDuration : null,
+        };
+      })()`);
+
+      const passed =
+        reducedMetrics.h1Opacity === "1" &&
+        reducedMetrics.h1AnimName === "none" &&
+        (reducedMetrics.h1AnimDuration === "0s" || reducedMetrics.h1AnimDuration === "0.01ms") &&
+        reducedMetrics.imgOpacity === "1" &&
+        reducedMetrics.imgTransform === "none" &&
+        !touchMetrics.matchesHoverHover &&
+        session.errors.length === 0;
+
+      return {
+        passed,
+        reducedMetrics,
+        touchMetrics,
+        errors: session.errors,
+      };
+    },
+  );
+
+  // 6. 6-Viewport Responsive Matrix across all 4 discovery routes
+  const viewportRoutes = [
+    { key: "destinations", url: destinationsUrl },
+    { key: "destination-detail", url: destinationDetailUrl },
+    { key: "experiences", url: experiencesUrl },
+    { key: "experience-detail", url: experienceDetailUrl },
+  ];
+  const viewportMatrix = [];
+  for (const vp of configuredViewports) {
+    const mobile = vp.width < 768;
+    const row = await withIsolatedSession(
+      browserClient,
+      { width: vp.width, height: vp.height, mobile, touch: mobile },
+      async (session) => {
+        const results = {};
+        for (const route of viewportRoutes) {
+          await navigateAndWaitReady(session, route.url, false);
+          await session.evaluate(`(async () => {
+            const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+            document.documentElement.style.scrollBehavior = "auto";
+            const h = document.documentElement.scrollHeight;
+            for (let y = 0; y <= h; y += Math.max(window.innerHeight * 0.75, 420)) {
+              window.scrollTo(0, y);
+              await delay(90);
+            }
+            window.scrollTo(0, h);
+            await delay(700);
+          })()`);
+          results[route.key] = await session.evaluate(`({
+            horizontalOverflowPx: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+            pendingCount: document.querySelectorAll('[data-reveal="pending"]').length,
+          })`);
+        }
+        const passed =
+          Object.values(results).every((r) => r.horizontalOverflowPx === 0 && r.pendingCount === 0) &&
+          session.errors.length === 0 &&
+          session.hydrationWarnings.length === 0;
+        return { viewport: vp.name, width: vp.width, passed, results, errors: session.errors };
+      },
+    );
+    viewportMatrix.push(row);
+  }
+
+  const passed =
+    destinationsDesktop.passed &&
+    experiencesDesktop.passed &&
+    destinationDetailDesktop.passed &&
+    experienceDetailDesktop.passed &&
+    overridesAndTouch.passed &&
+    viewportMatrix.every((row) => row.passed);
+
+  return {
+    passed,
+    destinationsDesktop,
+    experiencesDesktop,
+    destinationDetailDesktop,
+    experienceDetailDesktop,
+    overridesAndTouch,
+    viewportMatrix,
+  };
+}
+
+async function capturePackageCEvidence(browserClient, packageCSuites) {
+  await mkdir(packageCEvidenceDirectory, { recursive: true });
+  const files = [];
+
+  for (const profile of [
+    { prefix: "desktop", width: 1440, height: 900, mobile: false },
+    { prefix: "mobile", width: 390, height: 844, mobile: true },
+  ]) {
+    await withIsolatedSession(
+      browserClient,
+      {
+        width: profile.width,
+        height: profile.height,
+        deviceScaleFactor: 1,
+        mobile: profile.mobile,
+        touch: profile.mobile,
+      },
+      async (session) => {
+        // 1. /destinations initial & settled + chip settle + empty
+        await navigateAndWaitReady(session, `${siteUrl}/destinations`, false);
+        await wait(850);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-destinations-top.png`, false));
+
+        await session.evaluate(`(() => {
+          document.querySelector('[aria-labelledby="featured-heading"]')?.scrollIntoView({ behavior: "auto", block: "start" });
+        })()`);
+        await wait(300);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-destinations-featured.png`, false));
+
+        await session.evaluate(`(() => {
+          const chips = Array.from(document.querySelectorAll("button.filter-chip"));
+          const chip = chips.find((b) => b.getAttribute("aria-pressed") === "false");
+          chip?.click();
+        })()`);
+        await wait(300);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-destinations-filtered.png`, false));
+
+        // 2. /experiences initial + keyboard focus-visible + settled grid
+        await navigateAndWaitReady(session, `${siteUrl}/experiences`, false);
+        await wait(600);
+        if (!profile.mobile) {
+          await session.evaluate(`(() => {
+            const firstLink = document.querySelector('[data-testid="experience-results"] a[href^="/experiences/"]');
+            const focusable = Array.from(document.querySelectorAll('a[href], button:not([disabled]), input'));
+            const idx = focusable.indexOf(firstLink);
+            if (idx > 0) focusable[idx - 1].focus();
+          })()`);
+          await session.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+          await session.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+          await wait(340);
+          files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-experiences-focus.png`, false));
+        } else {
+          files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-experiences-top.png`, false));
+        }
+
+        // 3. /destinations/da-lat hero & highlights/trip reveal
+        await navigateAndWaitReady(session, `${siteUrl}/destinations/da-lat`, false);
+        await wait(900);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-da-lat-hero.png`, false));
+        await session.evaluate(`(async () => {
+          const h = document.documentElement.scrollHeight;
+          for (let y = 0; y <= h; y += Math.max(window.innerHeight * 0.6, 360)) {
+            window.scrollTo(0, y);
+            await new Promise((r) => setTimeout(r, 120));
+          }
+          document.querySelector('[aria-labelledby="highlights-heading"]')?.scrollIntoView({ behavior: "auto", block: "start" });
+          await new Promise((r) => setTimeout(r, 850));
+        })()`);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-da-lat-highlights.png`, false));
+
+        // 4. /experiences/ca-phe-nho-giot-cao-nguyen story+aside & related+cta
+        await navigateAndWaitReady(session, `${siteUrl}/experiences/ca-phe-nho-giot-cao-nguyen`, false);
+        await wait(900);
+        await session.evaluate(`(() => {
+          document.querySelector('[aria-labelledby="story-heading"]')?.scrollIntoView({ behavior: "auto", block: "start" });
+        })()`);
+        await wait(300);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-experience-detail-story.png`, false));
+
+        await session.evaluate(`(async () => {
+          const h = document.documentElement.scrollHeight;
+          for (let y = 0; y <= h; y += Math.max(window.innerHeight * 0.6, 360)) {
+            window.scrollTo(0, y);
+            await new Promise((r) => setTimeout(r, 120));
+          }
+          document.querySelector('[aria-labelledby="related-heading"]')?.scrollIntoView({ behavior: "auto", block: "start" });
+          await new Promise((r) => setTimeout(r, 850));
+        })()`);
+        files.push(await captureScreenshotFile(session, packageCEvidenceDirectory, `${profile.prefix}-experience-detail-related.png`, false));
+      },
+    );
+  }
+
+  if (packageCSuites) {
+    const telemetryPath = join(packageCEvidenceDirectory, "package-c-telemetry.json");
+    await writeFile(telemetryPath, `${JSON.stringify(packageCSuites, null, 2)}\n`, "utf8");
+    files.push(telemetryPath);
+  }
+
+  return {
+    captured: true,
+    directory: packageCEvidenceDirectory,
+    fileCount: files.length,
+    files,
+  };
+}
+
 const profileDirectory = await mkdtemp(join(tmpdir(), "adora-web-0-4-chrome-"));
 const chrome = spawn(
   chromePath,
@@ -4137,6 +4859,22 @@ try {
       evidenceCapture,
     };
     console.log(JSON.stringify(summary, null, 2));
+  } else if (capturePackageCEvidenceOnly) {
+    console.error("Package C Focused Reproduction: Capturing desktop & mobile discovery motion screenshots only...");
+    const packageCSuites = await runPackageCDiscoverySuite(browserClient);
+    const evidenceCapture = await capturePackageCEvidence(browserClient, packageCSuites);
+    summary = {
+      browser: versionInfo.Browser,
+      mode: "capture-package-c-evidence-only",
+      siteUrl,
+      packageC: {
+        executed: true,
+        passed: packageCSuites.passed,
+      },
+      evidenceCapture,
+    };
+    console.log(JSON.stringify(summary, null, 2));
+    if (!packageCSuites.passed) process.exitCode = 1;
   } else if (capturePackageDEvidenceOnly) {
     console.error("Package D Focused Reproduction: Capturing desktop & mobile application interaction screenshots only...");
     const packageDSuites = await runPackageDApplicationSuite(browserClient);
@@ -4176,6 +4914,15 @@ try {
       evidenceCapture = await capturePackageBEvidence(browserClient, packageBSuites.timelines);
     }
 
+    console.error("Package C [1/1]: Verifying Discovery Experience (INV-12..INV-16, E-6, E-7, E-11, E-12, N-5, N-6)...");
+    const packageCSuites = await runPackageCDiscoverySuite(browserClient);
+
+    let packageCEvidenceCapture = { captured: false };
+    if (capturePackageCEvidenceFlag) {
+      console.error("Package C Evidence: Capturing desktop & mobile screenshot sequence + motion telemetry...");
+      packageCEvidenceCapture = await capturePackageCEvidence(browserClient, packageCSuites);
+    }
+
     console.error("Package D [1/1]: Verifying Application Interactions (INV-17..INV-20, E-9..E-10, P-6, N-4, N-7, B-5)...");
     const packageDSuites = await runPackageDApplicationSuite(browserClient);
 
@@ -4193,6 +4940,7 @@ try {
       responsiveAndCss.passed;
 
     const packageBPassed = packageBSuites.passed;
+    const packageCPassed = packageCSuites.passed;
     const packageDPassed = packageDSuites.passed;
 
     summary = {
@@ -4219,6 +4967,18 @@ try {
         sampleBubbleFailVisible: packageBSuites.sampleBubbleFailVisible,
         evidenceCapture,
       },
+      packageC: {
+        implemented: true,
+        executed: true,
+        passed: packageCPassed,
+        destinationsDesktop: packageCSuites.destinationsDesktop,
+        experiencesDesktop: packageCSuites.experiencesDesktop,
+        destinationDetailDesktop: packageCSuites.destinationDetailDesktop,
+        experienceDetailDesktop: packageCSuites.experienceDetailDesktop,
+        overridesAndTouch: packageCSuites.overridesAndTouch,
+        viewportMatrix: packageCSuites.viewportMatrix,
+        evidenceCapture: packageCEvidenceCapture,
+      },
       packageD: {
         implemented: true,
         executed: true,
@@ -4231,13 +4991,12 @@ try {
         evidenceCapture: packageDEvidenceCapture,
       },
       futurePackages: {
-        packageC: { implemented: false, executed: false },
         packageE: { implemented: false, executed: false },
       },
     };
 
     console.log(JSON.stringify(summary, null, 2));
-    if (!packageAPassed || !packageBPassed || !packageDPassed) process.exitCode = 1;
+    if (!packageAPassed || !packageBPassed || !packageCPassed || !packageDPassed) process.exitCode = 1;
   }
 
   browserClient.close();
