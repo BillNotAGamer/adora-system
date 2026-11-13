@@ -1,0 +1,2315 @@
+{
+  "capturedAt": "2026-11-13T16:00:55.234Z",
+  "siteUrl": "http://127.0.0.1:3100",
+  "packageE": {
+    "passed": true,
+    "desktopJourney": {
+      "passed": true,
+      "forwardSteps": [
+        {
+          "path": "/",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/destinations",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/destinations/da-lat",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/experiences",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/experiences/ca-phe-nho-giot-cao-nguyen",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/ai-planner",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/trips",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/trips/da-lat-3-ngay",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        }
+      ],
+      "activityBackChain": [
+        {
+          "path": "/ai-planner",
+          "h1Visible": true,
+          "visibleRevealCount": 0,
+          "stuckAboveFold": 0,
+          "runningFiniteAnimations": 0
+        },
+        {
+          "path": "/experiences",
+          "h1Visible": true,
+          "visibleRevealCount": 1,
+          "stuckAboveFold": 0,
+          "runningFiniteAnimations": 0
+        },
+        {
+          "path": "/destinations/da-lat",
+          "h1Visible": true,
+          "visibleRevealCount": 18,
+          "stuckAboveFold": 0,
+          "runningFiniteAnimations": 0
+        }
+      ],
+      "forwardRestored": {
+        "path": "/experiences",
+        "h1Visible": true,
+        "visiblePendingRemaining": 0
+      },
+      "hydrationWarnings": [],
+      "errors": []
+    },
+    "mobileJourney": {
+      "passed": true,
+      "forwardSteps": [
+        {
+          "path": "/",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/destinations",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/destinations/da-lat",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/experiences",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/experiences/ca-phe-nho-giot-cao-nguyen",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/ai-planner",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/trips",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        },
+        {
+          "path": "/trips/da-lat-3-ngay",
+          "pendingCount": 0,
+          "overflowPx": 0,
+          "mainVisible": true,
+          "h1Visible": true
+        }
+      ],
+      "activityBackChain": [
+        {
+          "path": "/ai-planner",
+          "h1Visible": true,
+          "visibleRevealCount": 0,
+          "stuckAboveFold": 0,
+          "runningFiniteAnimations": 0
+        },
+        {
+          "path": "/experiences",
+          "h1Visible": true,
+          "visibleRevealCount": 1,
+          "stuckAboveFold": 0,
+          "runningFiniteAnimations": 0
+        },
+        {
+          "path": "/destinations/da-lat",
+          "h1Visible": true,
+          "visibleRevealCount": 18,
+          "stuckAboveFold": 0,
+          "runningFiniteAnimations": 0
+        }
+      ],
+      "forwardRestored": {
+        "path": "/experiences",
+        "h1Visible": true,
+        "visiblePendingRemaining": 0
+      },
+      "hydrationWarnings": [],
+      "errors": []
+    },
+    "reducedMotionAndKillSwitch": {
+      "passed": true,
+      "checks": [
+        {
+          "route": "/",
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "allRevealsVisible": true
+        },
+        {
+          "route": "/destinations",
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "allRevealsVisible": true
+        },
+        {
+          "route": "/destinations/da-lat",
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "allRevealsVisible": true
+        },
+        {
+          "route": "/ai-planner",
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "allRevealsVisible": true
+        },
+        {
+          "route": "/trips/da-lat-3-ngay",
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "allRevealsVisible": true
+        }
+      ],
+      "killSwitchState": {
+        "dataMotion": "off",
+        "allRevealsOpacity1": true
+      },
+      "printState": {
+        "allRevealsVisibleInPrint": true
+      },
+      "errors": []
+    },
+    "accessibilityAndKeyboardAudit": {
+      "passed": true,
+      "skipLinkCheck": {
+        "activeHref": "#main-content",
+        "visibleOnFocus": true,
+        "mainContentExists": true,
+        "inv01HeaderUntouched": true,
+        "backlogStatusDot": {
+          "present": true,
+          "tagName": "SPAN",
+          "roleAttr": null,
+          "ariaLabel": "Bản xem trước sẵn sàng"
+        }
+      },
+      "focusVisibleIndicatorCheck": {
+        "tagName": "A",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "hasVisibleFocusRing": true
+      },
+      "mobileDrawerCheck": {
+        "passed": true,
+        "openState": {
+          "expanded": "true",
+          "navVisible": true,
+          "inv02DrawerStaticDisplay": true
+        },
+        "closedState": {
+          "expanded": "false",
+          "navVisible": false
+        },
+        "errors": []
+      },
+      "deferredInventory": {
+        "INV_01": {
+          "status": "approved_deferred",
+          "headerUntouched": true
+        },
+        "INV_02": {
+          "status": "approved_deferred",
+          "drawerFunctionalAndUntouched": true
+        }
+      },
+      "preExistingBacklog": {
+        "resetButtonFocusLoss": {
+          "triggeredEmpty": true,
+          "beforeClickActiveTag": "BUTTON",
+          "afterClickActiveTag": "BODY",
+          "dropsToBody": true
+        },
+        "itineraryInactiveTabAriaControls": {
+          "tabs": [
+            {
+              "id": "day-tab-1",
+              "ariaSelected": "true",
+              "ariaControls": "day-panel-1",
+              "controlledElementExistsInDom": true
+            },
+            {
+              "id": "day-tab-2",
+              "ariaSelected": "false",
+              "ariaControls": "day-panel-2",
+              "controlledElementExistsInDom": false
+            },
+            {
+              "id": "day-tab-3",
+              "ariaSelected": "false",
+              "ariaControls": "day-panel-3",
+              "controlledElementExistsInDom": false
+            }
+          ],
+          "danglingInactiveControlsCount": 2
+        },
+        "aiPlannerPreviewStatusDot": {
+          "present": true,
+          "tagName": "SPAN",
+          "roleAttr": null,
+          "ariaLabel": "Bản xem trước sẵn sàng"
+        }
+      },
+      "errors": []
+    },
+    "staticDisclosureAndSixViewportCheck": [
+      {
+        "viewport": "360",
+        "width": 360,
+        "height": 800,
+        "passed": true,
+        "plannerCheck": {
+          "overflowPx": 0,
+          "demoVisible": true
+        },
+        "expCheck": {
+          "overflowPx": 0,
+          "priceDisclaimerVisible": true
+        }
+      },
+      {
+        "viewport": "mobile",
+        "width": 390,
+        "height": 844,
+        "passed": true,
+        "plannerCheck": {
+          "overflowPx": 0,
+          "demoVisible": true
+        },
+        "expCheck": {
+          "overflowPx": 0,
+          "priceDisclaimerVisible": true
+        }
+      },
+      {
+        "viewport": "768",
+        "width": 768,
+        "height": 1024,
+        "passed": true,
+        "plannerCheck": {
+          "overflowPx": 0,
+          "demoVisible": true
+        },
+        "expCheck": {
+          "overflowPx": 0,
+          "priceDisclaimerVisible": true
+        }
+      },
+      {
+        "viewport": "1024",
+        "width": 1024,
+        "height": 900,
+        "passed": true,
+        "plannerCheck": {
+          "overflowPx": 0,
+          "demoVisible": true
+        },
+        "expCheck": {
+          "overflowPx": 0,
+          "priceDisclaimerVisible": true
+        }
+      },
+      {
+        "viewport": "desktop",
+        "width": 1440,
+        "height": 900,
+        "passed": true,
+        "plannerCheck": {
+          "overflowPx": 0,
+          "demoVisible": true
+        },
+        "expCheck": {
+          "overflowPx": 0,
+          "priceDisclaimerVisible": true
+        }
+      },
+      {
+        "viewport": "1920",
+        "width": 1920,
+        "height": 1080,
+        "passed": true,
+        "plannerCheck": {
+          "overflowPx": 0,
+          "demoVisible": true
+        },
+        "expCheck": {
+          "overflowPx": 0,
+          "priceDisclaimerVisible": true
+        }
+      }
+    ]
+  },
+  "integratedSummary": {
+    "browser": "Chrome/157.0.8103.78",
+    "siteUrl": "http://127.0.0.1:3100",
+    "packageA": {
+      "executed": true,
+      "passed": true,
+      "ssrAndNoJs": {
+        "executed": true,
+        "passed": true,
+        "ssrHtml": {
+          "status": 200,
+          "hasAnyDataRevealStateAttr": false,
+          "totalSsrRevealVariantCount": 30,
+          "hasPhilosophyHeading": true
+        },
+        "noJsScriptDisabled": {
+          "sectionPresent": true,
+          "unitCount": 3,
+          "domUnitCount": 30,
+          "anyDataRevealAttr": false,
+          "allBaseStyleVisible": true,
+          "sampleBubblesVisible": true,
+          "heroImgVisible": true,
+          "h1Visible": true,
+          "sectionOpacity": "1",
+          "insideNextPprStreamContainerWhenAllScriptsBlocked": true,
+          "errors": []
+        },
+        "clientBundlesBlockedDesktop": {
+          "sectionPresent": true,
+          "unitCount": 3,
+          "homepageUnitCount": 20,
+          "anyDataRevealAttr": false,
+          "allLaidOutAndVisible": true,
+          "sampleBubblesVisible": true,
+          "errors": []
+        },
+        "clientBundlesBlockedMobile": {
+          "unitCount": 3,
+          "homepageUnitCount": 20,
+          "anyDataRevealAttr": false,
+          "allLaidOutAndVisible": true,
+          "sampleBubblesVisible": true,
+          "errors": []
+        }
+      },
+      "intersectionObserver": {
+        "executed": true,
+        "passed": true,
+        "normalScrollAndOneShot": {
+          "initialBelowFold": {
+            "sectionOpacity": "1",
+            "sectionTransform": "none",
+            "unitStates": [
+              {
+                "state": "pending",
+                "opacity": "0",
+                "transform": "matrix(1, 0, 0, 1, 0, 22)",
+                "top": 1066
+              },
+              {
+                "state": "pending",
+                "opacity": "0",
+                "transform": "matrix(1, 0, 0, 1, 0, 22)",
+                "top": 1066
+              },
+              {
+                "state": "pending",
+                "opacity": "0",
+                "transform": "matrix(1, 0, 0, 1, 0, 22)",
+                "top": 1370
+              }
+            ]
+          },
+          "afterReveal": [
+            {
+              "state": "visible",
+              "opacity": "1",
+              "transform": "none",
+              "transitionDuration": "0.68s",
+              "transitionDelay": "0s"
+            },
+            {
+              "state": "visible",
+              "opacity": "1",
+              "transform": "none",
+              "transitionDuration": "0.68s",
+              "transitionDelay": "0.08s"
+            },
+            {
+              "state": "visible",
+              "opacity": "1",
+              "transform": "none",
+              "transitionDuration": "0.68s",
+              "transitionDelay": "0.16s"
+            }
+          ],
+          "afterScrollAwayAndBack": {
+            "allStillVisible": true,
+            "pendingTransitionsAfterReveal": 3
+          },
+          "hydrationWarnings": [],
+          "errors": []
+        },
+        "partialFoldSafety": {
+          "viewportHeight": 1024,
+          "scrollY": 0,
+          "firstUnitTop": 944,
+          "partiallyVisibleCount": 1,
+          "partiallyVisibleStates": [
+            {
+              "state": "visible",
+              "opacity": "1"
+            }
+          ],
+          "anyPartiallyVisibleEverPending": false,
+          "errors": []
+        },
+        "fastScrollJumpTest": {
+          "beforePendingCount": 3,
+          "beforeHomepagePendingCount": 20,
+          "totalPendingAfterJump": 0,
+          "pendingInViewport": 0,
+          "philosophyStates": [
+            "visible",
+            "visible",
+            "visible"
+          ],
+          "homepageVisibleCount": 20,
+          "errors": []
+        },
+        "anchorNavigationCheck": {
+          "hash": "#philosophy",
+          "sectionInViewport": true,
+          "allVisible": true,
+          "anyVisibleUnitEverPending": false,
+          "errors": []
+        },
+        "erratumE1BatchedEntriesCheck": {
+          "unitCount": 3,
+          "allReadNewestEntryAsVisible": true,
+          "errors": []
+        }
+      },
+      "failVisible": {
+        "executed": true,
+        "passed": true,
+        "reducedMotionInitial": {
+          "allVisibleImmediately": true,
+          "everEnteredPending": false,
+          "errors": []
+        },
+        "reducedMotionToggledAfterHydration": {
+          "pendingCountBefore": 3,
+          "allVisible": true,
+          "errors": []
+        },
+        "motionOffPreHydration": {
+          "motionAttr": "off",
+          "allVisible": true,
+          "everEnteredPending": false,
+          "errors": []
+        },
+        "motionOffPostHydration": {
+          "beforePending": 3,
+          "syncCssVisible": true,
+          "settledAttrVisible": true,
+          "errors": []
+        },
+        "printMediaCheck": {
+          "pendingBeforePrint": 3,
+          "pendingUnitsChecked": 3,
+          "allPrintVisible": true,
+          "errors": []
+        },
+        "missingIntersectionObserverCheck": {
+          "ioType": "undefined",
+          "allVisible": true,
+          "errors": []
+        },
+        "focusWithinPendingCheck": {
+          "foundPendingTarget": true,
+          "opacityBefore": "0",
+          "duringFocus": {
+            "activeIsProbe": true,
+            "state": "visible",
+            "opacity": "1",
+            "transform": "none",
+            "transitionDuration": "0s"
+          },
+          "afterBlurAndCleanup": {
+            "state": "visible",
+            "opacity": "1",
+            "transform": "none"
+          },
+          "errors": []
+        },
+        "erratumE2StaggerAndStack": {
+          "desktop": {
+            "capDelay": "0.27s",
+            "stackDelayOnDesktop": "0.18s"
+          },
+          "mobile": {
+            "capDelayOnMobile": "0.18s",
+            "stackDelayOnMobile": "0s"
+          }
+        }
+      },
+      "lifecycleAndActivity": {
+        "executed": true,
+        "passed": true,
+        "activityPostRevealCheck": {
+          "beforeScrollStats": {
+            "philosophyActiveObservers": 3,
+            "activeObservers": 20,
+            "scrollListeners": 20
+          },
+          "afterRevealStats": {
+            "activeObservers": 0,
+            "scrollListeners": 0,
+            "resizeListeners": 0
+          },
+          "afterActivityBack": {
+            "pathname": "/",
+            "visibleUnitCount": 3,
+            "visibleHomepageUnitCount": 20,
+            "allRemainVisible": true,
+            "activeObservers": 0,
+            "scrollListeners": 0
+          },
+          "errors": []
+        },
+        "activityPendingRestoreCheck": {
+          "initialPendingCount": 3,
+          "initialHomepagePendingCount": 20,
+          "whileHiddenOnDestinations": {
+            "pathname": "/destinations",
+            "hiddenHomepageObserversWhileHidden": 0,
+            "visibleDestinationsFooterObservers": 1,
+            "scrollListenersWhileOnDestinations": 1
+          },
+          "afterBackAndScroll": {
+            "pathname": "/",
+            "unitCount": 3,
+            "homepageUnitCount": 20,
+            "allRevealedAfterRestore": true,
+            "activeObserversAfterReveal": 0,
+            "scrollListenersAfterReveal": 0
+          },
+          "errors": []
+        },
+        "strictModeDevCheck": {
+          "executed": false,
+          "passed": null,
+          "reason": "ADORA_STRICT_DEV_URL not supplied; pass ADORA_STRICT_DEV_URL=http://127.0.0.1:<dev-port> to execute against next dev React Strict Mode."
+        }
+      },
+      "responsiveAndCss": {
+        "executed": true,
+        "passed": true,
+        "viewportResults": [
+          {
+            "viewport": "360x800",
+            "width": 360,
+            "scrollWidthBeforeScroll": 360,
+            "heroImgOpacity": "1",
+            "h1Opacity": "1",
+            "scrollWidthAfterScroll": 360,
+            "pendingRemaining": 0,
+            "philosophySettled": true,
+            "allHomepageSettled": true,
+            "cls": 0,
+            "nonAutoWillChange": 0,
+            "editorialTransition": "0.42s, 0.42s",
+            "errors": []
+          },
+          {
+            "viewport": "390x844",
+            "width": 390,
+            "scrollWidthBeforeScroll": 390,
+            "heroImgOpacity": "1",
+            "h1Opacity": "1",
+            "scrollWidthAfterScroll": 390,
+            "pendingRemaining": 0,
+            "philosophySettled": true,
+            "allHomepageSettled": true,
+            "cls": 0,
+            "nonAutoWillChange": 0,
+            "editorialTransition": "0.42s, 0.42s",
+            "errors": []
+          },
+          {
+            "viewport": "768x1024",
+            "width": 768,
+            "scrollWidthBeforeScroll": 768,
+            "heroImgOpacity": "1",
+            "h1Opacity": "1",
+            "scrollWidthAfterScroll": 768,
+            "pendingRemaining": 0,
+            "philosophySettled": true,
+            "allHomepageSettled": true,
+            "cls": 0,
+            "nonAutoWillChange": 0,
+            "editorialTransition": "0.42s, 0.42s",
+            "errors": []
+          },
+          {
+            "viewport": "1024x900",
+            "width": 1024,
+            "scrollWidthBeforeScroll": 1024,
+            "heroImgOpacity": "1",
+            "h1Opacity": "1",
+            "scrollWidthAfterScroll": 1024,
+            "pendingRemaining": 0,
+            "philosophySettled": true,
+            "allHomepageSettled": true,
+            "cls": 0,
+            "nonAutoWillChange": 0,
+            "editorialTransition": "0.42s, 0.42s",
+            "errors": []
+          },
+          {
+            "viewport": "1440x900",
+            "width": 1440,
+            "scrollWidthBeforeScroll": 1440,
+            "heroImgOpacity": "1",
+            "h1Opacity": "1",
+            "scrollWidthAfterScroll": 1440,
+            "pendingRemaining": 0,
+            "philosophySettled": true,
+            "allHomepageSettled": true,
+            "cls": 0,
+            "nonAutoWillChange": 0,
+            "editorialTransition": "0.42s, 0.42s",
+            "errors": []
+          },
+          {
+            "viewport": "1920x1080",
+            "width": 1920,
+            "scrollWidthBeforeScroll": 1920,
+            "heroImgOpacity": "1",
+            "h1Opacity": "1",
+            "scrollWidthAfterScroll": 1920,
+            "pendingRemaining": 0,
+            "philosophySettled": true,
+            "allHomepageSettled": true,
+            "cls": 0,
+            "nonAutoWillChange": 0,
+            "editorialTransition": "0.42s, 0.42s",
+            "errors": []
+          }
+        ],
+        "desktopHoverZoomCheck": {
+          "finePointerMatches": true,
+          "beforeTransform": "none",
+          "transitionDuration": "1.2s",
+          "cx": 436,
+          "cy": 450,
+          "duringHover": {
+            "hoverMatched": true,
+            "transform": "matrix(1.01926, 0, 0, 1.01926, 0, 0)",
+            "scaleX": 1.0193
+          },
+          "errors": []
+        },
+        "mobileTouchHoverGuardCheck": {
+          "finePointerMatches": false,
+          "hoverNoneMatches": true,
+          "transitionDurationRetained": "1.2s",
+          "cx": 195,
+          "cy": 422,
+          "transformAfterTap": "none",
+          "errors": []
+        },
+        "focusAndUnrelatedRoutesCheck": {
+          "plannerCheck": {
+            "revealCountOnPlanner": 0,
+            "activeAnimationsOnPlanner": 0,
+            "nonAutoWillChange": 0,
+            "outlineNotAnimated": true
+          },
+          "tripDetailCheck": {
+            "revealCountOnTripDetail": 0,
+            "activeAnimationsOnTripDetail": 0
+          },
+          "errors": []
+        }
+      }
+    },
+    "packageB": {
+      "implemented": true,
+      "executed": true,
+      "passed": true,
+      "heroDesktop": {
+        "firstPaint": {
+          "tMs": 0,
+          "sectionOverflowX": "hidden",
+          "heroImg": {
+            "opacity": "1",
+            "animationName": "adora-image-settle",
+            "animationDuration": "0.92s",
+            "animationTimingFunction": "cubic-bezier(0.22, 1, 0.36, 1)",
+            "animationFillMode": "backwards",
+            "scaleX": 1.035,
+            "scaleY": 1.035,
+            "tx": 0,
+            "ty": 0
+          },
+          "eyebrow": {
+            "opacity": "1",
+            "animationName": "adora-hero-heading-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0s",
+            "animationFillMode": "backwards",
+            "scaleX": 1,
+            "scaleY": 1,
+            "tx": 0,
+            "ty": 20
+          },
+          "h1": {
+            "opacity": "1",
+            "animationName": "adora-hero-heading-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0s",
+            "animationFillMode": "backwards",
+            "childElementTags": [
+              "EM"
+            ],
+            "scaleX": 1,
+            "scaleY": 1,
+            "tx": 0,
+            "ty": 20
+          },
+          "leadCopy": {
+            "opacity": 0,
+            "animationName": "adora-load-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0.06s",
+            "animationFillMode": "backwards"
+          },
+          "primaryCta": {
+            "opacity": 0,
+            "animationName": "adora-load-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0.12s",
+            "animationFillMode": "backwards"
+          },
+          "secondaryCta": {
+            "opacity": 0,
+            "animationName": "adora-load-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0.18s",
+            "animationFillMode": "backwards"
+          },
+          "scrollLine": {
+            "animationName": "scroll-line",
+            "animationDuration": "2.2s",
+            "animationIterationCount": "1.5",
+            "animationFillMode": "none"
+          }
+        },
+        "frameStats": {
+          "totalFrames": 867,
+          "heroSettleFrameCount": 229,
+          "medianDtMs": 4.2,
+          "p95DtMs": 4.3,
+          "severeDropsOver50ms": 0
+        },
+        "midScrollSample": {
+          "tMs": 1500,
+          "dtMs": 4.2,
+          "imgScale": 1,
+          "imgOpacity": 1,
+          "eyebrowOpacity": 1,
+          "h1Opacity": 1,
+          "h1Ty": 0,
+          "leadOpacity": 1,
+          "primaryOpacity": 1,
+          "secondaryOpacity": 1,
+          "scrollOpacity": 0.815,
+          "scrollScaleY": 0.8147,
+          "scrollHeightPx": 39.1,
+          "scrollActiveAnims": 1,
+          "heroActiveAnims": 1
+        },
+        "nearEndSample": {
+          "tMs": 3287.5,
+          "dtMs": 3.9,
+          "imgScale": 1,
+          "imgOpacity": 1,
+          "eyebrowOpacity": 1,
+          "h1Opacity": 1,
+          "h1Ty": 0,
+          "leadOpacity": 1,
+          "primaryOpacity": 1,
+          "secondaryOpacity": 1,
+          "scrollOpacity": 1,
+          "scrollScaleY": 0.9996,
+          "scrollHeightPx": 47.98,
+          "scrollActiveAnims": 1,
+          "heroActiveAnims": 1
+        },
+        "settledDom": {
+          "heroImgOpacity": "1",
+          "heroImgTransform": "none",
+          "heroImgWillChange": "auto",
+          "heroImgFetchPriority": null,
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "primaryCtaOpacity": "1",
+          "primaryCtaTransform": "none",
+          "secondaryCtaOpacity": "1",
+          "secondaryCtaTransform": "none",
+          "scrollLineOpacity": "1",
+          "scrollLineTransform": "none",
+          "scrollLineActiveAnims": 0,
+          "totalActiveAnimsAfterSettle": 0
+        },
+        "errors": []
+      },
+      "heroMobile": {
+        "firstPaint": {
+          "tMs": 0,
+          "sectionOverflowX": "hidden",
+          "heroImg": {
+            "opacity": "1",
+            "animationName": "adora-image-settle",
+            "animationDuration": "0.92s",
+            "animationTimingFunction": "cubic-bezier(0.22, 1, 0.36, 1)",
+            "animationFillMode": "backwards",
+            "scaleX": 1.02,
+            "scaleY": 1.02,
+            "tx": 0,
+            "ty": 0
+          },
+          "eyebrow": {
+            "opacity": "1",
+            "animationName": "adora-hero-heading-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0s",
+            "animationFillMode": "backwards",
+            "scaleX": 1,
+            "scaleY": 1,
+            "tx": 0,
+            "ty": 12
+          },
+          "h1": {
+            "opacity": "1",
+            "animationName": "adora-hero-heading-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0s",
+            "animationFillMode": "backwards",
+            "childElementTags": [
+              "EM"
+            ],
+            "scaleX": 1,
+            "scaleY": 1,
+            "tx": 0,
+            "ty": 12
+          },
+          "leadCopy": {
+            "opacity": 0,
+            "animationName": "adora-load-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0.04s",
+            "animationFillMode": "backwards"
+          },
+          "primaryCta": {
+            "opacity": 0,
+            "animationName": "adora-load-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0.08s",
+            "animationFillMode": "backwards"
+          },
+          "secondaryCta": {
+            "opacity": 0,
+            "animationName": "adora-load-rise",
+            "animationDuration": "0.68s",
+            "animationDelay": "0.12s",
+            "animationFillMode": "backwards"
+          },
+          "scrollLine": {
+            "animationName": "scroll-line",
+            "animationDuration": "2.2s",
+            "animationIterationCount": "1.5",
+            "animationFillMode": "none"
+          }
+        },
+        "frameStats": {
+          "totalFrames": 867,
+          "heroSettleFrameCount": 229,
+          "medianDtMs": 4.2,
+          "p95DtMs": 4.4,
+          "severeDropsOver50ms": 0
+        },
+        "midScrollSample": {
+          "tMs": 1500.2,
+          "dtMs": 4.1,
+          "imgScale": 1,
+          "imgOpacity": 1,
+          "eyebrowOpacity": 1,
+          "h1Opacity": 1,
+          "h1Ty": 0,
+          "leadOpacity": 1,
+          "primaryOpacity": 1,
+          "secondaryOpacity": 1,
+          "scrollOpacity": 0.35,
+          "scrollScaleY": 1,
+          "scrollHeightPx": 0,
+          "scrollActiveAnims": 0,
+          "heroActiveAnims": 0
+        },
+        "nearEndSample": null,
+        "settledDom": {
+          "heroImgOpacity": "1",
+          "heroImgTransform": "none",
+          "heroImgWillChange": "auto",
+          "heroImgFetchPriority": null,
+          "h1Opacity": "1",
+          "h1Transform": "none",
+          "primaryCtaOpacity": "1",
+          "primaryCtaTransform": "none",
+          "secondaryCtaOpacity": "1",
+          "secondaryCtaTransform": "none",
+          "scrollLineOpacity": "0.35",
+          "scrollLineTransform": "none",
+          "scrollLineActiveAnims": 0,
+          "totalActiveAnimsAfterSettle": 0
+        },
+        "errors": []
+      },
+      "heroInteractionAndE6": {
+        "focusCheck": {
+          "activeIsCta": true,
+          "opacityOnFocus": "1",
+          "transformOnFocus": "none",
+          "outlineStyle": "solid",
+          "hasClientLatchAttr": false,
+          "cx": 205,
+          "cy": 722
+        },
+        "clickNavigation": {
+          "arrivedAtPlanner": true,
+          "restoredPathname": "/",
+          "restoredH1Visible": true,
+          "restoredImgVisible": true
+        },
+        "errors": []
+      },
+      "editorialDesktop": {
+        "beforeScrollGeometry": {
+          "nestedReveals": 0,
+          "allBandsStatic": true,
+          "footerNavStatic": true,
+          "destBefore": {
+            "frameState": "pending",
+            "frameOpacity": "0",
+            "frameTransform": "none",
+            "frameWidth": 677.77,
+            "frameHeight": 813.31,
+            "imgPendingTransform": "matrix(1.035, 0, 0, 1.035, 0, 0)",
+            "imgPendingTransitionDuration": "0s",
+            "badgePosition": "absolute",
+            "badgeParentPosition": "relative",
+            "badgeParentTransform": "none"
+          },
+          "expLiMetricsBefore": [
+            {
+              "tag": "LI",
+              "relTop": 1,
+              "height": 69,
+              "opacity": "1",
+              "transform": "none",
+              "borderBottomWidth": "1px"
+            },
+            {
+              "tag": "LI",
+              "relTop": 70,
+              "height": 69,
+              "opacity": "1",
+              "transform": "none",
+              "borderBottomWidth": "1px"
+            },
+            {
+              "tag": "LI",
+              "relTop": 139,
+              "height": 69,
+              "opacity": "1",
+              "transform": "none",
+              "borderBottomWidth": "1px"
+            }
+          ],
+          "howLiMetricsBefore": [
+            {
+              "tag": "LI",
+              "relTop": 1,
+              "width": 414.94,
+              "height": 276,
+              "opacity": "1",
+              "transform": "none",
+              "paddingLeft": "0px",
+              "paddingRight": "32px",
+              "borderRightWidth": "1px"
+            },
+            {
+              "tag": "LI",
+              "relTop": 1,
+              "width": 414.94,
+              "height": 276,
+              "opacity": "1",
+              "transform": "none",
+              "paddingLeft": "32px",
+              "paddingRight": "32px",
+              "borderRightWidth": "1px"
+            },
+            {
+              "tag": "LI",
+              "relTop": 1,
+              "width": 414.94,
+              "height": 276,
+              "opacity": "1",
+              "transform": "none",
+              "paddingLeft": "32px",
+              "paddingRight": "0px",
+              "borderRightWidth": "0px"
+            }
+          ],
+          "disclosuresBefore": {
+            "provenanceOutsideReveal": true,
+            "provenanceOpacityWhilePending": "1",
+            "leadDisclaimerDelay": "0ms",
+            "aiHonestyDelay": "0ms"
+          },
+          "aiPreviewBefore": {
+            "bubbleCount": 2,
+            "nestedRevealsInPreview": 0,
+            "bubblesPendingOpacity": [
+              "0",
+              "0"
+            ],
+            "bubbleTextsBefore": [
+              "Tôi muốn ba ngày ở Đà Lạt—chậm, nhiều thiên nhiên và có thời gian cho cà phê.",
+              "Tôi sẽ giúp bạn định hình một nhịp đi cân bằng giữa rừng thông, trải nghiệm địa phương và những khoảng nghỉ vừa đủ."
+            ],
+            "goldDotAnimations": 0,
+            "goldDotAnimationName": "none"
+          }
+        },
+        "afterScrollGeometry": {
+          "sectionBreakdown": {
+            "philosophy": 3,
+            "destinations": 4,
+            "experiences": 6,
+            "howItWorks": 4,
+            "footer": 1,
+            "totalHomepage": 20
+          },
+          "destAfter": {
+            "frameWidth": 677.77,
+            "frameHeight": 813.31,
+            "imgSettledTransform": "none",
+            "imgTransitionDuration": "1.2s",
+            "badgeOverlapsBottomPx": 24
+          },
+          "expDesktopLayout": {
+            "textLeftOfImage": true,
+            "imageColumnTranslatePreserved": "0px 40px"
+          },
+          "expLiMetricsAfter": [
+            {
+              "relTop": 1,
+              "height": 69
+            },
+            {
+              "relTop": 70,
+              "height": 69
+            },
+            {
+              "relTop": 139,
+              "height": 69
+            }
+          ],
+          "howLiMetricsAfter": [
+            {
+              "relTop": 1,
+              "width": 414.94,
+              "height": 276
+            },
+            {
+              "relTop": 1,
+              "width": 414.94,
+              "height": 276
+            },
+            {
+              "relTop": 1,
+              "width": 414.94,
+              "height": 276
+            }
+          ],
+          "aiPreviewAfter": {
+            "bubbleDelays": [
+              "0.18s",
+              "0.26s"
+            ],
+            "bubbleProperties": [
+              "opacity",
+              "opacity"
+            ],
+            "bubbleTransforms": [
+              "none",
+              "none"
+            ],
+            "bubbleOpacities": [
+              "1",
+              "1"
+            ],
+            "bubbleTextsAfter": [
+              "Tôi muốn ba ngày ở Đà Lạt—chậm, nhiều thiên nhiên và có thời gian cho cà phê.",
+              "Tôi sẽ giúp bạn định hình một nhịp đi cân bằng giữa rừng thông, trải nghiệm địa phương và những khoảng nghỉ vừa đủ."
+            ]
+          },
+          "activeAnimationsRemaining": 0
+        },
+        "errors": []
+      },
+      "editorialMobileAndOverrides": {
+        "imageAboveTextOnMobile": true,
+        "stackedUnitCount": 10,
+        "allStackedZeroDelayOnMobile": true,
+        "mobileBubbleDelays": [
+          "0.08s",
+          "0.16s"
+        ],
+        "mobileBubbleOpacities": [
+          "1",
+          "1"
+        ],
+        "errors": []
+      },
+      "sampleBubbleFailVisible": {
+        "reducedState": {
+          "heroImgTransform": "none",
+          "h1Transform": "none",
+          "scrollLineTransform": "none",
+          "scrollLineOpacity": "1",
+          "bubblesVisibleUnderReducedMotion": true
+        },
+        "printState": {
+          "bubblesVisibleInPrint": true
+        },
+        "errors": []
+      },
+      "evidenceCapture": {
+        "captured": false
+      }
+    },
+    "packageC": {
+      "implemented": true,
+      "executed": true,
+      "passed": true,
+      "destinationsDesktop": {
+        "passed": true,
+        "loadProbe": {
+          "h1AnimationName": "adora-intro-heading-rise",
+          "h1Duration": "0.48s",
+          "h1Delay": "0s",
+          "h1Opacity": "1",
+          "eyebrowDelay": "0s",
+          "rightColAnimationName": "adora-intro-rise",
+          "rightColDelay": "0s",
+          "hasBadgeInRightCol": true,
+          "featuredImgAnimationName": "adora-featured-settle",
+          "featuredImgDuration": "0.76s",
+          "featuredImgOpacity": "1",
+          "featuredFrameTransform": "none",
+          "featuredCardTransform": "none"
+        },
+        "settledProbe": {
+          "h1Opacity": "1",
+          "rightColOpacity": "1",
+          "featuredImgOpacity": "1",
+          "featuredCardTransform": "none"
+        },
+        "filterProbe": {
+          "chipChangedNode": true,
+          "chipHasAttr": true,
+          "chipAnimName": "adora-filter-settle",
+          "chipAnimDuration": "0.22s",
+          "chipAnimSeen": true,
+          "chipTransform": "none",
+          "activeBefore": true,
+          "activePreserved": true,
+          "typingRemounted": false,
+          "typingRestartedSettle": false,
+          "emptyHasAttr": true,
+          "emptyAnimName": "adora-filter-settle",
+          "emptySettledOpacity": "1"
+        },
+        "onDetail": "/destinations/da-lat",
+        "backProbe": {
+          "pathname": "/destinations",
+          "h1Visible": true,
+          "rightColVisible": true,
+          "featuredImgVisible": true
+        },
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "experiencesDesktop": {
+        "passed": true,
+        "focusAndStaticCheck": {
+          "isExperienceLink": true,
+          "matchesFocusVisible": true,
+          "svgTransform": "none",
+          "svgTranslate": "2px -2px",
+          "svgColor": "rgb(179, 154, 112)",
+          "svgTransitionDuration": "0.26s",
+          "indexCardCount": 6,
+          "indexRevealNodes": 0
+        },
+        "filterCheck": {
+          "chipChangedNode": true,
+          "chipHasAttr": true,
+          "chipAnimName": "adora-filter-settle",
+          "chipAnimDuration": "0.22s",
+          "chipTransform": "none",
+          "typingRemounted": false,
+          "emptyHasAttr": true,
+          "emptyAnimName": "adora-filter-settle",
+          "emptySettledOpacity": "1"
+        },
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "destinationDetailDesktop": {
+        "passed": true,
+        "loadProbe": {
+          "heroImgSettle": true,
+          "heroImgOpacity": "1",
+          "h1Opacity": "1",
+          "h1Delay": "0s",
+          "badgeDelay": "0s",
+          "proseReveals": 0,
+          "proseParentReveal": false,
+          "highlightLiWithReveal": 0,
+          "highlightInnerReveals": 4,
+          "tripLiWithReveal": 0,
+          "tripInnerReveals": 3,
+          "gridLiReveals": 6,
+          "ctaSectionHasReveal": false,
+          "ctaInnerHasReveal": true
+        },
+        "afterScroll": {
+          "pendingCount": 0,
+          "visibleCount": 18,
+          "hiddenVisibleCheck": 0,
+          "horizontalOverflowPx": 0
+        },
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "experienceDetailDesktop": {
+        "passed": true,
+        "loadProbe": {
+          "heroImgSettle": true,
+          "heroImgOpacity": "1",
+          "h1Opacity": "1",
+          "h1Delay": "0s",
+          "rightHeroDelay": "0s",
+          "proseReveals": 0,
+          "asideReveals": 0,
+          "asideHasReveal": false,
+          "noteOpacity": "1",
+          "relatedReveals": 3
+        },
+        "afterScroll": {
+          "pendingCount": 0,
+          "visibleCount": 6,
+          "hiddenVisibleCheck": 0,
+          "horizontalOverflowPx": 0
+        },
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "overridesAndTouch": {
+        "passed": true,
+        "reducedMetrics": {
+          "h1Opacity": "1",
+          "h1AnimName": "none",
+          "h1AnimDuration": "0s",
+          "imgOpacity": "1",
+          "imgTransform": "none"
+        },
+        "touchMetrics": {
+          "matchesHoverHover": false,
+          "imgTransitionDuration": "1e-05s"
+        },
+        "errors": []
+      },
+      "viewportMatrix": [
+        {
+          "viewport": "360",
+          "width": 360,
+          "passed": true,
+          "results": {
+            "destinations": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "destination-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experiences": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experience-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "mobile",
+          "width": 390,
+          "passed": true,
+          "results": {
+            "destinations": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "destination-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experiences": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experience-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "768",
+          "width": 768,
+          "passed": true,
+          "results": {
+            "destinations": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "destination-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experiences": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experience-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "1024",
+          "width": 1024,
+          "passed": true,
+          "results": {
+            "destinations": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "destination-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experiences": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experience-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "desktop",
+          "width": 1440,
+          "passed": true,
+          "results": {
+            "destinations": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "destination-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experiences": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experience-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "1920",
+          "width": 1920,
+          "passed": true,
+          "results": {
+            "destinations": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "destination-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experiences": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            },
+            "experience-detail": {
+              "horizontalOverflowPx": 0,
+              "pendingCount": 0
+            }
+          },
+          "errors": []
+        }
+      ],
+      "evidenceCapture": {
+        "captured": false
+      }
+    },
+    "packageD": {
+      "implemented": true,
+      "executed": true,
+      "passed": true,
+      "plannerDesktop": {
+        "initialCheck": {
+          "initialScrollTop": 0,
+          "suggestionCount": 2,
+          "allSuggestionsVisibleInLog": true,
+          "openingVisibleInLog": true,
+          "emptyPreviewPresent": true,
+          "liveRegionCount": 1,
+          "ariaBusyCount": 0,
+          "activeAnimationsAtLoad": 0
+        },
+        "turnAtT0": {
+          "activeElementIdAtT0": "planner-prompt",
+          "scrollTopAtT0": 196,
+          "ariaBusyCountAtT0": 0,
+          "replyTextLengthAtT0": 804,
+          "hasDemoLabelAtT0": true,
+          "userAnim": {
+            "name": "adora-planner-fade",
+            "duration": "0.16s",
+            "delay": "0s",
+            "fillMode": "backwards",
+            "transform": "none",
+            "tabIndex": -1
+          },
+          "replyAnim": {
+            "name": "adora-planner-fade",
+            "duration": "0.2s",
+            "delay": "0.08s",
+            "fillMode": "backwards",
+            "transform": "none"
+          },
+          "previewAnim": {
+            "name": "adora-preview-in",
+            "duration": "0.2s",
+            "delay": "0.08s",
+            "fillMode": "backwards"
+          }
+        },
+        "turnSettled": {
+          "scrollTopAfterSettle": 196,
+          "userAnchorOffsetPx": 12,
+          "replyTextLengthAfterSettle": 804,
+          "userEnteredLatch": true,
+          "replyEnteredLatch": true,
+          "previewEnteredLatch": true,
+          "userOpacity": "1",
+          "userTransform": "none",
+          "replyOpacity": "1",
+          "replyTransform": "none",
+          "previewOpacity": "1",
+          "previewTransform": "none",
+          "previewHeading": "Đà Lạt — 3 ngày chậm",
+          "previewDaysCount": 3,
+          "activeAnimationsAfterSettle": 0
+        },
+        "secondScenarioSwitch": {
+          "previewRemountedByKey": true,
+          "newPreviewAnimName": "adora-preview-in",
+          "previewDaysCount": 2,
+          "previewEnteredLatch": true,
+          "previewSettledOpacity": "1",
+          "previewSettledTransform": "none"
+        },
+        "unsupportedTurn": {
+          "hasDemoLabelAtT0": true,
+          "animAtT0": {
+            "dataPlannerEnter": "reply",
+            "name": "adora-planner-fade",
+            "duration": "0.2s",
+            "delay": "0.08s",
+            "transform": "none"
+          },
+          "settledOpacity": "1",
+          "settledTransform": "none",
+          "enteredLatch": true
+        },
+        "activityBackCheck": {
+          "restoredPathname": "/ai-planner",
+          "enterNodeCount": 9,
+          "allLatched": true,
+          "runningPlannerAnimsCount": 0,
+          "restoredScrollTop": 1231,
+          "scrollDeltaAfterBack": 0
+        },
+        "resetAndMouseSuggestion": {
+          "afterReset": {
+            "scrollTopAfterReset": 0,
+            "emptyPreviewRestored": true,
+            "activeElementAfterReset": "planner-prompt"
+          },
+          "activeElementAfterMouseWelcomeClick": "planner-prompt"
+        },
+        "externalRequests": [],
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "plannerMobile": {
+        "touchWelcomeAndMobileTurn": {
+          "activeIsUserTurn": true,
+          "activeIsNotPrompt": true,
+          "activeIsNotBody": true,
+          "scrollTopAtT0": 210,
+          "jumpbarAnim": {
+            "name": "adora-planner-fade",
+            "duration": "0.16s",
+            "delay": "0s",
+            "transform": "none"
+          },
+          "mobilePreviewAnim": {
+            "name": "adora-planner-fade",
+            "duration": "0.2s",
+            "delay": "0.08s",
+            "transform": "none"
+          },
+          "scrollTopAfterSettle": 210,
+          "userAnchorOffsetPx": 12,
+          "jumpbarEnteredLatch": true,
+          "mobilePreviewEnteredLatch": true,
+          "mobilePreviewOpacity": "1",
+          "mobilePreviewTransform": "none"
+        },
+        "jumpbarScrollCheck": {
+          "scrollTopAtT0Preview": 518,
+          "previewOffsetPx": 186,
+          "previewVisibleInLog": true,
+          "scrollTopAtT0Reply": 210,
+          "replyOffsetPx": 12
+        },
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "itineraryDesktop": {
+        "tripsIndexCheck": {
+          "cardCount": 2,
+          "cardTransitionDuration": "0.18s",
+          "imgRevealTransitionDuration": "1.2s"
+        },
+        "initialLoadCheck": {
+          "hasDayPanelEnterOnInitialLoad": false,
+          "panelAnimsOnInitialLoad": 0,
+          "day1Budget": "1.200.000 ₫",
+          "activityButtonCount": 3,
+          "regionCount": 3,
+          "allAriaControlsResolve": true,
+          "collapsedCheck": true
+        },
+        "day2SwitchCheck": {
+          "stablePanelNode": true,
+          "hasInnerEnterAttr": true,
+          "tab2SelectedAtT0": true,
+          "day2BudgetAtT0": "1.500.000 ₫",
+          "animMeta": {
+            "name": "adora-panel-in",
+            "duration": "0.22s",
+            "fillMode": "backwards",
+            "opacityAtT0": 0.25,
+            "tyAtT0": 6
+          },
+          "settledOpacity": "1",
+          "settledTransform": "none",
+          "enteredLatch": true,
+          "activeAnimsAfterSettle": 0
+        },
+        "keyboardTabsCheck": {
+          "stablePanelNodeAfterKeyboard": true,
+          "afterRight": {
+            "activeId": "day-tab-3",
+            "selected": "true",
+            "budget": "900.000 ₫"
+          },
+          "afterHome": {
+            "activeId": "day-tab-1",
+            "selected": "true",
+            "budget": "1.200.000 ₫"
+          },
+          "afterEnd": {
+            "activeId": "day-tab-3",
+            "selected": "true"
+          },
+          "afterLeft": {
+            "activeId": "day-tab-2",
+            "selected": "true"
+          }
+        },
+        "accordionCheck": {
+          "firstExpandedAtT0": "false",
+          "secondExpandedAtT0": "true",
+          "firstInertAtT0": true,
+          "secondInertAtT0": false,
+          "sameFirstRegionNode": false,
+          "sameRegionNodeAcrossToggle": true,
+          "firstCollapsedHeight": 0,
+          "secondExpandedHeight": 189,
+          "firstCollapsedOpacity": "0",
+          "firstCollapsedGridRows": "0px",
+          "secondHasLinkInDom": true
+        },
+        "tabSkipCollapsedLinkCheck": {
+          "secondRegionHasLink": true,
+          "secondRegionInert": true,
+          "activeIsThirdButton": true,
+          "activeInsideCollapsedSecondRegion": false
+        },
+        "itineraryActivityBackCheck": {
+          "restoredPathname": "/trips/da-lat-3-ngay",
+          "enteredLatch": true,
+          "runningPanelAnims": 0
+        },
+        "errors": [],
+        "hydrationWarnings": []
+      },
+      "reducedMotionApplicationCheck": {
+        "plannerReduced": {
+          "userAnimName": "none",
+          "userOpacity": "1",
+          "replyAnimName": "none",
+          "replyOpacity": "1",
+          "instantPreviewJumpOffsetPx": 186,
+          "instantPreviewVisibleInLog": true
+        },
+        "itineraryReduced": {
+          "panelAnimName": "none",
+          "panelOpacity": "1",
+          "accordionTransitionDuration": "1e-05s"
+        },
+        "errors": []
+      },
+      "viewportMatrix": [
+        {
+          "viewport": "360x800",
+          "routeResults": {
+            "/ai-planner": {
+              "innerWidth": 360,
+              "scrollWidth": 360,
+              "nonAutoWillChange": 0
+            },
+            "/trips": {
+              "innerWidth": 360,
+              "scrollWidth": 360,
+              "nonAutoWillChange": 0
+            },
+            "/trips/da-lat-3-ngay": {
+              "innerWidth": 360,
+              "scrollWidth": 360,
+              "nonAutoWillChange": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "390x844",
+          "routeResults": {
+            "/ai-planner": {
+              "innerWidth": 390,
+              "scrollWidth": 390,
+              "nonAutoWillChange": 0
+            },
+            "/trips": {
+              "innerWidth": 390,
+              "scrollWidth": 390,
+              "nonAutoWillChange": 0
+            },
+            "/trips/da-lat-3-ngay": {
+              "innerWidth": 390,
+              "scrollWidth": 390,
+              "nonAutoWillChange": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "768x1024",
+          "routeResults": {
+            "/ai-planner": {
+              "innerWidth": 768,
+              "scrollWidth": 768,
+              "nonAutoWillChange": 0
+            },
+            "/trips": {
+              "innerWidth": 768,
+              "scrollWidth": 768,
+              "nonAutoWillChange": 0
+            },
+            "/trips/da-lat-3-ngay": {
+              "innerWidth": 768,
+              "scrollWidth": 768,
+              "nonAutoWillChange": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "1024x900",
+          "routeResults": {
+            "/ai-planner": {
+              "innerWidth": 1024,
+              "scrollWidth": 1024,
+              "nonAutoWillChange": 0
+            },
+            "/trips": {
+              "innerWidth": 1024,
+              "scrollWidth": 1024,
+              "nonAutoWillChange": 0
+            },
+            "/trips/da-lat-3-ngay": {
+              "innerWidth": 1024,
+              "scrollWidth": 1024,
+              "nonAutoWillChange": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "1440x900",
+          "routeResults": {
+            "/ai-planner": {
+              "innerWidth": 1440,
+              "scrollWidth": 1440,
+              "nonAutoWillChange": 0
+            },
+            "/trips": {
+              "innerWidth": 1440,
+              "scrollWidth": 1440,
+              "nonAutoWillChange": 0
+            },
+            "/trips/da-lat-3-ngay": {
+              "innerWidth": 1440,
+              "scrollWidth": 1440,
+              "nonAutoWillChange": 0
+            }
+          },
+          "errors": []
+        },
+        {
+          "viewport": "1920x1080",
+          "routeResults": {
+            "/ai-planner": {
+              "innerWidth": 1920,
+              "scrollWidth": 1920,
+              "nonAutoWillChange": 0
+            },
+            "/trips": {
+              "innerWidth": 1920,
+              "scrollWidth": 1920,
+              "nonAutoWillChange": 0
+            },
+            "/trips/da-lat-3-ngay": {
+              "innerWidth": 1920,
+              "scrollWidth": 1920,
+              "nonAutoWillChange": 0
+            }
+          },
+          "errors": []
+        }
+      ],
+      "evidenceCapture": {
+        "captured": false
+      }
+    },
+    "packageE": {
+      "implemented": true,
+      "executed": true,
+      "passed": true,
+      "desktopJourney": {
+        "passed": true,
+        "forwardSteps": [
+          {
+            "path": "/",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/destinations",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/destinations/da-lat",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/experiences",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/experiences/ca-phe-nho-giot-cao-nguyen",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/ai-planner",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/trips",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/trips/da-lat-3-ngay",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          }
+        ],
+        "activityBackChain": [
+          {
+            "path": "/ai-planner",
+            "h1Visible": true,
+            "visibleRevealCount": 0,
+            "stuckAboveFold": 0,
+            "runningFiniteAnimations": 0
+          },
+          {
+            "path": "/experiences",
+            "h1Visible": true,
+            "visibleRevealCount": 1,
+            "stuckAboveFold": 0,
+            "runningFiniteAnimations": 0
+          },
+          {
+            "path": "/destinations/da-lat",
+            "h1Visible": true,
+            "visibleRevealCount": 18,
+            "stuckAboveFold": 0,
+            "runningFiniteAnimations": 0
+          }
+        ],
+        "forwardRestored": {
+          "path": "/experiences",
+          "h1Visible": true,
+          "visiblePendingRemaining": 0
+        },
+        "hydrationWarnings": [],
+        "errors": []
+      },
+      "mobileJourney": {
+        "passed": true,
+        "forwardSteps": [
+          {
+            "path": "/",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/destinations",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/destinations/da-lat",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/experiences",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/experiences/ca-phe-nho-giot-cao-nguyen",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/ai-planner",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/trips",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          },
+          {
+            "path": "/trips/da-lat-3-ngay",
+            "pendingCount": 0,
+            "overflowPx": 0,
+            "mainVisible": true,
+            "h1Visible": true
+          }
+        ],
+        "activityBackChain": [
+          {
+            "path": "/ai-planner",
+            "h1Visible": true,
+            "visibleRevealCount": 0,
+            "stuckAboveFold": 0,
+            "runningFiniteAnimations": 0
+          },
+          {
+            "path": "/experiences",
+            "h1Visible": true,
+            "visibleRevealCount": 1,
+            "stuckAboveFold": 0,
+            "runningFiniteAnimations": 0
+          },
+          {
+            "path": "/destinations/da-lat",
+            "h1Visible": true,
+            "visibleRevealCount": 18,
+            "stuckAboveFold": 0,
+            "runningFiniteAnimations": 0
+          }
+        ],
+        "forwardRestored": {
+          "path": "/experiences",
+          "h1Visible": true,
+          "visiblePendingRemaining": 0
+        },
+        "hydrationWarnings": [],
+        "errors": []
+      },
+      "reducedMotionAndKillSwitch": {
+        "passed": true,
+        "checks": [
+          {
+            "route": "/",
+            "h1Opacity": "1",
+            "h1Transform": "none",
+            "allRevealsVisible": true
+          },
+          {
+            "route": "/destinations",
+            "h1Opacity": "1",
+            "h1Transform": "none",
+            "allRevealsVisible": true
+          },
+          {
+            "route": "/destinations/da-lat",
+            "h1Opacity": "1",
+            "h1Transform": "none",
+            "allRevealsVisible": true
+          },
+          {
+            "route": "/ai-planner",
+            "h1Opacity": "1",
+            "h1Transform": "none",
+            "allRevealsVisible": true
+          },
+          {
+            "route": "/trips/da-lat-3-ngay",
+            "h1Opacity": "1",
+            "h1Transform": "none",
+            "allRevealsVisible": true
+          }
+        ],
+        "killSwitchState": {
+          "dataMotion": "off",
+          "allRevealsOpacity1": true
+        },
+        "printState": {
+          "allRevealsVisibleInPrint": true
+        },
+        "errors": []
+      },
+      "accessibilityAndKeyboardAudit": {
+        "passed": true,
+        "skipLinkCheck": {
+          "activeHref": "#main-content",
+          "visibleOnFocus": true,
+          "mainContentExists": true,
+          "inv01HeaderUntouched": true,
+          "backlogStatusDot": {
+            "present": true,
+            "tagName": "SPAN",
+            "roleAttr": null,
+            "ariaLabel": "Bản xem trước sẵn sàng"
+          }
+        },
+        "focusVisibleIndicatorCheck": {
+          "tagName": "A",
+          "outlineStyle": "solid",
+          "outlineWidth": "2px",
+          "hasVisibleFocusRing": true
+        },
+        "mobileDrawerCheck": {
+          "passed": true,
+          "openState": {
+            "expanded": "true",
+            "navVisible": true,
+            "inv02DrawerStaticDisplay": true
+          },
+          "closedState": {
+            "expanded": "false",
+            "navVisible": false
+          },
+          "errors": []
+        },
+        "deferredInventory": {
+          "INV_01": {
+            "status": "approved_deferred",
+            "headerUntouched": true
+          },
+          "INV_02": {
+            "status": "approved_deferred",
+            "drawerFunctionalAndUntouched": true
+          }
+        },
+        "preExistingBacklog": {
+          "resetButtonFocusLoss": {
+            "triggeredEmpty": true,
+            "beforeClickActiveTag": "BUTTON",
+            "afterClickActiveTag": "BODY",
+            "dropsToBody": true
+          },
+          "itineraryInactiveTabAriaControls": {
+            "tabs": [
+              {
+                "id": "day-tab-1",
+                "ariaSelected": "true",
+                "ariaControls": "day-panel-1",
+                "controlledElementExistsInDom": true
+              },
+              {
+                "id": "day-tab-2",
+                "ariaSelected": "false",
+                "ariaControls": "day-panel-2",
+                "controlledElementExistsInDom": false
+              },
+              {
+                "id": "day-tab-3",
+                "ariaSelected": "false",
+                "ariaControls": "day-panel-3",
+                "controlledElementExistsInDom": false
+              }
+            ],
+            "danglingInactiveControlsCount": 2
+          },
+          "aiPlannerPreviewStatusDot": {
+            "present": true,
+            "tagName": "SPAN",
+            "roleAttr": null,
+            "ariaLabel": "Bản xem trước sẵn sàng"
+          }
+        },
+        "errors": []
+      },
+      "staticDisclosureAndSixViewportCheck": [
+        {
+          "viewport": "360",
+          "width": 360,
+          "height": 800,
+          "passed": true,
+          "plannerCheck": {
+            "overflowPx": 0,
+            "demoVisible": true
+          },
+          "expCheck": {
+            "overflowPx": 0,
+            "priceDisclaimerVisible": true
+          }
+        },
+        {
+          "viewport": "mobile",
+          "width": 390,
+          "height": 844,
+          "passed": true,
+          "plannerCheck": {
+            "overflowPx": 0,
+            "demoVisible": true
+          },
+          "expCheck": {
+            "overflowPx": 0,
+            "priceDisclaimerVisible": true
+          }
+        },
+        {
+          "viewport": "768",
+          "width": 768,
+          "height": 1024,
+          "passed": true,
+          "plannerCheck": {
+            "overflowPx": 0,
+            "demoVisible": true
+          },
+          "expCheck": {
+            "overflowPx": 0,
+            "priceDisclaimerVisible": true
+          }
+        },
+        {
+          "viewport": "1024",
+          "width": 1024,
+          "height": 900,
+          "passed": true,
+          "plannerCheck": {
+            "overflowPx": 0,
+            "demoVisible": true
+          },
+          "expCheck": {
+            "overflowPx": 0,
+            "priceDisclaimerVisible": true
+          }
+        },
+        {
+          "viewport": "desktop",
+          "width": 1440,
+          "height": 900,
+          "passed": true,
+          "plannerCheck": {
+            "overflowPx": 0,
+            "demoVisible": true
+          },
+          "expCheck": {
+            "overflowPx": 0,
+            "priceDisclaimerVisible": true
+          }
+        },
+        {
+          "viewport": "1920",
+          "width": 1920,
+          "height": 1080,
+          "passed": true,
+          "plannerCheck": {
+            "overflowPx": 0,
+            "demoVisible": true
+          },
+          "expCheck": {
+            "overflowPx": 0,
+            "priceDisclaimerVisible": true
+          }
+        }
+      ],
+      "evidenceCapture": {
+        "captured": false
+      }
+    }
+  }
+}

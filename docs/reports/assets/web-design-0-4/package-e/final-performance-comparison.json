@@ -1,0 +1,854 @@
+{
+  "schemaVersion": "adora.web.package-e-performance-comparison.v1",
+  "generatedAt": "2026-11-13T15:52:33.328Z",
+  "collector": {
+    "scriptPath": "scripts/collect_web_motion_metrics.mjs",
+    "version": "1.0.0",
+    "sha256": "e4732607fe6508bec1becfe86c1a734182c3a7aa07a70b7fdc63675cd97a43fb"
+  },
+  "methodology": {
+    "runsPerCell": 5,
+    "coldCacheDisabled": true,
+    "desktopProfile": "desktop_unthrottled (1440x900, 1x CPU)",
+    "mobileProfile": "mobile_lab_throttled (390x844, 4x CPU slowdown, 150ms RTT, ~1.6 Mbps)",
+    "cpuLoadContext": {
+      "packageECollection": "1% before, 0% after",
+      "sameSessionControl03Collection": "1% before, 5% after (isolated detached git worktree at c49595573f8b7214f414a589006b748d5d6babfb)"
+    }
+  },
+  "environments": {
+    "a0Baseline": {
+      "collectedAt": "2026-11-06T22:34:54.841Z",
+      "gitSha": "87f2bf7de601e2689a71b3d543245c50c84e8271",
+      "appBaselineSha": "c49595573f8b7214f414a589006b748d5d6babfb",
+      "chromeBrowser": "Chrome/156.0.8078.80",
+      "nodeVersion": "v24.19.0"
+    },
+    "sameSessionControl03": {
+      "collectedAt": "2026-11-13T15:31:37.330Z",
+      "gitSha": "c49595573f8b7214f414a589006b748d5d6babfb",
+      "chromeBrowser": "Chrome/157.0.8103.78",
+      "nodeVersion": "v24.19.0"
+    },
+    "packageEFinal": {
+      "collectedAt": "2026-11-13T15:18:51.519Z",
+      "gitSha": "d62192c71c87b07aed72d5dd7e921003bf916302",
+      "chromeBrowser": "Chrome/157.0.8103.78",
+      "nodeVersion": "v24.19.0"
+    }
+  },
+  "routeComparisons": [
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/",
+      "lcpMs": {
+        "a0Baseline": 96,
+        "sameSessionControl03": 96,
+        "packageEFinal": 104,
+        "deltaVsA0": 8,
+        "deltaVsControl03": 8,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "h1"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 1,
+        "sameSessionControl03": 3,
+        "packageEFinal": 1,
+        "deltaVsA0": 0,
+        "deltaVsControl03": -2
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 195161,
+        "sameSessionControl03": 195161,
+        "packageEFinal": 197818,
+        "deltaBytesVsControl03": 2657,
+        "deltaKbVsControl03": 2.59
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.4,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/destinations",
+      "lcpMs": {
+        "a0Baseline": 108,
+        "sameSessionControl03": 100,
+        "packageEFinal": 104,
+        "deltaVsA0": -4,
+        "deltaVsControl03": 4,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.4,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/destinations/da-lat",
+      "lcpMs": {
+        "a0Baseline": 120,
+        "sameSessionControl03": 120,
+        "packageEFinal": 120,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/experiences",
+      "lcpMs": {
+        "a0Baseline": 104,
+        "sameSessionControl03": 100,
+        "packageEFinal": 112,
+        "deltaVsA0": 8,
+        "deltaVsControl03": 12,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "h1"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 195161,
+        "sameSessionControl03": 195161,
+        "packageEFinal": 197818,
+        "deltaBytesVsControl03": 2657,
+        "deltaKbVsControl03": 2.59
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.4,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/experiences/ca-phe-nho-giot-cao-nguyen",
+      "lcpMs": {
+        "a0Baseline": 112,
+        "sameSessionControl03": 108,
+        "packageEFinal": 108,
+        "deltaVsA0": -4,
+        "deltaVsControl03": 0,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.4,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/ai-planner",
+      "lcpMs": {
+        "a0Baseline": 124,
+        "sameSessionControl03": 124,
+        "packageEFinal": 120,
+        "deltaVsA0": -4,
+        "deltaVsControl03": -4,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "p"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 1,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": -1
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 195161,
+        "sameSessionControl03": 195161,
+        "packageEFinal": 197818,
+        "deltaBytesVsControl03": 2657,
+        "deltaKbVsControl03": 2.59
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/trips",
+      "lcpMs": {
+        "a0Baseline": 104,
+        "sameSessionControl03": 100,
+        "packageEFinal": 96,
+        "deltaVsA0": -8,
+        "deltaVsControl03": -4,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "h1"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "route": "/trips/da-lat-3-ngay",
+      "lcpMs": {
+        "a0Baseline": 108,
+        "sameSessionControl03": 104,
+        "packageEFinal": 112,
+        "deltaVsA0": 4,
+        "deltaVsControl03": 8,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.4,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/",
+      "lcpMs": {
+        "a0Baseline": 1436,
+        "sameSessionControl03": 1392,
+        "packageEFinal": 1524,
+        "deltaVsA0": 88,
+        "deltaVsControl03": 132,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 493,
+        "sameSessionControl03": 506,
+        "packageEFinal": 571,
+        "deltaVsA0": 78,
+        "deltaVsControl03": 65
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 195161,
+        "sameSessionControl03": 195161,
+        "packageEFinal": 197818,
+        "deltaBytesVsControl03": 2657,
+        "deltaKbVsControl03": 2.59
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/destinations",
+      "lcpMs": {
+        "a0Baseline": 2972,
+        "sameSessionControl03": 2976,
+        "packageEFinal": 2984,
+        "deltaVsA0": 12,
+        "deltaVsControl03": 8,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 359,
+        "sameSessionControl03": 380,
+        "packageEFinal": 383,
+        "deltaVsA0": 24,
+        "deltaVsControl03": 3
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/destinations/da-lat",
+      "lcpMs": {
+        "a0Baseline": 2952,
+        "sameSessionControl03": 2956,
+        "packageEFinal": 2972,
+        "deltaVsA0": 20,
+        "deltaVsControl03": 16,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 454,
+        "sameSessionControl03": 488,
+        "packageEFinal": 569,
+        "deltaVsA0": 115,
+        "deltaVsControl03": 81
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/experiences",
+      "lcpMs": {
+        "a0Baseline": 1052,
+        "sameSessionControl03": 1064,
+        "packageEFinal": 1096,
+        "deltaVsA0": 44,
+        "deltaVsControl03": 32,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "h1"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 340,
+        "sameSessionControl03": 341,
+        "packageEFinal": 333,
+        "deltaVsA0": -7,
+        "deltaVsControl03": -8
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 195161,
+        "sameSessionControl03": 195161,
+        "packageEFinal": 197818,
+        "deltaBytesVsControl03": 2657,
+        "deltaKbVsControl03": 2.59
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/experiences/ca-phe-nho-giot-cao-nguyen",
+      "lcpMs": {
+        "a0Baseline": 1984,
+        "sameSessionControl03": 1980,
+        "packageEFinal": 2028,
+        "deltaVsA0": 44,
+        "deltaVsControl03": 48,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 376,
+        "sameSessionControl03": 407,
+        "packageEFinal": 447,
+        "deltaVsA0": 71,
+        "deltaVsControl03": 40
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/ai-planner",
+      "lcpMs": {
+        "a0Baseline": 876,
+        "sameSessionControl03": 892,
+        "packageEFinal": 892,
+        "deltaVsA0": 16,
+        "deltaVsControl03": 0,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "p"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 219,
+        "sameSessionControl03": 254,
+        "packageEFinal": 265,
+        "deltaVsA0": 46,
+        "deltaVsControl03": 11
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 173308,
+        "sameSessionControl03": 173308,
+        "packageEFinal": 174717,
+        "deltaBytesVsControl03": 1409,
+        "deltaKbVsControl03": 1.38
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/trips",
+      "lcpMs": {
+        "a0Baseline": 1384,
+        "sameSessionControl03": 1380,
+        "packageEFinal": 1376,
+        "deltaVsA0": -8,
+        "deltaVsControl03": -4,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 310,
+        "sameSessionControl03": 295,
+        "packageEFinal": 323,
+        "deltaVsA0": 13,
+        "deltaVsControl03": 28
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "route": "/trips/da-lat-3-ngay",
+      "lcpMs": {
+        "a0Baseline": 1376,
+        "sameSessionControl03": 1376,
+        "packageEFinal": 1376,
+        "deltaVsA0": 0,
+        "deltaVsControl03": 0,
+        "identityPreservedVsA0": true,
+        "identityPreservedVsControl03": true,
+        "representativeElementTag": "img"
+      },
+      "clsTotal": {
+        "a0Baseline": 0,
+        "sameSessionControl03": 0,
+        "packageEFinal": 0,
+        "maxAcrossRunsPackageE": 0
+      },
+      "totalBlockingTimeMs": {
+        "a0Baseline": 318,
+        "sameSessionControl03": 325,
+        "packageEFinal": 373,
+        "deltaVsA0": 55,
+        "deltaVsControl03": 48
+      },
+      "javascriptCompressedBytes": {
+        "a0Baseline": 200854,
+        "sameSessionControl03": 200854,
+        "packageEFinal": 203792,
+        "deltaBytesVsControl03": 2938,
+        "deltaKbVsControl03": 2.87
+      },
+      "animationAndLayerHygiene": {
+        "medianFrameIntervalMs": 4.2,
+        "p95FrameIntervalMs": 4.3,
+        "framesOver50msAcrossRuns": 0,
+        "maxNonAutoWillChangeCount": 0
+      }
+    }
+  ],
+  "interactionComparisons": [
+    {
+      "profileId": "desktop_unthrottled",
+      "interactionId": "destination_filter_select",
+      "route": "/destinations",
+      "eventTimingMedianMs": {
+        "a0Baseline": 8,
+        "sameSessionControl03": 8,
+        "packageEFinal": 16,
+        "maxPackageE": 16
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 5.7,
+        "sameSessionControl03": 5,
+        "packageEFinal": 6,
+        "deltaVsControl03": 1
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "interactionId": "experience_category_select",
+      "route": "/experiences",
+      "eventTimingMedianMs": {
+        "a0Baseline": 8,
+        "sameSessionControl03": 8,
+        "packageEFinal": 8,
+        "maxPackageE": 8
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 5.3,
+        "sameSessionControl03": 5.4,
+        "packageEFinal": 6,
+        "deltaVsControl03": 0.6
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "interactionId": "planner_scripted_prompt_select",
+      "route": "/ai-planner",
+      "eventTimingMedianMs": {
+        "a0Baseline": 24,
+        "sameSessionControl03": 24,
+        "packageEFinal": 24,
+        "maxPackageE": 24
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 15,
+        "sameSessionControl03": 16,
+        "packageEFinal": 15.5,
+        "deltaVsControl03": -0.5
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "interactionId": "itinerary_day_switch",
+      "route": "/trips/da-lat-3-ngay",
+      "eventTimingMedianMs": {
+        "a0Baseline": 8,
+        "sameSessionControl03": 8,
+        "packageEFinal": 8,
+        "maxPackageE": 16
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 5.6,
+        "sameSessionControl03": 5.8,
+        "packageEFinal": 6.9,
+        "deltaVsControl03": 1.1
+      }
+    },
+    {
+      "profileId": "desktop_unthrottled",
+      "interactionId": "itinerary_accordion_toggle",
+      "route": "/trips/da-lat-3-ngay",
+      "eventTimingMedianMs": {
+        "a0Baseline": 8,
+        "sameSessionControl03": 8,
+        "packageEFinal": 8,
+        "maxPackageE": 8
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 5.2,
+        "sameSessionControl03": 5.9,
+        "packageEFinal": 5.7,
+        "deltaVsControl03": -0.2
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "interactionId": "destination_filter_select",
+      "route": "/destinations",
+      "eventTimingMedianMs": {
+        "a0Baseline": 16,
+        "sameSessionControl03": 24,
+        "packageEFinal": 24,
+        "maxPackageE": 32
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 14.8,
+        "sameSessionControl03": 15.5,
+        "packageEFinal": 20.9,
+        "deltaVsControl03": 5.4
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "interactionId": "experience_category_select",
+      "route": "/experiences",
+      "eventTimingMedianMs": {
+        "a0Baseline": 24,
+        "sameSessionControl03": 32,
+        "packageEFinal": 32,
+        "maxPackageE": 40
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 19,
+        "sameSessionControl03": 26.2,
+        "packageEFinal": 28.6,
+        "deltaVsControl03": 2.4
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "interactionId": "planner_scripted_prompt_select",
+      "route": "/ai-planner",
+      "eventTimingMedianMs": {
+        "a0Baseline": 112,
+        "sameSessionControl03": 136,
+        "packageEFinal": 120,
+        "maxPackageE": 120
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 108,
+        "sameSessionControl03": 130.8,
+        "packageEFinal": 118.2,
+        "deltaVsControl03": -12.6
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "interactionId": "itinerary_day_switch",
+      "route": "/trips/da-lat-3-ngay",
+      "eventTimingMedianMs": {
+        "a0Baseline": 32,
+        "sameSessionControl03": 40,
+        "packageEFinal": 48,
+        "maxPackageE": 56
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 31.6,
+        "sameSessionControl03": 38.6,
+        "packageEFinal": 42.1,
+        "deltaVsControl03": 3.5
+      }
+    },
+    {
+      "profileId": "mobile_lab_throttled",
+      "interactionId": "itinerary_accordion_toggle",
+      "route": "/trips/da-lat-3-ngay",
+      "eventTimingMedianMs": {
+        "a0Baseline": 24,
+        "sameSessionControl03": 24,
+        "packageEFinal": 16,
+        "maxPackageE": 24
+      },
+      "doubleRafNextPaintMedianMs": {
+        "a0Baseline": 16.6,
+        "sameSessionControl03": 19.2,
+        "packageEFinal": 13.9,
+        "deltaVsControl03": -5.3
+      }
+    }
+  ]
+}

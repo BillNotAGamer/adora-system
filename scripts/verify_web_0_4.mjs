@@ -71,6 +71,9 @@ const capturePackageCEvidenceFlag =
 const capturePackageDEvidenceOnly = process.argv.includes("--capture-package-d-evidence-only");
 const capturePackageDEvidenceFlag =
   capturePackageDEvidenceOnly || process.argv.includes("--capture-package-d-evidence");
+const capturePackageEEvidenceOnly = process.argv.includes("--capture-package-e-evidence-only");
+const capturePackageEEvidenceFlag =
+  capturePackageEEvidenceOnly || process.argv.includes("--capture-package-e-evidence");
 const CDP_COMMAND_TIMEOUT_MS = Number(process.env.ADORA_CDP_TIMEOUT_MS ?? "25000");
 const outputDirectory = resolve(process.env.ADORA_VERIFY_OUTPUT ?? "docs/reports/assets/web-design-0-4");
 const packageBEvidenceDirectory = resolve(
@@ -81,6 +84,9 @@ const packageCEvidenceDirectory = resolve(
 );
 const packageDEvidenceDirectory = resolve(
   process.env.ADORA_PACKAGE_D_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-d",
+);
+const packageEEvidenceDirectory = resolve(
+  process.env.ADORA_PACKAGE_E_EVIDENCE_DIR ?? "docs/reports/assets/web-design-0-4/package-e",
 );
 const debugPort = Number(process.env.ADORA_VERIFY_0_4_PORT ?? "9228");
 
@@ -4770,6 +4776,511 @@ async function capturePackageCEvidence(browserClient, packageCSuites) {
   };
 }
 
+async function runPackageEFinalSuite(browserClient) {
+  const routesToTraverse = [
+    "/",
+    "/destinations",
+    "/destinations/da-lat",
+    "/experiences",
+    "/experiences/ca-phe-nho-giot-cao-nguyen",
+    "/ai-planner",
+    "/trips",
+    "/trips/da-lat-3-ngay",
+  ];
+
+  async function runCrossRouteJourney(width, height, mobile) {
+    return withIsolatedSession(browserClient, { width, height, mobile }, async (session) => {
+      await navigateAndWaitReady(session, `${siteUrl}/`, true);
+      const forwardSteps = [];
+      for (const route of routesToTraverse) {
+        if (route !== "/") {
+          await session.evaluate(`(() => {
+            const target = ${JSON.stringify(route)};
+            const existing = Array.from(document.querySelectorAll('a[href]')).find((a) => a.getAttribute('href') === target);
+            if (existing) {
+              existing.click();
+              return 'link-click';
+            }
+            window.history.pushState({}, '', target);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            return 'fallback';
+          })()`);
+          const start = Date.now();
+          while (Date.now() - start < 8000) {
+            const matched = await session.evaluate(`window.location.pathname === ${JSON.stringify(route)}`);
+            if (matched) break;
+            await wait(80);
+          }
+          await wait(350);
+          const onRoute = await session.evaluate(`window.location.pathname === ${JSON.stringify(route)}`);
+          if (!onRoute) {
+            await navigateAndWaitReady(session, `${siteUrl}${route}`, route === "/");
+          } else {
+            await session.evaluate(`(async () => {
+              if (document.fonts?.ready) await document.fonts.ready;
+              for (const img of document.querySelectorAll('img')) {
+                if (img.complete) continue;
+                await new Promise((r) => {
+                  const t = setTimeout(r, 1200);
+                  img.addEventListener('load', () => { clearTimeout(t); r(); }, { once: true });
+                  img.addEventListener('error', () => { clearTimeout(t); r(); }, { once: true });
+                });
+              }
+            })()`);
+          }
+        }
+        const settled = await session.evaluate(`(async () => {
+          const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+          document.documentElement.style.scrollBehavior = 'auto';
+          const h = document.documentElement.scrollHeight;
+          for (let y = 0; y <= h; y += Math.max(window.innerHeight * 0.75, 420)) {
+            window.scrollTo(0, y);
+            await delay(100);
+          }
+          window.scrollTo(0, h);
+          await delay(250);
+          await Promise.all(
+            document.getAnimations()
+              .filter((anim) => anim.effect?.getComputedTiming?.().iterations !== Infinity)
+              .map((anim) => anim.finished.catch(() => {})),
+          );
+          const pending = document.querySelectorAll('[data-reveal="pending"]').length;
+          const main = document.querySelector('main');
+          const h1 = document.querySelector('h1');
+          return {
+            path: window.location.pathname,
+            pendingCount: pending,
+            overflowPx: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+            mainVisible: main ? main.checkVisibility() && getComputedStyle(main).opacity === '1' : true,
+            h1Visible: h1 ? h1.checkVisibility() && getComputedStyle(h1).opacity === '1' : true,
+          };
+        })()`);
+        forwardSteps.push(settled);
+      }
+
+      // Dedicated real client-link Activity back/forward roundtrip: / -> /destinations -> /destinations/da-lat -> /experiences -> /ai-planner -> /trips/da-lat-3-ngay -> history.back() chain
+      await navigateAndWaitReady(session, `${siteUrl}/`, true);
+      await wait(400);
+      const activityBackChain = [];
+      for (const nextRoute of ["/destinations", "/destinations/da-lat", "/experiences", "/ai-planner", "/trips/da-lat-3-ngay"]) {
+        const clicked = await session.evaluate(`(() => {
+          const target = ${JSON.stringify(nextRoute)};
+          const link = Array.from(document.querySelectorAll('a[href]')).find((a) => a.getAttribute('href') === target && a.checkVisibility());
+          if (!link) return false;
+          link.click();
+          return true;
+        })()`);
+        if (clicked) {
+          const start = Date.now();
+          while (Date.now() - start < 5000) {
+            if (await session.evaluate(`window.location.pathname === ${JSON.stringify(nextRoute)}`)) break;
+            await wait(60);
+          }
+          await wait(350);
+        } else {
+          await navigateAndWaitReady(session, `${siteUrl}${nextRoute}`, false);
+        }
+        await session.evaluate(`window.scrollTo(0, Math.min(480, document.documentElement.scrollHeight))`);
+        await wait(220);
+      }
+      for (let step = 0; step < 3; step += 1) {
+        await session.evaluate(`window.history.back()`);
+        await wait(300);
+        const state = await session.evaluate(`(async () => {
+          const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+          document.documentElement.style.scrollBehavior = 'auto';
+          const h = document.documentElement.scrollHeight;
+          for (let y = 0; y <= h; y += Math.max(window.innerHeight * 0.75, 420)) {
+            window.scrollTo(0, y);
+            await delay(60);
+          }
+          window.scrollTo(0, 0);
+          await delay(120);
+          await Promise.all(
+            document.getAnimations()
+              .filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity)
+              .map((a) => a.finished.catch(() => {})),
+          );
+          const h1 = Array.from(document.querySelectorAll('h1')).find((el) => el.checkVisibility());
+          const visibleReveals = Array.from(document.querySelectorAll('[data-reveal-variant]')).filter((el) => el.checkVisibility());
+          const stuckVisible = visibleReveals.filter((el) => el.getAttribute('data-reveal') === 'pending').length;
+          return {
+            path: window.location.pathname,
+            h1Visible: h1 ? getComputedStyle(h1).opacity === '1' : true,
+            visibleRevealCount: visibleReveals.length,
+            stuckAboveFold: stuckVisible,
+            runningFiniteAnimations: document.getAnimations().filter((a) => a.effect?.getComputedTiming?.().iterations !== Infinity && a.playState === 'running').length,
+          };
+        })()`);
+        activityBackChain.push(state);
+      }
+      await session.evaluate(`window.history.forward()`);
+      await wait(450);
+      const forwardRestored = await session.evaluate(`(() => {
+        const h1 = Array.from(document.querySelectorAll('h1')).find((el) => el.checkVisibility());
+        const visibleReveals = Array.from(document.querySelectorAll('[data-reveal-variant]')).filter((el) => el.checkVisibility());
+        return {
+          path: window.location.pathname,
+          h1Visible: h1 ? getComputedStyle(h1).opacity === '1' : true,
+          visiblePendingRemaining: visibleReveals.filter((el) => el.getAttribute('data-reveal') === 'pending').length,
+        };
+      })()`);
+
+      const passed =
+        forwardSteps.every((s) => s.pendingCount === 0 && s.overflowPx === 0 && s.mainVisible && s.h1Visible) &&
+        activityBackChain.every((s) => s.h1Visible && s.stuckAboveFold === 0 && s.runningFiniteAnimations === 0) &&
+        forwardRestored.h1Visible &&
+        forwardRestored.visiblePendingRemaining === 0 &&
+        session.hydrationWarnings.length === 0 &&
+        session.errors.length === 0;
+
+      return {
+        passed,
+        forwardSteps,
+        activityBackChain,
+        forwardRestored,
+        hydrationWarnings: session.hydrationWarnings,
+        errors: session.errors,
+      };
+    });
+  }
+
+  const desktopJourney = await runCrossRouteJourney(1440, 900, false);
+  const mobileJourney = await runCrossRouteJourney(390, 844, true);
+
+  const reducedMotionAndKillSwitch = await withIsolatedSession(
+    browserClient,
+    { width: 1440, height: 900, reducedMotion: true },
+    async (session) => {
+      const checks = [];
+      for (const route of ["/", "/destinations", "/destinations/da-lat", "/ai-planner", "/trips/da-lat-3-ngay"]) {
+        await navigateAndWaitReady(session, `${siteUrl}${route}`, route === "/");
+        await wait(120);
+        const rmState = await session.evaluate(`(() => {
+          const reveals = Array.from(document.querySelectorAll('[data-reveal-variant]'));
+          const h1 = document.querySelector('h1');
+          return {
+            route: window.location.pathname,
+            h1Opacity: h1 ? getComputedStyle(h1).opacity : null,
+            h1Transform: h1 ? getComputedStyle(h1).transform : null,
+            allRevealsVisible: reveals.every((el) => getComputedStyle(el).opacity === '1' && getComputedStyle(el).transform === 'none'),
+          };
+        })()`);
+        checks.push(rmState);
+      }
+
+      // Kill switch & @media print on /
+      await navigateAndWaitReady(session, `${siteUrl}/`, true);
+      await wait(120);
+      await session.evaluate(`document.documentElement.dataset.motion = "off"`);
+      await wait(50);
+      const killSwitchState = await session.evaluate(`(() => {
+        const reveals = Array.from(document.querySelectorAll('[data-reveal-variant]'));
+        return {
+          dataMotion: document.documentElement.dataset.motion,
+          allRevealsOpacity1: reveals.every((el) => getComputedStyle(el).opacity === '1'),
+        };
+      })()`);
+      await session.evaluate(`delete document.documentElement.dataset.motion`);
+      await session.send("Emulation.setEmulatedMedia", { media: "print" });
+      await wait(50);
+      const printState = await session.evaluate(`(() => {
+        const reveals = Array.from(document.querySelectorAll('[data-reveal-variant]'));
+        return {
+          allRevealsVisibleInPrint: reveals.every((el) => getComputedStyle(el).opacity === '1' && getComputedStyle(el).transform === 'none'),
+        };
+      })()`);
+      await session.send("Emulation.setEmulatedMedia", { media: "" });
+
+      return {
+        passed:
+          checks.every((c) => c.h1Opacity === "1" && c.allRevealsVisible) &&
+          killSwitchState.allRevealsOpacity1 &&
+          printState.allRevealsVisibleInPrint &&
+          session.errors.length === 0,
+        checks,
+        killSwitchState,
+        printState,
+        errors: session.errors,
+      };
+    },
+  );
+
+  const desktopAccessibilityAudit = await withIsolatedSession(browserClient, { width: 1440, height: 900 }, async (session) => {
+    await navigateAndWaitReady(session, `${siteUrl}/`, true);
+    await wait(300);
+    await session.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await session.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await wait(80);
+    const skipLinkCheck = await session.evaluate(`(() => {
+      const el = document.activeElement;
+      const rect = el?.getBoundingClientRect?.();
+      const target = document.getElementById('main-content');
+      const headerLinks = Array.from(document.querySelectorAll('header nav a'));
+      const statusDot = document.querySelector('span[aria-label="Bản xem trước sẵn sàng"]');
+      return {
+        activeHref: el?.getAttribute?.('href') ?? null,
+        visibleOnFocus: Boolean(rect && rect.width > 40 && rect.height > 20),
+        mainContentExists: Boolean(target),
+        inv01HeaderUntouched: headerLinks.every((a) => !a.hasAttribute('data-reveal') && !a.hasAttribute('data-header-underline')),
+        backlogStatusDot: statusDot
+          ? { present: true, tagName: statusDot.tagName, roleAttr: statusDot.getAttribute('role'), ariaLabel: statusDot.getAttribute('aria-label') }
+          : { present: false },
+      };
+    })()`);
+
+    await session.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await session.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await wait(60);
+    const focusVisibleIndicatorCheck = await session.evaluate(`(() => {
+      const el = document.activeElement;
+      const style = el ? getComputedStyle(el) : null;
+      return {
+        tagName: el?.tagName ?? null,
+        outlineStyle: style?.outlineStyle ?? null,
+        outlineWidth: style?.outlineWidth ?? null,
+        hasVisibleFocusRing: Boolean(style && style.outlineStyle !== 'none' && parseFloat(style.outlineWidth || '0') > 0),
+      };
+    })()`);
+
+    // Check Backlog #1: /destinations reset button focus loss (non-failing backlog probe)
+    await navigateAndWaitReady(session, `${siteUrl}/destinations`, false);
+    await wait(250);
+    await session.evaluate(`(() => {
+      const input = document.querySelector('input[type="search"]');
+      if (!input) throw new Error('Search input not found on /destinations');
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+      setter.call(input, 'zzz-nonexistent-query');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    })()`);
+    await wait(220);
+    const backlogResetFocus = await session.evaluate(`(() => {
+      const empty = document.querySelector('[data-testid="destination-empty"]');
+      const resetBtn = empty?.querySelector('button');
+      if (!empty || !resetBtn) return { triggeredEmpty: false };
+      resetBtn.focus();
+      const beforeTag = document.activeElement?.tagName ?? null;
+      resetBtn.click();
+      return {
+        triggeredEmpty: true,
+        beforeClickActiveTag: beforeTag,
+      };
+    })()`);
+    await wait(120);
+    const afterResetFocusTag = await session.evaluate(`document.activeElement?.tagName ?? null`);
+
+    // Check Backlog #2: /trips/da-lat-3-ngay inactive-tab aria-controls + keyboard day switching
+    await navigateAndWaitReady(session, `${siteUrl}/trips/da-lat-3-ngay`, false);
+    await wait(250);
+    const backlogTabAria = await session.evaluate(`(() => {
+      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      return tabs.map((tab) => {
+        const controls = tab.getAttribute('aria-controls');
+        return {
+          id: tab.id,
+          ariaSelected: tab.getAttribute('aria-selected'),
+          ariaControls: controls,
+          controlledElementExistsInDom: Boolean(controls && document.getElementById(controls)),
+        };
+      });
+    })()`);
+
+    return {
+      skipLinkCheck,
+      focusVisibleIndicatorCheck,
+      backlogResetFocus,
+      afterResetFocusTag,
+      backlogTabAria,
+      errors: session.errors,
+    };
+  });
+
+  // Mobile drawer check (INV-02 approved-deferred untouched functional contract)
+  const mobileDrawerCheck = await withIsolatedSession(
+    browserClient,
+    { width: 390, height: 844, mobile: true },
+    async (mobileSession) => {
+      await navigateAndWaitReady(mobileSession, `${siteUrl}/`, true);
+      await wait(250);
+      await mobileSession.evaluate(`document.querySelector('button[aria-controls="mobile-navigation"]')?.click()`);
+      await wait(120);
+      const openState = await mobileSession.evaluate(`(() => {
+        const btn = document.querySelector('button[aria-controls="mobile-navigation"]');
+        const nav = document.getElementById('mobile-navigation');
+        const navStyle = nav ? getComputedStyle(nav) : null;
+        return {
+          expanded: btn?.getAttribute('aria-expanded'),
+          navVisible: Boolean(nav?.checkVisibility()),
+          inv02DrawerStaticDisplay: navStyle?.display === 'grid',
+        };
+      })()`);
+      await mobileSession.evaluate(`document.querySelector('button[aria-controls="mobile-navigation"]')?.click()`);
+      await wait(120);
+      const closedState = await mobileSession.evaluate(`(() => {
+        const btn = document.querySelector('button[aria-controls="mobile-navigation"]');
+        const nav = document.getElementById('mobile-navigation');
+        return {
+          expanded: btn?.getAttribute('aria-expanded'),
+          navVisible: Boolean(nav?.checkVisibility()),
+        };
+      })()`);
+      return {
+        passed:
+          openState.expanded === "true" &&
+          openState.navVisible &&
+          closedState.expanded === "false" &&
+          !closedState.navVisible &&
+          mobileSession.errors.length === 0,
+        openState,
+        closedState,
+        errors: mobileSession.errors,
+      };
+    },
+  );
+
+  const accessibilityAndKeyboardAudit = {
+    passed:
+      desktopAccessibilityAudit.skipLinkCheck.activeHref === "#main-content" &&
+      desktopAccessibilityAudit.skipLinkCheck.visibleOnFocus &&
+      desktopAccessibilityAudit.skipLinkCheck.mainContentExists &&
+      desktopAccessibilityAudit.skipLinkCheck.inv01HeaderUntouched &&
+      desktopAccessibilityAudit.focusVisibleIndicatorCheck.hasVisibleFocusRing &&
+      mobileDrawerCheck.passed &&
+      desktopAccessibilityAudit.errors.length === 0,
+    skipLinkCheck: desktopAccessibilityAudit.skipLinkCheck,
+    focusVisibleIndicatorCheck: desktopAccessibilityAudit.focusVisibleIndicatorCheck,
+    mobileDrawerCheck,
+    deferredInventory: {
+      INV_01: { status: "approved_deferred", headerUntouched: desktopAccessibilityAudit.skipLinkCheck.inv01HeaderUntouched },
+      INV_02: { status: "approved_deferred", drawerFunctionalAndUntouched: mobileDrawerCheck.passed },
+    },
+    preExistingBacklog: {
+      resetButtonFocusLoss: {
+        ...desktopAccessibilityAudit.backlogResetFocus,
+        afterClickActiveTag: desktopAccessibilityAudit.afterResetFocusTag,
+        dropsToBody: desktopAccessibilityAudit.afterResetFocusTag === "BODY",
+      },
+      itineraryInactiveTabAriaControls: {
+        tabs: desktopAccessibilityAudit.backlogTabAria,
+        danglingInactiveControlsCount: desktopAccessibilityAudit.backlogTabAria.filter((t) => !t.controlledElementExistsInDom).length,
+      },
+      aiPlannerPreviewStatusDot: desktopAccessibilityAudit.skipLinkCheck.backlogStatusDot,
+    },
+    errors: [...desktopAccessibilityAudit.errors, ...mobileDrawerCheck.errors],
+  };
+
+  // 6-viewport disclosure & overflow confirmation on /, /ai-planner, /experiences/ca-phe-nho-giot-cao-nguyen
+  const staticDisclosureAndSixViewportCheck = [];
+  for (const vp of configuredViewports) {
+    const row = await withIsolatedSession(
+      browserClient,
+      { width: vp.width, height: vp.height, mobile: vp.width < 768 },
+      async (session) => {
+        await navigateAndWaitReady(session, `${siteUrl}/ai-planner`, false);
+        await wait(180);
+        const plannerCheck = await session.evaluate(`(() => {
+          const subtitle = Array.from(document.querySelectorAll('p')).find((p) => p.textContent?.includes('Chế độ demo'));
+          return {
+            overflowPx: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+            demoVisible: subtitle ? subtitle.checkVisibility() && getComputedStyle(subtitle).opacity === '1' : false,
+          };
+        })()`);
+        await navigateAndWaitReady(session, `${siteUrl}/experiences/ca-phe-nho-giot-cao-nguyen`, false);
+        await wait(220);
+        const expCheck = await session.evaluate(`(() => {
+          const note = document.querySelector('[role="note"]');
+          return {
+            overflowPx: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
+            priceDisclaimerVisible: note ? note.checkVisibility() && getComputedStyle(note).opacity === '1' : false,
+          };
+        })()`);
+        return {
+          viewport: vp.name,
+          width: vp.width,
+          height: vp.height,
+          passed:
+            plannerCheck.overflowPx === 0 &&
+            plannerCheck.demoVisible &&
+            expCheck.overflowPx === 0 &&
+            expCheck.priceDisclaimerVisible,
+          plannerCheck,
+          expCheck,
+        };
+      },
+    );
+    staticDisclosureAndSixViewportCheck.push(row);
+  }
+
+  const passed =
+    desktopJourney.passed &&
+    mobileJourney.passed &&
+    reducedMotionAndKillSwitch.passed &&
+    accessibilityAndKeyboardAudit.passed &&
+    staticDisclosureAndSixViewportCheck.every((v) => v.passed);
+
+  return {
+    passed,
+    desktopJourney,
+    mobileJourney,
+    reducedMotionAndKillSwitch,
+    accessibilityAndKeyboardAudit,
+    staticDisclosureAndSixViewportCheck,
+  };
+}
+
+async function capturePackageEEvidence(browserClient, packageESuites, fullSummary) {
+  await mkdir(packageEEvidenceDirectory, { recursive: true });
+  const files = [];
+
+  await withIsolatedSession(browserClient, { width: 1440, height: 900 }, async (session) => {
+    await navigateAndWaitReady(session, `${siteUrl}/`, true);
+    await wait(900);
+    files.push(await captureScreenshotFile(session, packageEEvidenceDirectory, "desktop-final-home-settled.png", false));
+
+    await navigateAndWaitReady(session, `${siteUrl}/ai-planner`, false);
+    await wait(300);
+    await session.evaluate(`document.querySelector('[data-testid="planner-welcome"] button')?.click()`);
+    await wait(500);
+    files.push(await captureScreenshotFile(session, packageEEvidenceDirectory, "desktop-final-planner-settled.png", false));
+  });
+
+  await withIsolatedSession(browserClient, { width: 390, height: 844, mobile: true }, async (session) => {
+    await navigateAndWaitReady(session, `${siteUrl}/`, true);
+    await wait(900);
+    files.push(await captureScreenshotFile(session, packageEEvidenceDirectory, "mobile-final-home-settled.png", false));
+
+    await navigateAndWaitReady(session, `${siteUrl}/trips/da-lat-3-ngay`, false);
+    await wait(300);
+    await session.evaluate(`document.getElementById('day-tab-2')?.click()`);
+    await wait(350);
+    files.push(await captureScreenshotFile(session, packageEEvidenceDirectory, "mobile-final-itinerary-settled.png", false));
+  });
+
+  const resultsPath = join(packageEEvidenceDirectory, "final-verification-results.json");
+  await writeFile(
+    resultsPath,
+    `${JSON.stringify(
+      {
+        capturedAt: new Date().toISOString(),
+        siteUrl,
+        packageE: packageESuites,
+        integratedSummary: fullSummary ?? null,
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  files.push(resultsPath);
+
+  return {
+    captured: true,
+    directory: packageEEvidenceDirectory,
+    fileCount: files.length,
+    files,
+  };
+}
+
 const profileDirectory = await mkdtemp(join(tmpdir(), "adora-web-0-4-chrome-"));
 const chrome = spawn(
   chromePath,
@@ -4911,6 +5422,23 @@ try {
     };
     console.log(JSON.stringify(summary, null, 2));
     if (!packageDSuites.passed) process.exitCode = 1;
+  } else if (capturePackageEEvidenceOnly) {
+    console.error("Package E Focused Verification: Running Package E integration & accessibility acceptance suite...");
+    const packageESuites = await runPackageEFinalSuite(browserClient);
+    const evidenceCapture = await capturePackageEEvidence(browserClient, packageESuites, null);
+    summary = {
+      browser: versionInfo.Browser,
+      mode: "capture-package-e-evidence-only",
+      siteUrl,
+      packageE: {
+        implemented: true,
+        executed: true,
+        ...packageESuites,
+      },
+      evidenceCapture,
+    };
+    console.log(JSON.stringify(summary, null, 2));
+    if (!packageESuites.passed) process.exitCode = 1;
   } else {
     console.error("Package A [1/4]: Verifying SSR & No-JS fail-visible contract...");
     const ssrAndNoJs = await runSsrAndNoJsSuite(browserClient);
@@ -4952,6 +5480,9 @@ try {
       packageDEvidenceCapture = await capturePackageDEvidence(browserClient, packageDSuites);
     }
 
+    console.error("Package E [1/1]: Verifying End-to-End Integration, Activity Navigation, Accessibility & Backlog Probes...");
+    const packageESuites = await runPackageEFinalSuite(browserClient);
+
     const packageAPassed =
       ssrAndNoJs.passed &&
       intersectionObserver.passed &&
@@ -4962,6 +5493,7 @@ try {
     const packageBPassed = packageBSuites.passed;
     const packageCPassed = packageCSuites.passed;
     const packageDPassed = packageDSuites.passed;
+    const packageEPassed = packageESuites.passed;
 
     summary = {
       browser: versionInfo.Browser,
@@ -5010,13 +5542,26 @@ try {
         viewportMatrix: packageDSuites.viewportMatrix,
         evidenceCapture: packageDEvidenceCapture,
       },
-      futurePackages: {
-        packageE: { implemented: false, executed: false },
+      packageE: {
+        implemented: true,
+        executed: true,
+        passed: packageEPassed,
+        desktopJourney: packageESuites.desktopJourney,
+        mobileJourney: packageESuites.mobileJourney,
+        reducedMotionAndKillSwitch: packageESuites.reducedMotionAndKillSwitch,
+        accessibilityAndKeyboardAudit: packageESuites.accessibilityAndKeyboardAudit,
+        staticDisclosureAndSixViewportCheck: packageESuites.staticDisclosureAndSixViewportCheck,
+        evidenceCapture: { captured: false },
       },
     };
 
+    if (capturePackageEEvidenceFlag) {
+      console.error("Package E Evidence: Capturing compact final-state screenshots & verification results JSON...");
+      summary.packageE.evidenceCapture = await capturePackageEEvidence(browserClient, packageESuites, summary);
+    }
+
     console.log(JSON.stringify(summary, null, 2));
-    if (!packageAPassed || !packageBPassed || !packageCPassed || !packageDPassed) process.exitCode = 1;
+    if (!packageAPassed || !packageBPassed || !packageCPassed || !packageDPassed || !packageEPassed) process.exitCode = 1;
   }
 
   browserClient.close();
