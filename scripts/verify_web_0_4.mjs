@@ -5006,6 +5006,329 @@ async function runPackageEFinalSuite(browserClient) {
     },
   );
 
+  async function runH1AccessibilityProfile(profile) {
+    return withIsolatedSession(
+      browserClient,
+      {
+        width: profile.width,
+        height: profile.height,
+        deviceScaleFactor: profile.mobile ? 2 : 1,
+        mobile: profile.mobile,
+        touch: profile.mobile,
+        reducedMotion: profile.reducedMotion,
+      },
+      async (session) => {
+        async function applyMotionOffIfRequested() {
+          if (profile.motionOff) {
+            await session.evaluate(`document.documentElement.dataset.motion = "off"`);
+            await wait(50);
+          }
+        }
+
+        // 1. AiPlannerSection decorative status dot semantics on /
+        await navigateAndWaitReady(session, `${siteUrl}/`, true);
+        await applyMotionOffIfRequested();
+        await wait(250);
+        const statusDotCheck = await session.evaluate(`(() => {
+          const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+          const legacyDot = Array.from(document.querySelectorAll('span[aria-label="Bản xem trước sẵn sàng"]')).filter(isVisible);
+          const previewLabel = Array.from(document.querySelectorAll('p')).find(
+            (p) => isVisible(p) && p.textContent?.trim() === 'Planning preview',
+          );
+          const headerBar = previewLabel?.closest('.border-b');
+          const decorativeDot = headerBar
+            ? Array.from(headerBar.querySelectorAll(':scope > span.rounded-full')).find(isVisible) ?? null
+            : null;
+          const disclaimer = Array.from(document.querySelectorAll('p')).find(
+            (p) => isVisible(p) && p.textContent?.includes('chưa kết nối mô hình AI'),
+          );
+          const prohibitedGenericAriaLabels = Array.from(document.querySelectorAll('span[aria-label], div[aria-label]')).filter(
+            (el) => isVisible(el) && !el.hasAttribute('role') && el.getAttribute('aria-hidden') !== 'true',
+          );
+          return {
+            legacyAriaLabelPresent: legacyDot.length > 0,
+            dotFound: Boolean(decorativeDot),
+            tagName: decorativeDot?.tagName ?? null,
+            roleAttr: decorativeDot?.getAttribute('role') ?? null,
+            ariaHidden: decorativeDot?.getAttribute('aria-hidden') ?? null,
+            hasAriaLabel: Boolean(decorativeDot?.hasAttribute('aria-label')),
+            planningPreviewVisible: Boolean(previewLabel && getComputedStyle(previewLabel).opacity === '1'),
+            honestNoticeVisible: Boolean(disclaimer && getComputedStyle(disclaimer).opacity === '1'),
+            prohibitedGenericAriaLabelCount: prohibitedGenericAriaLabels.length,
+          };
+        })()`);
+
+        // 2. Discovery empty-state reset focus restoration (Enter, Space, Click) across DestinationBrowser & ExperienceBrowser
+        const discoveryResetChecks = {};
+        for (const target of [
+          { key: "destinations", path: "/destinations", emptyTestId: "destination-empty", resultsTestId: "destination-results" },
+          { key: "experiences", path: "/experiences", emptyTestId: "experience-empty", resultsTestId: "experience-results" },
+        ]) {
+          await navigateAndWaitReady(session, `${siteUrl}${target.path}`, false);
+          await applyMotionOffIfRequested();
+          await wait(220);
+
+          const activationResults = {};
+          for (const method of ["enter", "space", "click"]) {
+            const prepared = await session.evaluate(`(() => {
+              const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+              const input = Array.from(document.querySelectorAll('input[type="search"]')).find(isVisible);
+              if (!input) return { ok: false, reason: 'missing search input' };
+              const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+              setter.call(input, 'zzz-nonexistent-query');
+              input.dispatchEvent(new Event('input', { bubbles: true }));
+              return { ok: true, searchId: input.id };
+            })()`);
+            await wait(160);
+
+            const readyToReset = await session.evaluate(`(() => {
+              const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+              const empty = Array.from(document.querySelectorAll('[data-testid="${target.emptyTestId}"]')).find(isVisible);
+              const resetBtn = empty?.querySelector('button');
+              if (!empty || !resetBtn) return { triggeredEmpty: false };
+              resetBtn.scrollIntoView({ block: 'center', behavior: 'instant' });
+              resetBtn.focus({ preventScroll: true });
+              return {
+                triggeredEmpty: true,
+                beforeActiveTag: document.activeElement?.tagName ?? null,
+                scrollYBefore: Math.round(window.scrollY),
+              };
+            })()`);
+
+            if (method === "enter") {
+              await session.send("Input.dispatchKeyEvent", {
+                type: "keyDown",
+                key: "Enter",
+                code: "Enter",
+                windowsVirtualKeyCode: 13,
+                nativeVirtualKeyCode: 13,
+                text: "\r",
+                unmodifiedText: "\r",
+              });
+              await session.send("Input.dispatchKeyEvent", {
+                type: "keyUp",
+                key: "Enter",
+                code: "Enter",
+                windowsVirtualKeyCode: 13,
+                nativeVirtualKeyCode: 13,
+              });
+            } else if (method === "space") {
+              await session.send("Input.dispatchKeyEvent", {
+                type: "keyDown",
+                key: " ",
+                code: "Space",
+                windowsVirtualKeyCode: 32,
+                nativeVirtualKeyCode: 32,
+                text: " ",
+                unmodifiedText: " ",
+              });
+              await session.send("Input.dispatchKeyEvent", {
+                type: "keyUp",
+                key: " ",
+                code: "Space",
+                windowsVirtualKeyCode: 32,
+                nativeVirtualKeyCode: 32,
+              });
+            } else {
+              await session.evaluate(`(() => {
+                const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+                const empty = Array.from(document.querySelectorAll('[data-testid="${target.emptyTestId}"]')).find(isVisible);
+                empty?.querySelector('button')?.click();
+              })()`);
+            }
+
+            await wait(140);
+            const after = await session.evaluate(`(() => {
+              const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+              const input = Array.from(document.querySelectorAll('input[type="search"]')).find(isVisible);
+              const results = Array.from(document.querySelectorAll('[data-testid="${target.resultsTestId}"]')).find(isVisible);
+              const empty = Array.from(document.querySelectorAll('[data-testid="${target.emptyTestId}"]')).find(isVisible);
+              const active = document.activeElement;
+              return {
+                resultsVisible: Boolean(results),
+                emptyGone: !empty,
+                inputValueCleared: input?.value === '',
+                activeTag: active?.tagName ?? null,
+                activeId: active?.id ?? null,
+                activeIsSearchInput: Boolean(input && active === input),
+                dropsToBody: active === document.body,
+                scrollYAfter: Math.round(window.scrollY),
+              };
+            })()`);
+
+            const scrollDelta = Math.abs(after.scrollYAfter - (readyToReset.scrollYBefore ?? 0));
+            activationResults[method] = {
+              passed:
+                prepared.ok &&
+                readyToReset.triggeredEmpty &&
+                readyToReset.beforeActiveTag === "BUTTON" &&
+                after.resultsVisible &&
+                after.emptyGone &&
+                after.inputValueCleared &&
+                after.activeIsSearchInput &&
+                !after.dropsToBody &&
+                scrollDelta <= 2,
+              scrollDelta,
+              ...readyToReset,
+              ...after,
+            };
+          }
+
+          discoveryResetChecks[target.key] = {
+            passed:
+              activationResults.enter.passed &&
+              activationResults.space.passed &&
+              activationResults.click.passed,
+            activations: activationResults,
+          };
+        }
+
+        // 3. ItineraryExplorer single-panel stable ARIA tab relationships + keyboard navigation
+        await navigateAndWaitReady(session, `${siteUrl}/trips/da-lat-3-ngay`, false);
+        await applyMotionOffIfRequested();
+        await wait(240);
+
+        const inspectItineraryState = async () =>
+          session.evaluate(`(() => {
+            const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+            const panel = Array.from(document.querySelectorAll('[data-testid="day-panel"]')).find(isVisible);
+            const tabs = Array.from(document.querySelectorAll('[role="tab"]')).filter(isVisible);
+            const selectedTabs = tabs.filter((t) => t.getAttribute('aria-selected') === 'true');
+            const tabSnapshots = tabs.map((tab) => {
+              const controls = tab.getAttribute('aria-controls');
+              const target = controls ? document.getElementById(controls) : null;
+              return {
+                id: tab.id,
+                ariaSelected: tab.getAttribute('aria-selected'),
+                ariaControls: controls,
+                controlledElementExistsInDom: Boolean(target),
+                controlsMatchesPanel: Boolean(panel && target === panel),
+              };
+            });
+            if (!window.__adoraH1PanelRef && panel) {
+              window.__adoraH1PanelRef = panel;
+            }
+            return {
+              panelFound: Boolean(panel),
+              panelId: panel?.id ?? null,
+              panelLabelledBy: panel?.getAttribute('aria-labelledby') ?? null,
+              stablePanelNode: Boolean(panel && panel === window.__adoraH1PanelRef),
+              activeId: document.activeElement?.id ?? null,
+              selectedTabCount: selectedTabs.length,
+              selectedTabId: selectedTabs[0]?.id ?? null,
+              labelledbyMatchesSelected: Boolean(panel && selectedTabs[0] && panel.getAttribute('aria-labelledby') === selectedTabs[0].id),
+              danglingControlsCount: tabSnapshots.filter((t) => !t.controlledElementExistsInDom).length,
+              allControlsMatchPanel: tabSnapshots.length > 0 && tabSnapshots.every((t) => t.controlsMatchesPanel),
+              tabs: tabSnapshots,
+            };
+          })()`);
+
+        const initialItinerary = await inspectItineraryState();
+
+        await session.evaluate(`(() => {
+          const isVisible = (el) => (typeof el?.checkVisibility === 'function' ? el.checkVisibility() : true);
+          const tab2 = Array.from(document.querySelectorAll('#day-tab-2')).find(isVisible);
+          tab2?.focus();
+          tab2?.click();
+        })()`);
+        await wait(120);
+        const afterClickDay2 = await inspectItineraryState();
+
+        // Keyboard switching via CDP: ArrowRight -> Day 3, ArrowLeft -> Day 2, Home -> Day 1, End -> Day 3
+        const keyboardSteps = [];
+        for (const step of [
+          { key: "ArrowRight", code: "ArrowRight", vk: 39, expectedTab: "day-tab-3" },
+          { key: "ArrowLeft", code: "ArrowLeft", vk: 37, expectedTab: "day-tab-2" },
+          { key: "Home", code: "Home", vk: 36, expectedTab: "day-tab-1" },
+          { key: "End", code: "End", vk: 35, expectedTab: "day-tab-3" },
+        ]) {
+          await session.send("Input.dispatchKeyEvent", {
+            type: "keyDown",
+            key: step.key,
+            code: step.code,
+            windowsVirtualKeyCode: step.vk,
+          });
+          await session.send("Input.dispatchKeyEvent", {
+            type: "keyUp",
+            key: step.key,
+            code: step.code,
+            windowsVirtualKeyCode: step.vk,
+          });
+          await wait(120);
+          const state = await inspectItineraryState();
+          keyboardSteps.push({
+            key: step.key,
+            expectedTab: step.expectedTab,
+            passed:
+              state.selectedTabId === step.expectedTab &&
+              state.activeId === step.expectedTab &&
+              state.selectedTabCount === 1 &&
+              state.stablePanelNode &&
+              state.labelledbyMatchesSelected &&
+              state.danglingControlsCount === 0 &&
+              state.allControlsMatchPanel,
+            state,
+          });
+        }
+
+        const itineraryAriaPassed =
+          initialItinerary.panelFound &&
+          initialItinerary.selectedTabCount === 1 &&
+          initialItinerary.selectedTabId === "day-tab-1" &&
+          initialItinerary.labelledbyMatchesSelected &&
+          initialItinerary.danglingControlsCount === 0 &&
+          initialItinerary.allControlsMatchPanel &&
+          afterClickDay2.selectedTabCount === 1 &&
+          afterClickDay2.selectedTabId === "day-tab-2" &&
+          afterClickDay2.stablePanelNode &&
+          afterClickDay2.labelledbyMatchesSelected &&
+          afterClickDay2.danglingControlsCount === 0 &&
+          afterClickDay2.allControlsMatchPanel &&
+          keyboardSteps.every((s) => s.passed);
+
+        const statusDotPassed =
+          !statusDotCheck.legacyAriaLabelPresent &&
+          statusDotCheck.dotFound &&
+          statusDotCheck.tagName === "SPAN" &&
+          statusDotCheck.roleAttr === null &&
+          statusDotCheck.ariaHidden === "true" &&
+          !statusDotCheck.hasAriaLabel &&
+          statusDotCheck.planningPreviewVisible &&
+          statusDotCheck.honestNoticeVisible &&
+          statusDotCheck.prohibitedGenericAriaLabelCount === 0;
+
+        return {
+          profile: profile.label,
+          passed:
+            statusDotPassed &&
+            discoveryResetChecks.destinations.passed &&
+            discoveryResetChecks.experiences.passed &&
+            itineraryAriaPassed &&
+            session.errors.length === 0,
+          statusDot: { passed: statusDotPassed, ...statusDotCheck },
+          discoveryResetChecks,
+          itineraryAria: {
+            passed: itineraryAriaPassed,
+            initial: initialItinerary,
+            afterClickDay2,
+            keyboardSteps,
+          },
+          errors: session.errors,
+        };
+      },
+    );
+  }
+
+  const h1HardeningProfiles = [];
+  for (const profile of [
+    { label: "desktop_normal", width: 1440, height: 900, mobile: false, reducedMotion: false, motionOff: false },
+    { label: "mobile_normal", width: 390, height: 844, mobile: true, reducedMotion: false, motionOff: false },
+    { label: "desktop_reduced_motion", width: 1440, height: 900, mobile: false, reducedMotion: true, motionOff: false },
+    { label: "desktop_motion_off", width: 1440, height: 900, mobile: false, reducedMotion: false, motionOff: true },
+  ]) {
+    h1HardeningProfiles.push(await runH1AccessibilityProfile(profile));
+  }
+
   const desktopAccessibilityAudit = await withIsolatedSession(browserClient, { width: 1440, height: 900 }, async (session) => {
     await navigateAndWaitReady(session, `${siteUrl}/`, true);
     await wait(300);
@@ -5017,14 +5340,24 @@ async function runPackageEFinalSuite(browserClient) {
       const rect = el?.getBoundingClientRect?.();
       const target = document.getElementById('main-content');
       const headerLinks = Array.from(document.querySelectorAll('header nav a'));
-      const statusDot = document.querySelector('span[aria-label="Bản xem trước sẵn sàng"]');
+      const legacyStatusDot = document.querySelector('span[aria-label="Bản xem trước sẵn sàng"]');
+      const previewLabel = Array.from(document.querySelectorAll('p')).find((p) => p.textContent?.trim() === 'Planning preview');
+      const statusDot = previewLabel?.closest('.border-b')?.querySelector(':scope > span.rounded-full') ?? null;
       return {
         activeHref: el?.getAttribute?.('href') ?? null,
         visibleOnFocus: Boolean(rect && rect.width > 40 && rect.height > 20),
         mainContentExists: Boolean(target),
         inv01HeaderUntouched: headerLinks.every((a) => !a.hasAttribute('data-reveal') && !a.hasAttribute('data-header-underline')),
         backlogStatusDot: statusDot
-          ? { present: true, tagName: statusDot.tagName, roleAttr: statusDot.getAttribute('role'), ariaLabel: statusDot.getAttribute('aria-label') }
+          ? {
+              present: true,
+              legacyAriaLabelPresent: Boolean(legacyStatusDot),
+              tagName: statusDot.tagName,
+              roleAttr: statusDot.getAttribute('role'),
+              ariaHidden: statusDot.getAttribute('aria-hidden'),
+              hasAriaLabel: statusDot.hasAttribute('aria-label'),
+              ariaLabel: statusDot.getAttribute('aria-label'),
+            }
           : { present: false },
       };
     })()`);
@@ -5138,6 +5471,10 @@ async function runPackageEFinalSuite(browserClient) {
     },
   );
 
+  const promotedStatusDot = desktopAccessibilityAudit.skipLinkCheck.backlogStatusDot;
+  const promotedDanglingControlsCount = desktopAccessibilityAudit.backlogTabAria.filter((t) => !t.controlledElementExistsInDom).length;
+  const h1HardeningPassed = h1HardeningProfiles.every((profile) => profile.passed);
+
   const accessibilityAndKeyboardAudit = {
     passed:
       desktopAccessibilityAudit.skipLinkCheck.activeHref === "#main-content" &&
@@ -5145,6 +5482,15 @@ async function runPackageEFinalSuite(browserClient) {
       desktopAccessibilityAudit.skipLinkCheck.mainContentExists &&
       desktopAccessibilityAudit.skipLinkCheck.inv01HeaderUntouched &&
       desktopAccessibilityAudit.focusVisibleIndicatorCheck.hasVisibleFocusRing &&
+      desktopAccessibilityAudit.backlogResetFocus.triggeredEmpty &&
+      desktopAccessibilityAudit.afterResetFocusTag === "INPUT" &&
+      desktopAccessibilityAudit.backlogTabAria.length > 0 &&
+      promotedDanglingControlsCount === 0 &&
+      promotedStatusDot.present &&
+      !promotedStatusDot.legacyAriaLabelPresent &&
+      promotedStatusDot.ariaHidden === "true" &&
+      !promotedStatusDot.hasAriaLabel &&
+      h1HardeningPassed &&
       mobileDrawerCheck.passed &&
       desktopAccessibilityAudit.errors.length === 0,
     skipLinkCheck: desktopAccessibilityAudit.skipLinkCheck,
@@ -5154,6 +5500,7 @@ async function runPackageEFinalSuite(browserClient) {
       INV_01: { status: "approved_deferred", headerUntouched: desktopAccessibilityAudit.skipLinkCheck.inv01HeaderUntouched },
       INV_02: { status: "approved_deferred", drawerFunctionalAndUntouched: mobileDrawerCheck.passed },
     },
+    h1HardeningProfiles,
     preExistingBacklog: {
       resetButtonFocusLoss: {
         ...desktopAccessibilityAudit.backlogResetFocus,
@@ -5162,9 +5509,9 @@ async function runPackageEFinalSuite(browserClient) {
       },
       itineraryInactiveTabAriaControls: {
         tabs: desktopAccessibilityAudit.backlogTabAria,
-        danglingInactiveControlsCount: desktopAccessibilityAudit.backlogTabAria.filter((t) => !t.controlledElementExistsInDom).length,
+        danglingInactiveControlsCount: promotedDanglingControlsCount,
       },
-      aiPlannerPreviewStatusDot: desktopAccessibilityAudit.skipLinkCheck.backlogStatusDot,
+      aiPlannerPreviewStatusDot: promotedStatusDot,
     },
     errors: [...desktopAccessibilityAudit.errors, ...mobileDrawerCheck.errors],
   };

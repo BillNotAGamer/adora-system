@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { ExperienceGrid } from "@/components/discovery/experience-grid";
 import { EXPERIENCE_CATEGORY_LABELS } from "@/lib/demo/experiences";
@@ -12,6 +12,12 @@ import type { Experience, ExperienceCategory } from "@/lib/demo/types";
 export function ExperienceBrowser({ experiences }: Readonly<{ experiences: Experience[] }>) {
   const [filter, setFilter] = useState<ExperienceFilter>(DEFAULT_EXPERIENCE_FILTER);
   const searchId = useId();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  function resetFilters() {
+    setFilter(DEFAULT_EXPERIENCE_FILTER);
+    searchInputRef.current?.focus({ preventScroll: true });
+  }
 
   const counts = experiences.reduce<Partial<Record<ExperienceCategory, number>>>((accumulator, experience) => {
     accumulator[experience.category] = (accumulator[experience.category] ?? 0) + 1;
@@ -31,6 +37,7 @@ export function ExperienceBrowser({ experiences }: Readonly<{ experiences: Exper
           <div className="mt-3 flex min-h-12 items-center gap-3 border border-[var(--adora-hairline)] bg-white/50 px-4 focus-within:border-[var(--adora-ink)]">
             <Search className="size-4 shrink-0 text-[var(--adora-text-secondary)]" aria-hidden="true" />
             <input
+              ref={searchInputRef}
               id={searchId}
               type="search"
               value={filter.query}
@@ -87,7 +94,7 @@ export function ExperienceBrowser({ experiences }: Readonly<{ experiences: Exper
               Bộ gợi ý biên tập hiện còn nhỏ. Hãy thử một từ khoá khác hoặc xoá bộ lọc.
             </p>
             {isFiltered ? (
-              <button type="button" className="editorial-link mt-6" onClick={() => setFilter(DEFAULT_EXPERIENCE_FILTER)}>
+              <button type="button" className="editorial-link mt-6" onClick={resetFilters}>
                 Xoá bộ lọc
               </button>
             ) : null}

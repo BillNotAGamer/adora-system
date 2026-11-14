@@ -91,7 +91,7 @@ export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
                 role="tab"
                 id={`day-tab-${candidate.day}`}
                 aria-selected={selected}
-                aria-controls={`day-panel-${candidate.day}`}
+                aria-controls="itinerary-day-panel"
                 tabIndex={selected ? 0 : -1}
                 onClick={() => selectDay(candidate.day)}
                 onKeyDown={(event) => onTabKeyDown(event, index)}
@@ -108,7 +108,7 @@ export function ItineraryExplorer({ trip }: Readonly<{ trip: Trip }>) {
           })}
         </div>
 
-        <div role="tabpanel" id={`day-panel-${day.day}`} aria-labelledby={`day-tab-${day.day}`} tabIndex={0} className="mt-8" data-testid="day-panel">
+        <div role="tabpanel" id="itinerary-day-panel" aria-labelledby={`day-tab-${day.day}`} tabIndex={0} className="mt-8" data-testid="day-panel">
           <div
             key={day.day}
             data-day-panel-enter={hasSwitched ? "" : undefined}

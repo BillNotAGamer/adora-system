@@ -3,7 +3,7 @@
 import { ArrowUpRight, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { REGION_LABELS } from "@/lib/demo/destinations";
 import { DEFAULT_DESTINATION_FILTER, filterDestinations, type DestinationFilter } from "@/lib/demo/filters";
@@ -27,9 +27,15 @@ const AVAILABILITY_OPTIONS: { value: DestinationFilter["availability"]; label: s
 export function DestinationBrowser({ destinations }: Readonly<{ destinations: Destination[] }>) {
   const [filter, setFilter] = useState<DestinationFilter>(DEFAULT_DESTINATION_FILTER);
   const searchId = useId();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const results = filterDestinations(destinations, filter);
   const isFiltered =
     filter.query !== "" || filter.region !== DEFAULT_DESTINATION_FILTER.region || filter.availability !== "all";
+
+  function resetFilters() {
+    setFilter(DEFAULT_DESTINATION_FILTER);
+    searchInputRef.current?.focus({ preventScroll: true });
+  }
 
   return (
     <div>
@@ -41,6 +47,7 @@ export function DestinationBrowser({ destinations }: Readonly<{ destinations: De
           <div className="mt-3 flex min-h-12 items-center gap-3 border border-[var(--adora-hairline)] bg-white/50 px-4 focus-within:border-[var(--adora-ink)]">
             <Search className="size-4 shrink-0 text-[var(--adora-text-secondary)]" aria-hidden="true" />
             <input
+              ref={searchInputRef}
               id={searchId}
               type="search"
               value={filter.query}
@@ -160,7 +167,7 @@ export function DestinationBrowser({ destinations }: Readonly<{ destinations: De
               ADORA mới có một bộ nhỏ nội dung biên tập. Hãy thử từ khoá khác hoặc xoá bộ lọc.
             </p>
             {isFiltered ? (
-              <button type="button" className="editorial-link mt-6" onClick={() => setFilter(DEFAULT_DESTINATION_FILTER)}>
+              <button type="button" className="editorial-link mt-6" onClick={resetFilters}>
                 Xoá bộ lọc
               </button>
             ) : null}

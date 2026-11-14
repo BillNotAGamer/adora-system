@@ -41,7 +41,7 @@ export function AiPlannerSection() {
                   <p className="mt-1 text-[0.66rem] text-white/42">Planning preview</p>
                 </div>
               </div>
-              <span className="size-2 rounded-full bg-[var(--adora-gold)]" aria-label="Bản xem trước sẵn sàng" />
+              <span className="size-2 rounded-full bg-[var(--adora-gold)]" aria-hidden="true" />
             </div>
 
             <div className="space-y-4 py-7 text-sm leading-6">
