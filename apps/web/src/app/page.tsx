@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { AiPlannerSection } from "@/components/home/ai-planner-section";
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 async function CatalogStories() {
+  await connection();
   const catalog = await getHomepageCatalog();
 
   return (
