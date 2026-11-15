@@ -4,16 +4,10 @@ import Link from "next/link";
 
 import { Reveal } from "@/components/ui/reveal";
 import type { HomepageCatalog } from "@/lib/catalog";
-
-const editorialExperiences = [
-  "Sớm mai trong rừng thông",
-  "Hương vị cao nguyên",
-  "Những khoảng lặng có chủ đích",
-];
+import { homepageEditorialPresentation } from "@/lib/catalog-contract";
 
 export function ExperienceStory({ catalog }: Readonly<{ catalog: HomepageCatalog }>) {
-  const experienceNames = catalog.offers.length > 0 ? catalog.offers.map((offer) => offer.title) : editorialExperiences;
-  const isCatalogBacked = catalog.offers.length > 0;
+  const { experienceNames, catalogAvailable } = homepageEditorialPresentation(catalog.source);
 
   return (
     <section id="experiences" className="adora-section bg-[var(--adora-paper)]">
@@ -46,7 +40,7 @@ export function ExperienceStory({ catalog }: Readonly<{ catalog: HomepageCatalog
               ))}
             </ol>
             <p className="mt-5 text-[0.67rem] leading-5 font-semibold tracking-[0.1em] text-[var(--adora-text-secondary)] uppercase">
-              {isCatalogBacked ? "Tên trải nghiệm từ danh mục công khai · dữ liệu demo có thể được sử dụng" : "Nội dung biên tập tạm thời · danh mục trực tiếp chưa khả dụng"}
+              {catalogAvailable ? "Nội dung biên tập · chưa liên kết nội dung danh mục" : "Nội dung biên tập tạm thời · danh mục trực tiếp chưa khả dụng"}
             </p>
             <Link href="/experiences" className="editorial-link mt-6">
               Xem các trải nghiệm gợi ý

@@ -1,6 +1,7 @@
 import type { ApiComponents } from "@adora/api-client";
 
-import { apiUrl } from "@/lib/api";
+import { apiUrl } from "./api.ts";
+import { destinationListSchema, offerListSchema } from "./catalog-contract.ts";
 
 type Destination = ApiComponents["schemas"]["DestinationResponse"];
 type DestinationList = ApiComponents["schemas"]["DestinationListResponse"];
@@ -21,8 +22,8 @@ export const EDITORIAL_CATALOG_FALLBACK: HomepageCatalog = {
   source: "fallback",
 };
 
-async function requestCatalog<T>(path: string): Promise<T> {
-  const response = await fetch(apiUrl(path), {
+async function requestCatalog<T>(path: string, parse: (value: unknown) => T, request: typeof fetch): Promise<T> {
+  const response = await request(apiUrl(path), {
     headers: { Accept: "application/json" },
     next: { revalidate: 300 },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -32,13 +33,13 @@ async function requestCatalog<T>(path: string): Promise<T> {
     throw new Error(`Catalog request failed with status ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  return parse(await response.json());
 }
 
-export async function getHomepageCatalog(): Promise<HomepageCatalog> {
+export async function getHomepageCatalog(request: typeof fetch = fetch): Promise<HomepageCatalog> {
   const [destinationsResult, offersResult] = await Promise.allSettled([
-    requestCatalog<DestinationList>("/api/v1/destinations?limit=1&offset=0"),
-    requestCatalog<OfferList>("/api/v1/offers?limit=3&offset=0"),
+    requestCatalog<DestinationList>("/api/v1/destinations?limit=1&offset=0", value => destinationListSchema.parse(value), request),
+    requestCatalog<OfferList>("/api/v1/offers?limit=3&offset=0", value => offerListSchema.parse(value), request),
   ]);
 
   const destination =

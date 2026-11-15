@@ -4,10 +4,10 @@ import Link from "next/link";
 
 import { Reveal } from "@/components/ui/reveal";
 import type { HomepageCatalog } from "@/lib/catalog";
+import { homepageEditorialPresentation } from "@/lib/catalog-contract";
 
 export function DestinationStory({ catalog }: Readonly<{ catalog: HomepageCatalog }>) {
-  const destinationName = catalog.destination?.name ?? "Đà Lạt";
-  const isCatalogBacked = Boolean(catalog.destination);
+  const { destinationName, catalogAvailable } = homepageEditorialPresentation(catalog.source);
 
   return (
     <section id="destinations" className="adora-section bg-[var(--adora-ivory)]">
@@ -41,7 +41,7 @@ export function DestinationStory({ catalog }: Readonly<{ catalog: HomepageCatalo
               <p className="adora-eyebrow text-[var(--adora-sage)]">Điểm đến chọn lọc</p>
               <p className="mt-8 flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-[var(--adora-text-secondary)] uppercase">
                 <MapPin className="size-4 text-[var(--adora-gold)]" aria-hidden="true" />
-                {isCatalogBacked ? "Từ danh mục công khai ADORA" : "Gợi ý biên tập · API tạm ngoại tuyến"}
+                {catalogAvailable ? "Gợi ý biên tập · chưa liên kết nội dung danh mục" : "Gợi ý biên tập · API tạm ngoại tuyến"}
               </p>
               <h2 className="font-editorial mt-5 text-[clamp(3.6rem,8vw,7rem)] leading-[0.9] tracking-[-0.05em]">
                 {destinationName}

@@ -8,6 +8,7 @@ from uuid import UUID
 from geoalchemy2 import Geometry
 from sqlalchemy import Select, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.domain.models.catalog import Destination, Place, PlaceMedia, ServiceOffer
 from app.domain.models.partner import Partner
@@ -36,12 +37,12 @@ class CatalogRepository:
         self.session = session
 
     @staticmethod
-    def _destination_coordinates():
+    def _destination_coordinates() -> tuple[ColumnElement[float], ColumnElement[float]]:
         geometry = cast(Destination.center, Geometry("POINT", srid=4326))
         return func.ST_X(geometry), func.ST_Y(geometry)
 
     @staticmethod
-    def _place_coordinates():
+    def _place_coordinates() -> tuple[ColumnElement[float], ColumnElement[float]]:
         geometry = cast(Place.location, Geometry("POINT", srid=4326))
         return func.ST_X(geometry), func.ST_Y(geometry)
 
