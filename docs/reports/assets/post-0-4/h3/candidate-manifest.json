@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "format": "webp",
+    "mediaType": "image/webp",
+    "width": 1086,
+    "height": 1448,
+    "space": "srgb",
+    "channels": 3,
+    "depth": "uchar",
+    "isProgressive": false,
+    "isPalette": false,
+    "hasProfile": false,
+    "hasAlpha": false,
+    "autoOrient": {
+      "width": 1086,
+      "height": 1448
+    }
+  },
+  "versions": {
+    "aom": "3.15.1",
+    "archive": "3.8.9",
+    "cairo": "1.18.6",
+    "cgif": "0.5.4",
+    "exif": "0.6.26",
+    "expat": "2.8.5",
+    "ffi": "3.8.0",
+    "fontconfig": "2.18.3",
+    "freetype": "2.14.3",
+    "fribidi": "1.0.17",
+    "glib": "2.90.0",
+    "harfbuzz": "14.5.0",
+    "heif": "1.23.5",
+    "highway": "1.4.0",
+    "imagequant": "2.4.1",
+    "lcms": "2.19.1",
+    "mozjpeg": "0826579",
+    "pango": "1.58.2",
+    "pixman": "0.46.4",
+    "png": "1.6.58",
+    "proxy-libintl": "0.5",
+    "rsvg": "2.63.2",
+    "tiff": "4.7.2",
+    "uhdr": "2.0.2",
+    "vips": "8.18.7",
+    "webp": "1.6.0",
+    "xml2": "2.15.4",
+    "zlib-ng": "2.3.3",
+    "sharp": "0.35.5"
+  },
+  "candidates": [
+    {
+      "quality": 95,
+      "bytes": 507216,
+      "psnr": 43.28879690588246,
+      "sha256": "7e3802b1a5eca19f0ceb127ca65d1dd22ff9b2307b5ca72228c0007ab05e6fb5",
+      "estimated828Bytes": 152726
+    },
+    {
+      "quality": 90,
+      "bytes": 445054,
+      "psnr": 41.35982056162034,
+      "sha256": "ddbd60f70cd2cd81c19a9b53b11662c0815e6e0de8d90f5c8c7019158ae4d403",
+      "estimated828Bytes": 151816
+    },
+    {
+      "quality": 80,
+      "bytes": 340910,
+      "psnr": 38.560641014424554,
+      "sha256": "4c6380e45754ef5fa4250f889c5225451ae5fbb1202be63c93ecf61565fb0947",
+      "estimated828Bytes": 156304
+    },
+    {
+      "quality": 70,
+      "bytes": 254186,
+      "psnr": 33.83859511135732,
+      "sha256": "db30eb4890410beb218d5d81d48b4bb4b39fa8ef22e5c4c1d57eaceb874ba345",
+      "estimated828Bytes": 151732
+    },
+    {
+      "quality": 60,
+      "bytes": 212870,
+      "psnr": 32.50762495006718,
+      "sha256": "d693fd4117dd316c027223b37b5ea15263f7e97527ce68fda633b87b9fcd5741",
+      "estimated828Bytes": 143906
+    },
+    {
+      "quality": 40,
+      "bytes": 157362,
+      "psnr": 30.932822073055668,
+      "sha256": "2db681d80142bd50bc3e06428cbe545ca020ed8acdf1757c6fa18284732b9099",
+      "estimated828Bytes": 137328
+    }
+  ],
+  "originalSha256": "358a9d042fd417656464db896e3a1cb58e8c580428051b5a76417ca6882a19d6",
+  "original828EstimatedBytes": 154432
+}

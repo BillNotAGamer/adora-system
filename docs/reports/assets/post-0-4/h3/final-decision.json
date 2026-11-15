@@ -1,0 +1,12 @@
+{
+  "decision": "preserve-original",
+  "productionAssetChanged": false,
+  "candidateTested": "WebP quality 90 effort 6; original dimensions",
+  "mobile828OriginalBytes": 154432,
+  "mobile828CandidateBytes": 151816,
+  "reductionPercent": 1.69394944053046,
+  "lcpIndexDeltaMs": -24,
+  "lcpDetailDeltaMs": -18,
+  "reason": "Byte reduction and LCP improvement are too small to justify an additional lossy generation; aggressive candidates lose texture.",
+  "noSub2500Claim": true
+}

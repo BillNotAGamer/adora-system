@@ -1,0 +1,928 @@
+{
+  "environment": {
+    "osPlatform": "win32",
+    "osRelease": "10.0.26100",
+    "cpuArchitecture": "x64",
+    "logicalCpuCount": 20,
+    "cpuModelSummary": "12th Gen Intel(R) Core(TM) i7-12700H",
+    "totalMemoryGiB": 31.7,
+    "nodeVersion": "v24.19.0",
+    "pnpmVersion": "12.16.1",
+    "nextVersion": "16.4.3",
+    "reactVersion": "19.3.0",
+    "chromeBrowser": "Chrome/157.0.8103.78",
+    "cdpProtocolVersion": "1.3",
+    "v8Version": "15.7.112.43",
+    "siteOrigin": "http://127.0.0.1:3100",
+    "productionBuildMode": true,
+    "fastApiReachable": false
+  },
+  "method": "ABBA; five cold runs per route per block; unchanged historical metric definitions",
+  "comparisons": [
+    {
+      "route": "/destinations",
+      "aMedian": 2996,
+      "bMedian": 2972,
+      "delta": -24,
+      "percent": -0.8010680907877169,
+      "aTbt": 363.5,
+      "bTbt": 360.5,
+      "aRange": [
+        2980,
+        3052
+      ],
+      "bRange": [
+        2964,
+        3036
+      ]
+    },
+    {
+      "route": "/destinations/da-lat",
+      "aMedian": 2966,
+      "bMedian": 2948,
+      "delta": -18,
+      "percent": -0.6068779501011463,
+      "aTbt": 480,
+      "bTbt": 496,
+      "aRange": [
+        2944,
+        2988
+      ],
+      "bRange": [
+        2932,
+        2972
+      ]
+    },
+    {
+      "route": "/ai-planner",
+      "aMedian": 888,
+      "bMedian": 896,
+      "delta": 8,
+      "percent": 0.9009009009009009,
+      "aTbt": 215.5,
+      "bTbt": 236,
+      "aRange": [
+        872,
+        932
+      ],
+      "bRange": [
+        872,
+        928
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "block": 1,
+      "variant": "A",
+      "route": "/destinations",
+      "lcp": [
+        3052,
+        2996,
+        2992,
+        2996,
+        3004
+      ],
+      "medianLcp": 2996,
+      "tbt": [
+        415,
+        339,
+        333,
+        331,
+        407
+      ],
+      "medianTbt": 339,
+      "longTaskDurations": [
+        [
+          380,
+          135
+        ],
+        [
+          308,
+          131
+        ],
+        [
+          308,
+          125
+        ],
+        [
+          302,
+          129
+        ],
+        [
+          384,
+          123
+        ]
+      ],
+      "cpu": [
+        18.36,
+        12.52,
+        10.28,
+        9.17,
+        9.68
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover"
+      ]
+    },
+    {
+      "block": 1,
+      "variant": "A",
+      "route": "/destinations/da-lat",
+      "lcp": [
+        2944,
+        2960,
+        2956,
+        2972,
+        2968
+      ],
+      "medianLcp": 2960,
+      "tbt": [
+        484,
+        494,
+        471,
+        482,
+        473
+      ],
+      "medianTbt": 482,
+      "longTaskDurations": [
+        [
+          443,
+          141
+        ],
+        [
+          461,
+          133
+        ],
+        [
+          439,
+          132
+        ],
+        [
+          444,
+          138
+        ],
+        [
+          445,
+          128
+        ]
+      ],
+      "cpu": [
+        11.85,
+        10.32,
+        10.39,
+        9.74,
+        9.7
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover"
+      ]
+    },
+    {
+      "block": 1,
+      "variant": "A",
+      "route": "/ai-planner",
+      "lcp": [
+        908,
+        876,
+        884,
+        932,
+        912
+      ],
+      "medianLcp": 908,
+      "tbt": [
+        215,
+        207,
+        215,
+        262,
+        235
+      ],
+      "medianTbt": 215,
+      "longTaskDurations": [
+        [
+          193,
+          122
+        ],
+        [
+          181,
+          126
+        ],
+        [
+          179,
+          136
+        ],
+        [
+          218,
+          144
+        ],
+        [
+          188,
+          147
+        ]
+      ],
+      "cpu": [
+        9.78,
+        9.97,
+        9.28,
+        10.91,
+        10.96
+      ],
+      "js": [
+        174717,
+        174717,
+        174717,
+        174717,
+        174717
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "p",
+        "p",
+        "p",
+        "p",
+        "p"
+      ]
+    },
+    {
+      "block": 2,
+      "variant": "B",
+      "route": "/destinations",
+      "lcp": [
+        3036,
+        2972,
+        2964,
+        2988,
+        2964
+      ],
+      "medianLcp": 2972,
+      "tbt": [
+        408,
+        335,
+        319,
+        364,
+        357
+      ],
+      "medianTbt": 357,
+      "longTaskDurations": [
+        [
+          364,
+          144
+        ],
+        [
+          311,
+          124
+        ],
+        [
+          293,
+          126
+        ],
+        [
+          339,
+          125
+        ],
+        [
+          316,
+          141
+        ]
+      ],
+      "cpu": [
+        16.6,
+        12.33,
+        9.71,
+        9.22,
+        8.38
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover"
+      ]
+    },
+    {
+      "block": 2,
+      "variant": "B",
+      "route": "/destinations/da-lat",
+      "lcp": [
+        2944,
+        2952,
+        2948,
+        2936,
+        2972
+      ],
+      "medianLcp": 2948,
+      "tbt": [
+        535,
+        492,
+        482,
+        541,
+        451
+      ],
+      "medianTbt": 492,
+      "longTaskDurations": [
+        [
+          503,
+          132
+        ],
+        [
+          462,
+          130
+        ],
+        [
+          439,
+          143
+        ],
+        [
+          481,
+          160
+        ],
+        [
+          421,
+          130
+        ]
+      ],
+      "cpu": [
+        9.56,
+        9.45,
+        11.38,
+        11.52,
+        9.53
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover"
+      ]
+    },
+    {
+      "block": 2,
+      "variant": "B",
+      "route": "/ai-planner",
+      "lcp": [
+        896,
+        912,
+        884,
+        896,
+        872
+      ],
+      "medianLcp": 896,
+      "tbt": [
+        254,
+        228,
+        212,
+        244,
+        214
+      ],
+      "medianTbt": 228,
+      "longTaskDurations": [
+        [
+          184,
+          170
+        ],
+        [
+          203,
+          125
+        ],
+        [
+          185,
+          127
+        ],
+        [
+          189,
+          155
+        ],
+        [
+          187,
+          127
+        ]
+      ],
+      "cpu": [
+        10.57,
+        9.86,
+        8.75,
+        9.03,
+        8.85
+      ],
+      "js": [
+        174717,
+        174717,
+        174717,
+        174717,
+        174717
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "p",
+        "p",
+        "p",
+        "p",
+        "p"
+      ]
+    },
+    {
+      "block": 3,
+      "variant": "B",
+      "route": "/destinations",
+      "lcp": [
+        2972,
+        2984,
+        2968,
+        2972,
+        2972
+      ],
+      "medianLcp": 2972,
+      "tbt": [
+        480,
+        341,
+        369,
+        462,
+        356
+      ],
+      "medianTbt": 369,
+      "longTaskDurations": [
+        [
+          439,
+          141
+        ],
+        [
+          302,
+          139
+        ],
+        [
+          329,
+          140
+        ],
+        [
+          401,
+          161
+        ],
+        [
+          323,
+          133
+        ]
+      ],
+      "cpu": [
+        15.48,
+        13.34,
+        8.85,
+        11.56,
+        9.43
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover"
+      ]
+    },
+    {
+      "block": 3,
+      "variant": "B",
+      "route": "/destinations/da-lat",
+      "lcp": [
+        2948,
+        2952,
+        2932,
+        2944,
+        2968
+      ],
+      "medianLcp": 2948,
+      "tbt": [
+        479,
+        477,
+        548,
+        500,
+        597
+      ],
+      "medianTbt": 500,
+      "longTaskDurations": [
+        [
+          447,
+          132
+        ],
+        [
+          444,
+          133
+        ],
+        [
+          503,
+          145
+        ],
+        [
+          462,
+          138
+        ],
+        [
+          525,
+          172
+        ]
+      ],
+      "cpu": [
+        10.07,
+        9.85,
+        10.9,
+        11.18,
+        9.28
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover"
+      ]
+    },
+    {
+      "block": 3,
+      "variant": "B",
+      "route": "/ai-planner",
+      "lcp": [
+        920,
+        888,
+        896,
+        884,
+        928
+      ],
+      "medianLcp": 896,
+      "tbt": [
+        264,
+        223,
+        250,
+        227,
+        250
+      ],
+      "medianTbt": 250,
+      "longTaskDurations": [
+        [
+          211,
+          153
+        ],
+        [
+          191,
+          132
+        ],
+        [
+          187,
+          163
+        ],
+        [
+          182,
+          145
+        ],
+        [
+          205,
+          145
+        ]
+      ],
+      "cpu": [
+        9.89,
+        8.75,
+        9.97,
+        8.54,
+        9.44
+      ],
+      "js": [
+        174717,
+        174717,
+        174717,
+        174717,
+        174717
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "p",
+        "p",
+        "p",
+        "p",
+        "p"
+      ]
+    },
+    {
+      "block": 4,
+      "variant": "A",
+      "route": "/destinations",
+      "lcp": [
+        2980,
+        2992,
+        3008,
+        2988,
+        2996
+      ],
+      "medianLcp": 2992,
+      "tbt": [
+        410,
+        354,
+        339,
+        373,
+        384
+      ],
+      "medianTbt": 373,
+      "longTaskDurations": [
+        [
+          376,
+          134
+        ],
+        [
+          328,
+          126
+        ],
+        [
+          321,
+          118
+        ],
+        [
+          338,
+          135
+        ],
+        [
+          354,
+          130
+        ]
+      ],
+      "cpu": [
+        18.05,
+        13.89,
+        10.29,
+        13.92,
+        9.77
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover",
+        "img.object-cover"
+      ]
+    },
+    {
+      "block": 4,
+      "variant": "A",
+      "route": "/destinations/da-lat",
+      "lcp": [
+        2968,
+        2956,
+        2968,
+        2988,
+        2964
+      ],
+      "medianLcp": 2968,
+      "tbt": [
+        467,
+        467,
+        507,
+        493,
+        478
+      ],
+      "medianTbt": 478,
+      "longTaskDurations": [
+        [
+          441,
+          126
+        ],
+        [
+          441,
+          126
+        ],
+        [
+          471,
+          136
+        ],
+        [
+          456,
+          137
+        ],
+        [
+          455,
+          123
+        ]
+      ],
+      "cpu": [
+        9.62,
+        9.03,
+        14.13,
+        10.45,
+        9.32
+      ],
+      "js": [
+        203871,
+        203871,
+        203871,
+        203871,
+        203871
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover",
+        "img.-z-30.object-cover"
+      ]
+    },
+    {
+      "block": 4,
+      "variant": "A",
+      "route": "/ai-planner",
+      "lcp": [
+        884,
+        900,
+        892,
+        872,
+        876
+      ],
+      "medianLcp": 884,
+      "tbt": [
+        216,
+        231,
+        221,
+        212,
+        215
+      ],
+      "medianTbt": 216,
+      "longTaskDurations": [
+        [
+          185,
+          131
+        ],
+        [
+          206,
+          125
+        ],
+        [
+          187,
+          134
+        ],
+        [
+          180,
+          132
+        ],
+        [
+          188,
+          127
+        ]
+      ],
+      "cpu": [
+        14.59,
+        15.5,
+        11.75,
+        10.93,
+        9.66
+      ],
+      "js": [
+        174717,
+        174717,
+        174717,
+        174717,
+        174717
+      ],
+      "cls": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "identity": [
+        "p",
+        "p",
+        "p",
+        "p",
+        "p"
+      ]
+    }
+  ]
+}
