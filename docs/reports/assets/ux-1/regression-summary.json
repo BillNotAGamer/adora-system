@@ -1,0 +1,34 @@
+{
+  "command": "node scripts/verify_web_0_4.mjs",
+  "exitCode": 0,
+  "packages": {
+    "A": true,
+    "B": true,
+    "C": true,
+    "D": true,
+    "E": true
+  },
+  "h1Profiles": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "strictConcierge": {
+    "opened": {
+      "show": 2,
+      "close": 1,
+      "dialogs": 1,
+      "focus": "concierge-title"
+    },
+    "closed": {
+      "show": 2,
+      "close": 2,
+      "dialogs": 0,
+      "overflow": "",
+      "focus": "light-cta hero-primary-cta group inline-flex min-h-13 items-center gap-4 px-6 text-xs font-bold tracking-[0.11em] transition-colors adora-load-rise"
+    },
+    "passed": true
+  },
+  "fullLogs": "F:/Coding/Adora System Mega Project/adora-ux1-scratch"
+}

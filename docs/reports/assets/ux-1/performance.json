@@ -1,0 +1,132 @@
+{
+  "method": "DPR1, unthrottled Chrome 157.0.8103.79; initial encoded JS after document ready +700ms; first-rAF is not INP",
+  "baselineCommit": "14749b380172b417274c071358b988afb87592aa",
+  "comparisons": [
+    {
+      "width": 390,
+      "beforeBytes": 186012,
+      "afterBytes": 172754,
+      "deltaBytes": -13258
+    },
+    {
+      "width": 1440,
+      "beforeBytes": 192268,
+      "afterBytes": 177604,
+      "deltaBytes": -14664
+    }
+  ],
+  "runs": [
+    {
+      "viewport": 360,
+      "welcome": {
+        "pollingOpenMs": 473.19999998807907,
+        "paintMarkMs": 17.299999982118607,
+        "initialJsBytes": 172754,
+        "lazyJsBytes": 29022,
+        "longTasks": [
+          {
+            "start": 258.40000000596046,
+            "duration": 54
+          }
+        ],
+        "focus": "concierge-title",
+        "overflow": false,
+        "lock": "hidden",
+        "logCount": 1,
+        "title": "concierge-title"
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "viewport": 390,
+      "welcome": {
+        "pollingOpenMs": 471,
+        "paintMarkMs": 10.799999982118607,
+        "initialJsBytes": 172754,
+        "lazyJsBytes": 29022,
+        "longTasks": [],
+        "focus": "concierge-title",
+        "overflow": false,
+        "lock": "hidden",
+        "logCount": 1,
+        "title": "concierge-title"
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "viewport": 768,
+      "welcome": {
+        "pollingOpenMs": 471.5,
+        "paintMarkMs": 11.400000005960464,
+        "initialJsBytes": 172754,
+        "lazyJsBytes": 29022,
+        "longTasks": [],
+        "focus": "concierge-title",
+        "overflow": false,
+        "lock": "hidden",
+        "logCount": 1,
+        "title": "concierge-title"
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "viewport": 1024,
+      "welcome": {
+        "pollingOpenMs": 470.2000000178814,
+        "paintMarkMs": 18.399999976158142,
+        "initialJsBytes": 177604,
+        "lazyJsBytes": 29022,
+        "longTasks": [],
+        "focus": "concierge-title",
+        "overflow": false,
+        "lock": "hidden",
+        "logCount": 1,
+        "title": "concierge-title"
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "viewport": 1440,
+      "welcome": {
+        "pollingOpenMs": 466.69999998807907,
+        "paintMarkMs": 16.200000017881393,
+        "initialJsBytes": 177604,
+        "lazyJsBytes": 29022,
+        "longTasks": [
+          {
+            "start": 40.20000001788139,
+            "duration": 60
+          }
+        ],
+        "focus": "concierge-title",
+        "overflow": false,
+        "lock": "hidden",
+        "logCount": 1,
+        "title": "concierge-title"
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "viewport": 1920,
+      "welcome": {
+        "pollingOpenMs": 468.59999999403954,
+        "paintMarkMs": 15.5,
+        "initialJsBytes": 177604,
+        "lazyJsBytes": 29022,
+        "longTasks": [],
+        "focus": "concierge-title",
+        "overflow": false,
+        "lock": "hidden",
+        "logCount": 1,
+        "title": "concierge-title"
+      },
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

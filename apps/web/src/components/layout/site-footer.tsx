@@ -1,3 +1,4 @@
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
@@ -20,10 +21,10 @@ export function SiteFooter({ showCta = true }: Readonly<SiteFooterProps>) {
                 Bắt đầu bằng một câu hỏi thật hay.
               </h2>
             </div>
-            <Link href="/ai-planner" className="editorial-link lg:ml-auto">
+            <ConciergeTrigger href="/ai-planner" className="editorial-link lg:ml-auto">
               Plan with Adora AI
               <ArrowUpRight className="size-4" aria-hidden="true" />
-            </Link>
+            </ConciergeTrigger>
           </Reveal>
         ) : null}
 
@@ -43,9 +44,9 @@ export function SiteFooter({ showCta = true }: Readonly<SiteFooterProps>) {
             <Link href="/experiences" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
               Trải nghiệm
             </Link>
-            <Link href="/ai-planner" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
+            <ConciergeTrigger href="/ai-planner" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
               AI Planner
-            </Link>
+            </ConciergeTrigger>
             <Link href="/trips" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
               Chuyến đi mẫu
             </Link>

@@ -15,6 +15,9 @@ import {
 
 import { UNSUPPORTED_PROMPT_REPLY, matchScenario } from "@/lib/demo/planner-scenarios";
 import type { DemoImage, PlannerScenario } from "@/lib/demo/types";
+import { useConcierge } from "@/components/concierge/concierge-provider";
+import { ConciergeSurvey } from "@/components/concierge/concierge-survey";
+import { usePathname } from "next/navigation";
 
 /** Serializable subset of a trip, built on the server so the client island stays small. */
 export type TripPreview = {
@@ -26,11 +29,6 @@ export type TripPreview = {
   cover: DemoImage;
   days: { day: number; title: string; summary: string }[];
 };
-
-type Message =
-  | { id: number; role: "user"; text: string }
-  | { id: number; role: "assistant"; kind: "scripted"; scenarioId: string }
-  | { id: number; role: "assistant"; kind: "unsupported" };
 
 type PlannerWorkspaceProps = {
   scenarios: PlannerScenario[];
@@ -64,11 +62,12 @@ function markEnteredOnAnimationEnd(event: AnimationEvent<HTMLElement>) {
  * is involved. Only exact matches of predefined prompts produce a scripted reply.
  */
 export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorkspaceProps>) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
+  const { state, dispatch } = useConcierge();
+  const { messages, scenarioId: activeScenarioId, draft } = state;
+  const pathname = usePathname();
+  const setDraft = (value: string) => dispatch({ type: 'draft', value });
   const [menuOpen, setMenuOpen] = useState(false);
-  const nextId = useRef(1);
+  const [confirmReset, setConfirmReset] = useState(false);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -148,18 +147,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
   function submit(text: string) {
     const trimmed = text.trim();
     if (!trimmed) return;
-    const scenario = matchScenario(trimmed);
-    const userId = nextId.current++;
-    const replyId = nextId.current++;
-    setMessages((current) => [
-      ...current,
-      { id: userId, role: "user", text: trimmed },
-      scenario
-        ? { id: replyId, role: "assistant", kind: "scripted", scenarioId: scenario.id }
-        : { id: replyId, role: "assistant", kind: "unsupported" },
-    ]);
-    if (scenario) setActiveScenarioId(scenario.id);
-    setDraft("");
+    dispatch({ type: 'submit', text: trimmed });
   }
 
   function onWelcomeSuggestionPointerDown(event: PointerEvent<HTMLButtonElement>) {
@@ -174,10 +162,11 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
   }
 
   function startNewConversation() {
-    setMessages([]);
-    setActiveScenarioId(null);
-    setDraft("");
-    nextId.current = 1;
+    setConfirmReset(true);
+  }
+  function confirmNewConversation() {
+    dispatch({ type: 'reset', confirmed: true });
+    setConfirmReset(false);
     pendingSuggestionFocusRef.current = null;
     closeMenu(false);
     textareaRef.current?.focus();
@@ -199,7 +188,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
   const isEmpty = messages.length === 0;
 
   return (
-    <div ref={workspaceRef} className="flex h-dvh w-full overflow-hidden bg-[var(--adora-paper)] text-[var(--adora-ink)]">
+    <div ref={workspaceRef} aria-hidden={pathname !== '/ai-planner' ? true : undefined} className="flex h-dvh w-full overflow-hidden bg-[var(--adora-paper)] text-[var(--adora-ink)]">
       <aside
         aria-label="Thanh bên AI Planner"
         onKeyDown={(event) => {
@@ -231,6 +220,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
           Cuộc trò chuyện demo mới
         </button>
 
+        {confirmReset && <div className="mt-3 flex flex-wrap gap-3 text-sm"><p>Xóa bản nháp trong phiên này?</p><button data-confirm-reset type="button" className="min-h-11 underline" onClick={confirmNewConversation}>Xác nhận xóa</button><button type="button" className="min-h-11 underline" onClick={() => setConfirmReset(false)}>Giữ lại</button></div>}
         <section className="mt-8" aria-labelledby="suggested-heading">
           <h2 id="suggested-heading" className="text-[0.66rem] font-bold tracking-[0.16em] text-white/55 uppercase">
             Gợi ý cuộc trò chuyện
@@ -330,6 +320,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
             </nav>
           ) : null}
 
+          <details className="max-h-[45dvh] shrink-0 overflow-y-auto border-b border-[var(--adora-hairline)] px-4 py-2"><summary className="cursor-pointer text-sm">Định hình chuyến đi · Concierge</summary><ConciergeSurvey /></details>
           <div
             ref={logRef}
             role="log"
@@ -527,6 +518,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
                   id="planner-prompt"
                   ref={textareaRef}
                   rows={1}
+                  maxLength={2000}
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={onComposerKeyDown}
@@ -546,6 +538,7 @@ export function PlannerWorkspace({ scenarios, previews }: Readonly<PlannerWorksp
                 Enter để gửi, Shift+Enter xuống dòng. Chỉ các gợi ý dựng sẵn được hỗ trợ; tin nhắn không được gửi tới máy chủ hay mô hình AI.
               </p>
             </form>
+            {state.error && <p role="alert">{state.error}</p>}
           </div>
         </section>
 

@@ -476,6 +476,8 @@ async function verifyInteractiveFlows() {
       );
       newConvBtn?.click();
       await delay(150);
+      document.querySelector('[data-confirm-reset]')?.click();
+      await delay(150);
 
       const resetEmptyPreview = Boolean(document.querySelector('[data-testid="trip-preview-empty"]'));
       const scriptedAfterReset = Boolean(document.querySelector('[data-testid="scripted-reply"]'));

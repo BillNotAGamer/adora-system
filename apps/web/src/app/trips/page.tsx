@@ -1,6 +1,6 @@
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import { ArrowUpRight, Info } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -58,10 +58,10 @@ export default function TripsPage() {
                     Khi có tài khoản thật, các lịch trình bạn lưu sẽ nằm trong thư viện này. Hiện chưa có chức năng lưu hay đồng bộ.
                   </p>
                 </div>
-                <Link href="/ai-planner" className="editorial-link">
+                <ConciergeTrigger href="/ai-planner" className="editorial-link">
                   Mở AI Planner demo
                   <ArrowUpRight className="size-4" aria-hidden="true" />
-                </Link>
+                </ConciergeTrigger>
               </div>
             </li>
           </ul>

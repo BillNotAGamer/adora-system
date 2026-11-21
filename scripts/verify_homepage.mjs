@@ -329,6 +329,8 @@ async function verifyViewport(viewport) {
       `(async () => {
         const delay = (ms) => new Promise((r) => setTimeout(r, ms));
         for (let i = 0; i < 30; i += 1) {
+          // UX-1: explicitly expand the shared dialog to retain route coverage.
+          document.querySelector('dialog[open] a[href="/ai-planner"]')?.click();
           const visibleH1s = Array.from(document.querySelectorAll('h1')).filter((el) => el.checkVisibility());
           if (window.location.pathname === '/ai-planner' && visibleH1s.length > 0) {
             break;

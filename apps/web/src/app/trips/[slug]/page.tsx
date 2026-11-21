@@ -1,3 +1,4 @@
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -104,10 +105,10 @@ export default async function TripDetailPage({ params }: PageProps) {
               <ArrowLeft className="size-4" aria-hidden="true" />
               Tất cả chuyến đi mẫu
             </Link>
-            <Link href="/ai-planner" className="editorial-link">
+            <ConciergeTrigger href="/ai-planner" className="editorial-link">
               Mở AI Planner demo
               <ArrowUpRight className="size-4" aria-hidden="true" />
-            </Link>
+            </ConciergeTrigger>
           </div>
         </section>
       </main>

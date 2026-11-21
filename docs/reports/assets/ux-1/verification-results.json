@@ -1,0 +1,119 @@
+[
+  {
+    "viewport": 360,
+    "welcome": {
+      "pollingOpenMs": 470.19999998807907,
+      "paintMarkMs": 19.099999994039536,
+      "initialJsBytes": 172754,
+      "lazyJsBytes": 29022,
+      "longTasks": [],
+      "focus": "concierge-title",
+      "overflow": false,
+      "lock": "hidden",
+      "logCount": 1,
+      "title": "concierge-title"
+    },
+    "errors": [],
+    "passed": true
+  },
+  {
+    "viewport": 390,
+    "welcome": {
+      "pollingOpenMs": 474.80000001192093,
+      "paintMarkMs": 12.099999994039536,
+      "initialJsBytes": 172754,
+      "lazyJsBytes": 29022,
+      "longTasks": [
+        {
+          "start": 36.900000005960464,
+          "duration": 50
+        }
+      ],
+      "focus": "concierge-title",
+      "overflow": false,
+      "lock": "hidden",
+      "logCount": 1,
+      "title": "concierge-title"
+    },
+    "errors": [],
+    "passed": true
+  },
+  {
+    "viewport": 768,
+    "welcome": {
+      "pollingOpenMs": 475.80000001192093,
+      "paintMarkMs": 11.5,
+      "initialJsBytes": 172754,
+      "lazyJsBytes": 29022,
+      "longTasks": [],
+      "focus": "concierge-title",
+      "overflow": false,
+      "lock": "hidden",
+      "logCount": 1,
+      "title": "concierge-title"
+    },
+    "errors": [],
+    "passed": true
+  },
+  {
+    "viewport": 1024,
+    "welcome": {
+      "pollingOpenMs": 465.7000000178814,
+      "paintMarkMs": 16.80000001192093,
+      "initialJsBytes": 177604,
+      "lazyJsBytes": 29022,
+      "longTasks": [],
+      "focus": "concierge-title",
+      "overflow": false,
+      "lock": "hidden",
+      "logCount": 1,
+      "title": "concierge-title"
+    },
+    "errors": [],
+    "passed": true
+  },
+  {
+    "viewport": 1440,
+    "welcome": {
+      "pollingOpenMs": 486.5,
+      "paintMarkMs": 21,
+      "initialJsBytes": 177604,
+      "lazyJsBytes": 29022,
+      "longTasks": [
+        {
+          "start": 24.900000005960464,
+          "duration": 52
+        }
+      ],
+      "focus": "concierge-title",
+      "overflow": false,
+      "lock": "hidden",
+      "logCount": 1,
+      "title": "concierge-title"
+    },
+    "errors": [],
+    "passed": true
+  },
+  {
+    "viewport": 1920,
+    "welcome": {
+      "pollingOpenMs": 472.69999998807907,
+      "paintMarkMs": 15.700000017881393,
+      "initialJsBytes": 177604,
+      "lazyJsBytes": 29022,
+      "longTasks": [
+        {
+          "start": 42.30000001192093,
+          "duration": 59
+        }
+      ],
+      "focus": "concierge-title",
+      "overflow": false,
+      "lock": "hidden",
+      "logCount": 1,
+      "title": "concierge-title"
+    },
+    "errors": [],
+    "passed": true
+  }
+]

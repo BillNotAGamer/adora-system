@@ -1,5 +1,5 @@
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import { ArrowUpRight, Sparkles } from "lucide-react";
-import Link from "next/link";
 
 import { Reveal } from "@/components/ui/reveal";
 
@@ -16,10 +16,10 @@ export function AiPlannerSection() {
           <p className="mt-7 max-w-xl text-sm leading-7 text-white/65 sm:text-base sm:leading-8">
             Không gian lập kế hoạch của ADORA đang được xây dựng để biến sở thích, thời gian và nhịp đi của bạn thành một bản phác thảo hành trình mạch lạc.
           </p>
-          <Link href="/ai-planner" className="editorial-link mt-9 text-[var(--adora-ivory)]">
+          <ConciergeTrigger href="/ai-planner" className="editorial-link mt-9 text-[var(--adora-ivory)]">
             Plan with Adora AI
             <ArrowUpRight className="size-4" aria-hidden="true" />
-          </Link>
+          </ConciergeTrigger>
           <p className="mt-5 text-[0.67rem] leading-5 tracking-[0.08em] text-white/42 uppercase">
             Bản xem trước giao diện · chưa kết nối mô hình AI
           </p>

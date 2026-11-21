@@ -1,3 +1,4 @@
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import type { CSSProperties } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
@@ -34,14 +35,14 @@ export function EditorialHero() {
             ADORA kết nối cảm hứng, dữ liệu điểm đến và trí tuệ nhân tạo để mỗi chuyến đi trở thành một hành trình có chủ đích.
           </p>
           <div className="mt-9 flex flex-col items-start gap-5 sm:flex-row sm:items-center lg:mt-11">
-            <Link
+            <ConciergeTrigger
               href="/ai-planner"
               style={{ "--stagger-index": 2 } as CSSProperties}
               className="light-cta hero-primary-cta group inline-flex min-h-13 items-center gap-4 px-6 text-xs font-bold tracking-[0.11em] transition-colors adora-load-rise"
             >
               Plan with Adora AI
               <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-            </Link>
+            </ConciergeTrigger>
             <Link
               href="/destinations"
               style={{ "--stagger-index": 3 } as CSSProperties}

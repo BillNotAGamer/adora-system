@@ -1971,6 +1971,8 @@ async function runPackageBHomepageSuite(browserClient) {
       let earlyClickArrived = false;
       for (let i = 0; i < 50; i += 1) {
         try {
+          // UX-1 preserves the expanded route behind an explicit dialog action.
+          await session.evaluate("document.querySelector('dialog[open] a[href=\"/ai-planner\"]')?.click(); true");
           const onPlanner = await session.evaluate(
             "window.location.pathname === '/ai-planner' && Boolean(document.querySelector('#planner-prompt'))",
           );
@@ -1990,6 +1992,7 @@ async function runPackageBHomepageSuite(browserClient) {
       let spaArrived = false;
       for (let i = 0; i < 50; i += 1) {
         try {
+          await session.evaluate("document.querySelector('dialog[open] a[href=\"/ai-planner\"]')?.click(); true");
           const onPlanner = await session.evaluate(
             "window.location.pathname === '/ai-planner' && Boolean(document.querySelector('#planner-prompt'))",
           );
@@ -2821,6 +2824,8 @@ async function runPackageDApplicationSuite(browserClient) {
           openingVisibleInLog: openingRect.top >= logRect.top && openingRect.bottom <= logRect.bottom,
           emptyPreviewPresent: Boolean(emptyPreview && emptyPreview.checkVisibility()),
           liveRegionCount: liveRegions.length,
+          conversationLogCount: document.querySelectorAll('[role="log"]').length,
+          surveyAnnouncementCount: document.querySelectorAll('.concierge-survey h2[aria-live="polite"]').length,
           ariaBusyCount: document.querySelectorAll('[aria-busy]').length,
           activeAnimationsAtLoad: document.getAnimations().length,
         };
@@ -3042,6 +3047,8 @@ async function runPackageDApplicationSuite(browserClient) {
           (b) => b.textContent?.includes('Cuộc trò chuyện demo mới'),
         );
         resetBtn.click();
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        document.querySelector('[data-confirm-reset]')?.click();
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
         const log = document.querySelector('[role="log"]');
         const afterReset = {
@@ -3594,7 +3601,10 @@ async function runPackageDApplicationSuite(browserClient) {
     plannerDesktop.initialCheck.allSuggestionsVisibleInLog &&
     plannerDesktop.initialCheck.openingVisibleInLog &&
     plannerDesktop.initialCheck.emptyPreviewPresent &&
+    // Explicit step focus announces questions; retain exactly one live conversation log.
     plannerDesktop.initialCheck.liveRegionCount === 1 &&
+    plannerDesktop.initialCheck.conversationLogCount === 1 &&
+    plannerDesktop.initialCheck.surveyAnnouncementCount === 0 &&
     plannerDesktop.initialCheck.ariaBusyCount === 0 &&
     plannerDesktop.initialCheck.activeAnimationsAtLoad === 0 &&
     plannerDesktop.turnAtT0.activeElementIdAtT0 === "planner-prompt" &&

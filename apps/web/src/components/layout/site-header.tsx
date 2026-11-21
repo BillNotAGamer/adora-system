@@ -2,7 +2,8 @@
 
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useConcierge } from "@/components/concierge/concierge-provider";
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 
 export type NavSection = "destinations" | "experiences" | "trips";
 
@@ -21,7 +22,7 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderProps>) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { menuOpen: isOpen, setMenuOpen: updateMenu } = useConcierge();
   const isOverlay = tone === "overlay";
 
   const headerClass = isOverlay
@@ -66,9 +67,9 @@ export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderPro
               </Link>
             );
           })}
-          <Link href="/ai-planner" className={ctaClass}>
+          <ConciergeTrigger href="/ai-planner" className={ctaClass}>
             Plan with Adora AI
-          </Link>
+          </ConciergeTrigger>
         </nav>
 
         <button
@@ -77,7 +78,7 @@ export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderPro
           aria-expanded={isOpen}
           aria-controls="mobile-navigation"
           aria-label={isOpen ? "Đóng trình đơn" : "Mở trình đơn"}
-          onClick={() => setIsOpen((open) => !open)}
+          onClick={() => updateMenu(!isOpen)}
         >
           {isOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
         </button>
@@ -96,19 +97,19 @@ export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderPro
               href={item.href}
               aria-current={isCurrent ? "page" : undefined}
               className={`${panelLinkClass} flex min-h-12 items-center py-3 text-sm font-medium`}
-              onClick={() => setIsOpen(false)}
+              onClick={() => updateMenu(false)}
             >
               {item.label}
             </Link>
           );
         })}
-        <Link
+        <ConciergeTrigger
           href="/ai-planner"
           className={`${isOverlay ? "light-cta" : "dark-cta"} mt-6 inline-flex min-h-12 items-center justify-center px-5 text-xs font-bold tracking-[0.1em]`}
-          onClick={() => setIsOpen(false)}
+          onClick={() => updateMenu(false)}
         >
           Plan with Adora AI
-        </Link>
+        </ConciergeTrigger>
       </nav>
     </header>
   );
