@@ -11,6 +11,7 @@ import {
 
 const HIGHLAND_PLATE = "/images/cxp01/highland-world.jpg";
 const HUMAN_PLATE = "/images/cxp01/human-moment.jpg";
+const PILLAR_OCCLUDER = "/images/cxp01/stone-pillar-occluder.png";
 
 // Desktop 1600x900 focal 'A' center and Mobile 900x1600 focal 'A' center
 const DESKTOP_A_X = 356;
@@ -32,7 +33,7 @@ export function TypographyWorldExperience() {
   const worldOverlayRef = useRef<HTMLDivElement | null>(null);
   const humanPortalRef = useRef<HTMLDivElement | null>(null);
   const humanPlateWrapRef = useRef<HTMLDivElement | null>(null);
-  const archRimRef = useRef<HTMLDivElement | null>(null);
+  const pillarOccluderRef = useRef<HTMLDivElement | null>(null);
   const humanOverlayRef = useRef<HTMLDivElement | null>(null);
   const progressFillRef = useRef<HTMLSpanElement | null>(null);
 
@@ -92,9 +93,9 @@ export function TypographyWorldExperience() {
         setHumanInteractive(state.humanCtaInteractive);
       }
 
-      // Layer 0: Continuous highland world camera dolly (with Moment III scrim isolated to Moment III)
+      // Layer 0: Far highland world plane (dolly + lateral orbit during colonnade pass)
       if (worldLayerRef.current) {
-        worldLayerRef.current.style.transform = `translate3d(0, ${state.worldTranslateY.toFixed(3)}%, 0) scale(${state.worldScale.toFixed(4)})`;
+        worldLayerRef.current.style.transform = `translate3d(${state.worldTranslateX.toFixed(3)}%, ${state.worldTranslateY.toFixed(3)}%, 0) scale(${state.worldScale.toFixed(4)})`;
       }
       if (worldScrimRef.current) {
         worldScrimRef.current.style.opacity = state.worldScrimOpacity.toFixed(4);
@@ -156,51 +157,33 @@ export function TypographyWorldExperience() {
         worldOverlayRef.current.style.transform = `translate3d(0, ${state.worldTextOffsetY.toFixed(2)}px, 0)`;
       }
 
-      // Moment III -> IV: Architectural arch portal originating inside the valley stone arch
-      const archP = state.archPortalProgress;
-      const anchorX = isMobile ? 50 : 76;
-      const anchorY = isMobile ? 48 : 48;
-      const topInset = anchorY * (1 - archP);
-      const bottomInset = (100 - anchorY) * (1 - archP);
-      const leftInset = anchorX * (1 - archP);
-      const rightInset = (100 - anchorX) * (1 - archP);
-      const archRadius = Math.max(0, (1 - archP) * 52);
+      // Moment III -> IV: 2.5D weathered stone colonnade occlusion pass
+      const colP = state.colonnadeProgress;
+      const revealLeft = state.humanRevealLeftPct;
 
       if (humanPortalRef.current) {
-        if (archP <= 0.001) {
+        if (revealLeft >= 99.9) {
           humanPortalRef.current.style.visibility = "hidden";
-          humanPortalRef.current.style.clipPath = `inset(${anchorY}% ${100 - anchorX}% ${100 - anchorY}% ${anchorX}% round 50% 50% 0 0)`;
-          humanPortalRef.current.style.maskImage = "none";
-          humanPortalRef.current.style.webkitMaskImage = "none";
+          humanPortalRef.current.style.clipPath = "inset(0% 0% 0% 100%)";
         } else {
           humanPortalRef.current.style.visibility = "visible";
           humanPortalRef.current.style.clipPath =
-            archP >= 0.999
-              ? "inset(0% 0% 0% 0% round 0% 0% 0 0)"
-              : `inset(${topInset.toFixed(3)}% ${rightInset.toFixed(3)}% ${bottomInset.toFixed(3)}% ${leftInset.toFixed(3)}% round ${archRadius.toFixed(2)}% ${archRadius.toFixed(2)}% 0% 0%)`;
-          // Soften the bottom horizon threshold during mid-expansion so it dissolves into mist instead of a flat razor line
-          const maskStop = (100 - bottomInset).toFixed(2);
-          const maskStart = Math.max(0, 100 - bottomInset - (1 - archP) * 18).toFixed(2);
-          const featherMask =
-            archP >= 0.96
-              ? "none"
-              : `linear-gradient(180deg, #000 0%, #000 ${maskStart}%, transparent ${maskStop}%)`;
-          humanPortalRef.current.style.maskImage = featherMask;
-          humanPortalRef.current.style.webkitMaskImage = featherMask;
+            revealLeft <= 0.1
+              ? "inset(0% 0% 0% 0%)"
+              : `inset(0% 0% 0% ${revealLeft.toFixed(3)}%)`;
         }
       }
 
       if (humanPlateWrapRef.current) {
-        humanPlateWrapRef.current.style.transform = `scale(${state.humanScale.toFixed(4)})`;
+        humanPlateWrapRef.current.style.transform = `translate3d(${state.humanTranslateX.toFixed(3)}%, 0, 0) scale(${state.humanScale.toFixed(4)})`;
       }
 
-      if (archRimRef.current) {
-        archRimRef.current.style.opacity = state.archRimOpacity.toFixed(4);
-        archRimRef.current.style.top = `${topInset.toFixed(3)}%`;
-        archRimRef.current.style.right = `${rightInset.toFixed(3)}%`;
-        archRimRef.current.style.bottom = `${bottomInset.toFixed(3)}%`;
-        archRimRef.current.style.left = `${leftInset.toFixed(3)}%`;
-        archRimRef.current.style.borderRadius = `${archRadius.toFixed(2)}% ${archRadius.toFixed(2)}% 0 0`;
+      if (pillarOccluderRef.current) {
+        const active = colP > 0.001 && colP < 0.999;
+        pillarOccluderRef.current.style.visibility = active ? "visible" : "hidden";
+        pillarOccluderRef.current.style.width = `${state.pillarWidthPct}%`;
+        // Translate in vw units from left: 0 so pillar sweeps smoothly across the viewport
+        pillarOccluderRef.current.style.transform = `translate3d(${state.pillarLeftPct.toFixed(3)}vw, 0, 0) scale(${state.pillarScale.toFixed(4)})`;
       }
 
       // Moment IV — The Human Moment editorial overlay
@@ -446,13 +429,20 @@ export function TypographyWorldExperience() {
             </div>
           </div>
 
-          {/* Golden sunlit mist glow framing the architectural arch doorway during Moment III -> IV */}
+          {/* Near-plane weathered stone colonnade pillar occluding the World -> Human seam */}
           <div
-            ref={archRimRef}
-            className="cxp01-arch-rim"
-            style={{ opacity: 0 }}
+            ref={pillarOccluderRef}
+            className="cxp01-pillar-occluder"
+            style={{ visibility: "hidden" }}
             aria-hidden="true"
-          />
+          >
+            <img
+              src={PILLAR_OCCLUDER}
+              alt=""
+              decoding="async"
+              className="cxp01-pillar-image"
+            />
+          </div>
 
           {/* Layer 2: Precision vector inverted typographic mask veil */}
           <div ref={veilLayerRef} className="cxp01-veil-layer" aria-hidden="true">
