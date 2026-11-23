@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import "@/app/creative-lab/typography-world/typography-world.css";
 import "@/app/creative-lab/cinematic-journey/cinematic-journey.css";
+import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import {
   DiscoveryRibbon,
   ReducedMotionDiscoverySection,
@@ -17,6 +18,9 @@ import {
   computeCinematicJourneyState,
   type JourneyMovementId,
 } from "@/components/creative-lab/cinematic-journey/narrative-choreography";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import type { HomepageCatalog } from "@/lib/catalog";
 
 const HIGHLAND_PLATE = "/images/cxp01/highland-world.jpg";
 const HUMAN_PLATE = "/images/cxp01/human-moment.jpg";
@@ -27,7 +31,51 @@ const DESKTOP_A_Y = 416;
 const MOBILE_A_X = 450;
 const MOBILE_A_Y = 740;
 
-export function CinematicJourneyExperience() {
+const NO_JS_FALLBACK_CSS = `
+.cxp03-production .cxp02-runway { height: auto !important; }
+.cxp03-production .cxp02-stage { position: relative !important; height: auto !important; overflow: visible !important; }
+.cxp03-production .cxp01-world-layer,
+.cxp03-production .cxp01-human-portal-layer,
+.cxp03-production .cxp02-journey-backdrop,
+.cxp03-production .cxp01-veil-layer,
+.cxp03-production .cxp01-pillar-occluder,
+.cxp03-production .cxp01-outer-frame,
+.cxp03-production .cxp01-scroll-cue,
+.cxp03-production .cxp01-chrome-footer { display: none !important; }
+.cxp03-production .cxp01-opening-overlay,
+.cxp03-production .cxp01-world-overlay,
+.cxp03-production .cxp01-human-overlay,
+.cxp03-production .cxp02-discovery-layer,
+.cxp03-production .cxp02-journey-overlay,
+.cxp03-production .cxp02-concierge-overlay {
+  position: relative !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  min-height: 62svh;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+}
+.cxp03-production .cxp01-opening-overlay {
+  padding-top: 7.5rem !important;
+  background: linear-gradient(180deg, rgba(11, 14, 12, 0.72) 0%, rgba(11, 14, 12, 0.88) 100%), url('/images/cxp01/highland-world.jpg') center/cover no-repeat;
+}
+.cxp03-production .cxp02-discovery-grid { grid-template-columns: 1fr !important; }
+.cxp03-production .cxp02-ribbon-track { flex-wrap: wrap !important; transform: none !important; }
+`;
+
+interface CinematicJourneyExperienceProps {
+  mode?: "lab" | "production";
+  catalogSource?: HomepageCatalog["source"];
+  catalogDisclosure?: ReactNode;
+}
+
+export function CinematicJourneyExperience({
+  mode = "lab",
+  catalogSource = "fallback",
+  catalogDisclosure,
+}: Readonly<CinematicJourneyExperienceProps> = {}) {
+  const isProduction = mode === "production";
   const runwayRef = useRef<HTMLDivElement | null>(null);
   const worldLayerRef = useRef<HTMLDivElement | null>(null);
   const worldScrimRef = useRef<HTMLDivElement | null>(null);
@@ -61,29 +109,43 @@ export function CinematicJourneyExperience() {
   const [movementCaption, setMovementCaption] = useState(
     "01  /  IDENTITY — TYPOGRAPHY BECOMES LANDSCAPE",
   );
+  const [openingInteractive, setOpeningInteractive] = useState(true);
   const [discoveryInteractive, setDiscoveryInteractive] = useState(false);
   const [journeyInteractive, setJourneyInteractive] = useState(false);
   const [conciergeInteractive, setConciergeInteractive] = useState(false);
 
   const lastMovementRef = useRef<JourneyMovementId>("01");
-  const lastFlagsRef = useRef({ discovery: false, journey: false, concierge: false });
+  const lastFlagsRef = useRef({
+    opening: true,
+    discovery: false,
+    journey: false,
+    concierge: false,
+  });
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 767px)");
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const syncQueries = () => {
+      const motionOffAttr = document.documentElement.getAttribute("data-motion") === "off";
       setIsMobile(mobileQuery.matches);
-      setReducedMotion(motionQuery.matches);
+      setReducedMotion(motionQuery.matches || motionOffAttr);
     };
 
     syncQueries();
     mobileQuery.addEventListener("change", syncQueries);
     motionQuery.addEventListener("change", syncQueries);
 
+    const attrObserver = new MutationObserver(syncQueries);
+    attrObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-motion"],
+    });
+
     return () => {
       mobileQuery.removeEventListener("change", syncQueries);
       motionQuery.removeEventListener("change", syncQueries);
+      attrObserver.disconnect();
     };
   }, []);
 
@@ -107,6 +169,10 @@ export function CinematicJourneyExperience() {
         lastMovementRef.current = state.movement;
         setMovement(state.movement);
         setMovementCaption(state.movementCaption);
+      }
+      if (state.openingInteractive !== lastFlagsRef.current.opening) {
+        lastFlagsRef.current.opening = state.openingInteractive;
+        setOpeningInteractive(state.openingInteractive);
       }
       if (state.discoveryInteractive !== lastFlagsRef.current.discovery) {
         lastFlagsRef.current.discovery = state.discoveryInteractive;
@@ -170,6 +236,8 @@ export function CinematicJourneyExperience() {
       }
       if (openingOverlayRef.current) {
         openingOverlayRef.current.style.opacity = state.openingTextOpacity.toFixed(4);
+        openingOverlayRef.current.style.visibility =
+          state.openingTextOpacity <= 0.001 ? "hidden" : "visible";
         openingOverlayRef.current.style.transform = `translate3d(0, ${state.openingTextOffsetY.toFixed(2)}px, 0)`;
       }
       if (scrollCueRef.current) {
@@ -292,16 +360,24 @@ export function CinematicJourneyExperience() {
 
   if (reducedMotion) {
     return (
-      <main id="main-content" className="cxp01-reduced-root" data-cxp02-mode="reduced-motion">
-        <header className="cxp01-reduced-header">
-          <Link href="/" className="cxp01-brand-link">
-            <span className="cxp01-brand-wordmark">ADORA</span>
-            <span className="cxp01-brand-tagline">AN INVITATION TO FEEL</span>
-          </Link>
-          <Link href="/ai-planner" className="cxp01-skip-link">
-            AI Planner
-          </Link>
-        </header>
+      <main
+        id="main-content"
+        className={`cxp01-reduced-root${isProduction ? " cxp03-reduced-production" : ""}`}
+        data-cxp02-mode="reduced-motion"
+      >
+        {isProduction ? (
+          <SiteHeader tone="cinematic" />
+        ) : (
+          <header className="cxp01-reduced-header">
+            <Link href="/" className="cxp01-brand-link">
+              <span className="cxp01-brand-wordmark">ADORA</span>
+              <span className="cxp01-brand-tagline">AN INVITATION TO FEEL</span>
+            </Link>
+            <Link href="/ai-planner" className="cxp01-skip-link">
+              AI Planner
+            </Link>
+          </header>
+        )}
 
         <section className="cxp01-reduced-identity-stage" aria-label="Movement 01 — Identity">
           <div className="cxp01-reduced-bg">
@@ -387,10 +463,21 @@ export function CinematicJourneyExperience() {
             </svg>
           </div>
           <div className="cxp01-reduced-caption">
-            <h1 className="sr-only">ADORA — Full Cinematic Narrative</h1>
+            <h1 className="sr-only">
+              {isProduction
+                ? "ADORA — Đi xa hơn. Hiểu sâu hơn."
+                : "ADORA — Full Cinematic Narrative"}
+            </h1>
             <p className="cxp01-opening-subtitle">
               Một nơi chốn không thể chỉ nhìn qua màn hình.
             </p>
+            {isProduction ? (
+              <div style={{ marginTop: "1.25rem" }}>
+                <ConciergeTrigger href="/ai-planner" className="hero-primary-cta cxp03-opening-cta">
+                  Plan with Adora AI
+                </ConciergeTrigger>
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -432,35 +519,53 @@ export function CinematicJourneyExperience() {
           </div>
         </section>
 
-        <ReducedMotionDiscoverySection />
-        <ReducedMotionJourneyAndConcierge />
+        <ReducedMotionDiscoverySection
+          catalogSource={catalogSource}
+          catalogDisclosure={catalogDisclosure}
+        />
+        <ReducedMotionJourneyAndConcierge mode={mode} />
+        {isProduction ? <SiteFooter showCta={false} tone="dark" /> : null}
       </main>
     );
   }
 
   return (
-    <main id="main-content" className="cxp02-root" data-cxp02-mode="cinematic">
+    <main
+      id="main-content"
+      className={`cxp02-root${isProduction ? " cxp03-production" : ""}`}
+      data-cxp02-mode="cinematic"
+    >
+      {isProduction ? (
+        <>
+          <noscript>
+            <style>{NO_JS_FALLBACK_CSS}</style>
+          </noscript>
+          <SiteHeader tone="cinematic" />
+        </>
+      ) : null}
       <div ref={runwayRef} className="cxp02-runway" data-cxp02-runway>
         <div className="cxp02-stage" data-cxp02-stage>
-          <header className="cxp01-chrome-header">
-            <div className="cxp01-chrome-header-inner">
-              <Link href="/" className="cxp01-brand-link">
-                <span className="cxp01-brand-wordmark">ADORA</span>
-                <span className="cxp01-brand-tagline">
-                  {isMobile ? "THE ART OF GOING SLOW" : "AN INVITATION TO FEEL"}
-                </span>
-              </Link>
-
-              <div className="cxp01-header-meta">
-                <span className="cxp01-movement-tag" aria-live="polite">
-                  MOVEMENT {movement}
-                </span>
-                <Link href="/ai-planner" className="cxp01-skip-link">
-                  AI Planner
+          {!isProduction ? (
+            <header className="cxp01-chrome-header">
+              <div className="cxp01-chrome-header-inner">
+                <Link href="/" className="cxp01-brand-link">
+                  <span className="cxp01-brand-wordmark">ADORA</span>
+                  <span className="cxp01-brand-tagline">
+                    {isMobile ? "THE ART OF GOING SLOW" : "AN INVITATION TO FEEL"}
+                  </span>
                 </Link>
+
+                <div className="cxp01-header-meta">
+                  <span className="cxp01-movement-tag" aria-live="polite">
+                    MOVEMENT {movement}
+                  </span>
+                  <Link href="/ai-planner" className="cxp01-skip-link">
+                    AI Planner
+                  </Link>
+                </div>
               </div>
-            </div>
-          </header>
+            </header>
+          ) : null}
 
           {/* Layer 0: Continuous highland world (Identity -> Passage -> World) */}
           <div ref={worldLayerRef} className="cxp01-world-layer" aria-hidden="true">
@@ -480,6 +585,8 @@ export function CinematicJourneyExperience() {
             layerRef={discoveryLayerRef}
             ribbonTrackRef={ribbonTrackRef}
             interactive={discoveryInteractive}
+            catalogSource={catalogSource}
+            catalogDisclosure={catalogDisclosure}
           />
 
           {/* Layer 1: Human Moment (revealed behind stone pillar -> reframed as Discovery origin plate) */}
@@ -657,7 +764,11 @@ export function CinematicJourneyExperience() {
 
           {/* Movement 01 — Identity */}
           <section ref={openingOverlayRef} className="cxp01-opening-overlay" aria-label="Identity">
-            <h1 className="sr-only">ADORA — Full Cinematic Narrative</h1>
+            <h1 className="sr-only">
+              {isProduction
+                ? "ADORA — Đi xa hơn. Hiểu sâu hơn."
+                : "ADORA — Full Cinematic Narrative"}
+            </h1>
             <p className="cxp01-opening-subtitle">
               Một nơi chốn không thể chỉ nhìn qua màn hình.
             </p>
@@ -669,6 +780,15 @@ export function CinematicJourneyExperience() {
               </p>
               <span className="cxp01-mobile-opening-cue">Khám phá ADORA</span>
             </div>
+            {isProduction ? (
+              <ConciergeTrigger
+                href="/ai-planner"
+                className="hero-primary-cta cxp03-opening-cta"
+                tabIndex={openingInteractive ? 0 : -1}
+              >
+                Plan with Adora AI
+              </ConciergeTrigger>
+            ) : null}
           </section>
 
           <div ref={scrollCueRef} className="cxp01-scroll-cue" aria-hidden="true">
@@ -720,21 +840,42 @@ export function CinematicJourneyExperience() {
             conciergeBackdropRef={conciergeBackdropRef}
             conciergeOverlayRef={conciergeOverlayRef}
             conciergeInteractive={conciergeInteractive}
+            mode={mode}
           />
 
-          <footer className="cxp01-chrome-footer">
-            <div className="cxp01-chrome-footer-inner">
-              <span className="cxp01-footer-caption">{movementCaption}</span>
-              <div className="cxp01-progress-pill" aria-hidden="true">
-                <span className="cxp01-progress-track">
-                  <span ref={progressFillRef} className="cxp01-progress-fill" />
-                </span>
-                <span className="cxp01-progress-marker" />
+          {isProduction ? (
+            <div
+              className="cxp01-chrome-footer"
+              role="region"
+              aria-label="Tiến trình hành trình"
+              data-cxp03-movement={movement}
+            >
+              <div className="cxp01-chrome-footer-inner">
+                <span className="cxp01-footer-caption">{movementCaption}</span>
+                <div className="cxp01-progress-pill" aria-hidden="true">
+                  <span className="cxp01-progress-track">
+                    <span ref={progressFillRef} className="cxp01-progress-fill" />
+                  </span>
+                  <span className="cxp01-progress-marker" />
+                </div>
               </div>
             </div>
-          </footer>
+          ) : (
+            <footer className="cxp01-chrome-footer">
+              <div className="cxp01-chrome-footer-inner">
+                <span className="cxp01-footer-caption">{movementCaption}</span>
+                <div className="cxp01-progress-pill" aria-hidden="true">
+                  <span className="cxp01-progress-track">
+                    <span ref={progressFillRef} className="cxp01-progress-fill" />
+                  </span>
+                  <span className="cxp01-progress-marker" />
+                </div>
+              </div>
+            </footer>
+          )}
         </div>
       </div>
+      {isProduction ? <SiteFooter showCta={false} tone="dark" /> : null}
     </main>
   );
 }

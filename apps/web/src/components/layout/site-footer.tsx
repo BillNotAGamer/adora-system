@@ -7,12 +7,18 @@ import { Reveal } from "@/components/ui/reveal";
 type SiteFooterProps = {
   /** The closing call-to-action block is used on the homepage and long editorial pages. */
   showCta?: boolean;
+  /** `dark` blends seamlessly with the obsidian cinematic homepage finale. */
+  tone?: "light" | "dark";
 };
 
-export function SiteFooter({ showCta = true }: Readonly<SiteFooterProps>) {
+export function SiteFooter({ showCta = true, tone = "light" }: Readonly<SiteFooterProps>) {
+  const isDark = tone === "dark";
+
   return (
-    <footer className="bg-[var(--adora-ivory)]">
-      <div className={`adora-container border-t border-[var(--adora-hairline)] ${showCta ? "py-14 sm:py-20" : "py-10"}`}>
+    <footer className={isDark ? "bg-[#080b09] text-[#f4efe6]" : "bg-[var(--adora-ivory)]"}>
+      <div
+        className={`adora-container border-t ${isDark ? "border-[#f4efe6]/16" : "border-[var(--adora-hairline)]"} ${showCta ? "py-14 sm:py-20" : "py-10"}`}
+      >
         {showCta ? (
           <Reveal delayMs={0} className="grid gap-12 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
             <div>
@@ -29,25 +35,29 @@ export function SiteFooter({ showCta = true }: Readonly<SiteFooterProps>) {
         ) : null}
 
         <div
-          className={`${showCta ? "mt-20 border-t border-[var(--adora-hairline)] pt-8" : ""} grid gap-9 text-xs text-[var(--adora-text-secondary)] sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto] lg:items-center lg:gap-10`}
+          className={`${showCta ? `mt-20 border-t ${isDark ? "border-[#f4efe6]/16" : "border-[var(--adora-hairline)]"} pt-8` : ""} grid gap-9 text-xs ${isDark ? "text-[#f4efe6]/70" : "text-[var(--adora-text-secondary)]"} sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto] lg:items-center lg:gap-10`}
         >
-          <Link href="/" className="text-sm font-bold tracking-[0.34em] text-[var(--adora-ink)]" aria-label="ADORA — trang chủ">
+          <Link
+            href="/"
+            className={`text-sm font-bold tracking-[0.34em] ${isDark ? "text-[#f4efe6]" : "text-[var(--adora-ink)]"}`}
+            aria-label="ADORA — trang chủ"
+          >
             ADORA
           </Link>
           <nav aria-label="Điều hướng chân trang" className="flex flex-wrap gap-x-6 gap-y-1">
-            <Link href="/" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
+            <Link href="/" className={`inline-flex min-h-11 items-center ${isDark ? "hover:text-[#e4c68c]" : "hover:text-[var(--adora-ink)]"}`}>
               Trang chủ
             </Link>
-            <Link href="/destinations" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
+            <Link href="/destinations" className={`inline-flex min-h-11 items-center ${isDark ? "hover:text-[#e4c68c]" : "hover:text-[var(--adora-ink)]"}`}>
               Điểm đến
             </Link>
-            <Link href="/experiences" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
+            <Link href="/experiences" className={`inline-flex min-h-11 items-center ${isDark ? "hover:text-[#e4c68c]" : "hover:text-[var(--adora-ink)]"}`}>
               Trải nghiệm
             </Link>
-            <ConciergeTrigger href="/ai-planner" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
+            <ConciergeTrigger href="/ai-planner" className={`inline-flex min-h-11 items-center ${isDark ? "hover:text-[#e4c68c]" : "hover:text-[var(--adora-ink)]"}`}>
               AI Planner
             </ConciergeTrigger>
-            <Link href="/trips" className="inline-flex min-h-11 items-center hover:text-[var(--adora-ink)]">
+            <Link href="/trips" className={`inline-flex min-h-11 items-center ${isDark ? "hover:text-[#e4c68c]" : "hover:text-[var(--adora-ink)]"}`}>
               Chuyến đi mẫu
             </Link>
           </nav>

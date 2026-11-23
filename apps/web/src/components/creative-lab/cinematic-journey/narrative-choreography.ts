@@ -12,6 +12,7 @@ export interface CinematicJourneyState {
   openingTextOffsetY: number;
   openingFrameOpacity: number;
   scrollCueOpacity: number;
+  openingInteractive: boolean;
 
   maskScale: number;
   maskShiftX: number;
@@ -114,6 +115,7 @@ export function computeCinematicJourneyState(
   const openingTextOffsetY = openingFade * -24;
   const openingFrameOpacity = 1 - smoothstep(p, 0.02, 0.08);
   const scrollCueOpacity = 1 - smoothstep(p, 0.0, 0.045);
+  const openingInteractive = openingTextOpacity > 0.5;
 
   const introScaleT = smoothstep(p, 0.0, 0.075);
   const passageT = rangeProgress(p, 0.07, 0.215);
@@ -167,18 +169,20 @@ export function computeCinematicJourneyState(
   // --- ACT I (NEW): Human Moment -> Discovery (p = 0.48..0.73) ---
   // The full-bleed café terrace physically reframes into the left origin anchor plate
   // while smoothly panning the subject (woman with steaming cup) into the docked frame.
+  // CXP-03A polish: keep the woman's face & cup squarely centered inside the desktop 30% origin plate
+  // without altering the verified mobile framing.
   const humanReframeProgress = easeInOutCubic(rangeProgress(p, 0.485, 0.565));
-  const humanScale = 1.09 - humanSettleT * 0.09 + humanReframeProgress * (isMobile ? 0.08 : 0.14);
+  const humanScale = 1.09 - humanSettleT * 0.09 + humanReframeProgress * (isMobile ? 0.08 : 0.04);
   const colonnadeSlideX = (1 - humanSettleT) * (isMobile ? 4.5 : 5.5);
-  const reframePanX = isMobile ? 0 : -50 * humanReframeProgress;
+  const reframePanX = isMobile ? 0 : -56 * humanReframeProgress;
   const humanTranslateX = colonnadeSlideX + reframePanX;
-  const humanTranslateY = isMobile ? -25 * humanReframeProgress : -2 * humanReframeProgress;
+  const humanTranslateY = isMobile ? -25 * humanReframeProgress : -1 * humanReframeProgress;
 
   // Target reframed box for Human Moment as origin chapter "01 · Sáng sớm"
   const targetTop = isMobile ? 12 : 16;
-  const targetRight = isMobile ? 6 : 69;
+  const targetRight = isMobile ? 6 : 66.5;
   const targetBottom = isMobile ? 62 : 14;
-  const targetLeft = isMobile ? 6 : 4;
+  const targetLeft = isMobile ? 6 : 3.5;
 
   // Before colonnade finishes, left clip is controlled by humanRevealLeftPct;
   // after p >= 0.485, it smoothly transitions into the reframed origin plate.
@@ -191,29 +195,30 @@ export function computeCinematicJourneyState(
       : targetLeft * humanReframeProgress;
 
   // Fade out the reframed Human Moment plate cleanly as Your Journey shutter closes over Discovery
-  const discoveryExit = smoothstep(p, 0.715, 0.765);
+  const discoveryExit = smoothstep(p, 0.7, 0.765);
   const humanLayerOpacity = 1 - discoveryExit;
 
   const discoveryIn = smoothstep(p, 0.51, 0.575);
   const discoveryOpacity = clamp(discoveryIn * (1 - discoveryExit), 0, 1);
-  const ribbonRaw = rangeProgress(p, 0.56, 0.72);
+  const ribbonRaw = rangeProgress(p, 0.56, 0.715);
   const discoveryRibbonShiftPct = easeInOutCubic(ribbonRaw) * (isMobile ? 74 : 52);
   const discoveryInteractive = discoveryOpacity > 0.65;
 
-  // --- ACT II (NEW): Discovery -> Your Journey (p = 0.72..0.88) ---
+  // --- ACT II (NEW): Discovery -> Your Journey (p = 0.715..0.885) ---
   // Widescreen horizontal cinema shutter expands from center horizon into twilight highlands
-  const journeyShutterRaw = rangeProgress(p, 0.725, 0.805);
+  // CXP-03A polish: slightly gentler shutter & typography handoff for clearer readability.
+  const journeyShutterRaw = rangeProgress(p, 0.715, 0.81);
   const journeyShutterProgress = easeInOutCubic(journeyShutterRaw);
-  const journeyIn = smoothstep(p, 0.765, 0.81);
-  const journeyOut = smoothstep(p, 0.865, 0.905);
+  const journeyIn = smoothstep(p, 0.76, 0.818);
+  const journeyOut = smoothstep(p, 0.87, 0.912);
   const journeyTextOpacity = clamp(journeyIn * (1 - journeyOut), 0, 1);
   const journeyTextOffsetY = (1 - journeyIn) * 24 - journeyOut * 24;
-  const journeyScale = 1.12 - easeOutCubic(rangeProgress(p, 0.725, 0.92)) * 0.12;
+  const journeyScale = 1.12 - easeOutCubic(rangeProgress(p, 0.715, 0.92)) * 0.12;
   const journeyInteractive = journeyTextOpacity > 0.65;
 
-  // --- ACT III (NEW): Your Journey -> AI Concierge Finale (p = 0.87..1.00) ---
-  const conciergeBackdropOpacity = smoothstep(p, 0.87, 0.935);
-  const conciergeOpacity = smoothstep(p, 0.895, 0.95);
+  // --- ACT III (NEW): Your Journey -> AI Concierge Finale (p = 0.88..1.00) ---
+  const conciergeBackdropOpacity = smoothstep(p, 0.875, 0.94);
+  const conciergeOpacity = smoothstep(p, 0.9, 0.955);
   const conciergeOffsetY = (1 - conciergeOpacity) * 24;
   const conciergeInteractive = conciergeOpacity > 0.65;
 
@@ -225,6 +230,7 @@ export function computeCinematicJourneyState(
     openingTextOffsetY,
     openingFrameOpacity,
     scrollCueOpacity,
+    openingInteractive,
     maskScale,
     maskShiftX,
     maskShiftY,
