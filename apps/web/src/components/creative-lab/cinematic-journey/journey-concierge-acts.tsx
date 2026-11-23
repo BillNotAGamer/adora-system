@@ -16,6 +16,7 @@ interface JourneyConciergeActsProps {
   conciergeBackdropRef: RefObject<HTMLDivElement | null>;
   conciergeOverlayRef: RefObject<HTMLElement | null>;
   conciergeInteractive: boolean;
+  mode?: "lab" | "production";
 }
 
 export function JourneyConciergeActs({
@@ -26,6 +27,7 @@ export function JourneyConciergeActs({
   conciergeBackdropRef,
   conciergeOverlayRef,
   conciergeInteractive,
+  mode = "lab",
 }: JourneyConciergeActsProps) {
   const [selectedSlug, setSelectedSlug] = useState<string>(TRIPS[0]?.slug ?? "da-lat-3-ngay");
   const activeTrip = TRIPS.find((t) => t.slug === selectedSlug) ?? TRIPS[0];
@@ -52,10 +54,12 @@ export function JourneyConciergeActs({
       </div>
 
       <section
+        id={mode === "production" ? "how-it-works" : undefined}
         ref={journeyOverlayRef}
         className="cxp02-journey-overlay"
         style={{ opacity: 0, pointerEvents: "none" }}
         aria-label="Movement 05 — Your Journey"
+        aria-hidden={!journeyInteractive}
       >
         <div className="cxp02-journey-grid">
           <div>
@@ -121,6 +125,8 @@ export function JourneyConciergeActs({
         className="cxp02-concierge-overlay"
         style={{ opacity: 0, pointerEvents: "none" }}
         aria-label="Movement 06 — AI Travel Concierge"
+        aria-hidden={!conciergeInteractive}
+        data-concierge-inline={conciergeInteractive ? "true" : undefined}
       >
         <div className="cxp02-concierge-inner">
           <span className="cxp02-eyebrow">Movement 06 · ADORA Travel Concierge</span>
@@ -146,13 +152,15 @@ export function JourneyConciergeActs({
             >
               Đi tới trang AI Planner
             </Link>
-            <Link
-              href="/creative-lab/typography-world"
-              className="cxp01-secondary-cta"
-              tabIndex={conciergeInteractive ? 0 : -1}
-            >
-              Xem bản CXP-01S
-            </Link>
+            {mode === "lab" ? (
+              <Link
+                href="/creative-lab/typography-world"
+                className="cxp01-secondary-cta"
+                tabIndex={conciergeInteractive ? 0 : -1}
+              >
+                Xem bản CXP-01S
+              </Link>
+            ) : null}
           </div>
           <p className="cxp02-concierge-disclosure">
             Bản xem trước kịch bản dựng sẵn cho Đà Lạt · Chưa kết nối mô hình AI trực tiếp, không phải giá bán hay đặt chỗ.
@@ -163,12 +171,19 @@ export function JourneyConciergeActs({
   );
 }
 
-export function ReducedMotionJourneyAndConcierge() {
-  const sampleTrip = TRIPS[0];
+export function ReducedMotionJourneyAndConcierge({
+  mode = "lab",
+}: Readonly<{ mode?: "lab" | "production" }>) {
+  const [selectedSlug, setSelectedSlug] = useState<string>(TRIPS[0]?.slug ?? "da-lat-3-ngay");
+  const sampleTrip = TRIPS.find((t) => t.slug === selectedSlug) ?? TRIPS[0];
   if (!sampleTrip) return null;
   return (
     <>
-      <section className="cxp01-reduced-section" aria-label="Movement 05 — Your Journey">
+      <section
+        id={mode === "production" ? "how-it-works" : undefined}
+        className="cxp01-reduced-section"
+        aria-label="Movement 05 — Your Journey"
+      >
         <div className="cxp01-reduced-bg">
           <img
             src={JOURNEY_HORIZON_PLATE}
@@ -180,6 +195,19 @@ export function ReducedMotionJourneyAndConcierge() {
         <div className="cxp01-reduced-content" style={{ maxWidth: "46rem" }}>
           <span className="cxp02-eyebrow">Movement 05 · Hành trình của riêng bạn</span>
           <h2 className="cxp02-journey-headline">Từ cảm hứng. Thành nhịp đi của riêng bạn.</h2>
+          <div className="cxp02-trip-switcher" role="group" aria-label="Chọn nhịp hành trình mẫu">
+            {TRIPS.map((trip) => (
+              <button
+                key={trip.slug}
+                type="button"
+                className="cxp02-trip-pill"
+                aria-pressed={trip.slug === sampleTrip.slug}
+                onClick={() => setSelectedSlug(trip.slug)}
+              >
+                {trip.durationDays} ngày · {trip.pace}
+              </button>
+            ))}
+          </div>
           <div className="cxp02-itinerary-preview" style={{ marginTop: "1.5rem" }}>
             {sampleTrip.days.map((day) => (
               <div key={day.day} className="cxp02-day-item">
@@ -191,13 +219,17 @@ export function ReducedMotionJourneyAndConcierge() {
           </div>
           <div className="cxp01-cta-group">
             <Link href={`/trips/${sampleTrip.slug}`} className="cxp01-primary-cta">
-              Xem lịch trình mẫu 3 ngày
+              Xem lịch trình mẫu {sampleTrip.durationDays} ngày
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="cxp02-reduced-concierge" aria-label="Movement 06 — AI Travel Concierge">
+      <section
+        className="cxp02-reduced-concierge"
+        aria-label="Movement 06 — AI Travel Concierge"
+        data-concierge-inline="true"
+      >
         <div className="cxp02-concierge-inner" style={{ marginInline: "auto" }}>
           <span className="cxp02-eyebrow">Movement 06 · ADORA Travel Concierge</span>
           <h2 className="cxp02-concierge-headline">Hành trình của bạn bắt đầu từ một câu hỏi.</h2>

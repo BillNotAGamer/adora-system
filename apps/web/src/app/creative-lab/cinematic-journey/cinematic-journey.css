@@ -550,3 +550,148 @@
   padding: clamp(4rem, 9vw, 6.5rem) clamp(1.25rem, 4vw, 3.75rem);
   background: radial-gradient(circle at 50% 35%, rgba(196, 156, 98, 0.14) 0%, #090c0a 70%);
 }
+
+/* ==========================================================================
+   CXP-03A: Production Homepage Integration & Targeted Visual Polish
+   ========================================================================== */
+
+.cxp03-production .cxp02-runway {
+  height: 1140svh;
+}
+
+.cxp03-production .cxp01-outer-frame {
+  inset: clamp(6rem, 11.5vh, 7.5rem) clamp(1.25rem, 4vw, 3.75rem) clamp(4.75rem, 10vh, 6.25rem);
+}
+
+.cxp03-production .cxp01-opening-overlay {
+  padding-bottom: clamp(8.5rem, 17.5vh, 10.5rem);
+}
+
+/* Full-grid bottom horizontal rail aligned symmetrically with header & outer hero frame */
+.cxp03-production .cxp01-chrome-footer {
+  padding: 0 clamp(1.25rem, 4vw, 3.75rem) clamp(1.15rem, 2.2vw, 1.85rem);
+}
+
+.cxp03-production .cxp01-chrome-footer-inner {
+  padding-top: clamp(0.85rem, 1.35vw, 1.15rem);
+  border-top: 1px solid rgba(244, 239, 230, 0.24);
+}
+
+/* Lift floating Concierge trigger cleanly above the full-width bottom rail on / */
+body:has(.cxp03-production) .concierge-floating {
+  right: clamp(1.25rem, 4vw, 3.75rem);
+  bottom: clamp(4.35rem, 8.5vh, 5.15rem);
+}
+
+/* Authored editorial rhythm in Discovery ribbon on desktop (>= 768px) */
+@media (min-width: 768px) {
+  .cxp03-production .cxp02-ribbon-track {
+    align-items: flex-end;
+    gap: clamp(1.25rem, 2.4vw, 1.85rem);
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(1) {
+    flex-basis: clamp(15.5rem, 22vw, 19.5rem);
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(1) .cxp02-ribbon-media {
+    aspect-ratio: 11 / 10;
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(2) {
+    flex-basis: clamp(17rem, 26vw, 22.5rem);
+    transform: translateY(-0.85rem);
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(2):hover {
+    transform: translateY(-1.1rem);
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(3) {
+    flex-basis: clamp(16rem, 23.5vw, 20.5rem);
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(3) .cxp02-ribbon-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .cxp03-production .cxp02-ribbon-plate:nth-child(4) {
+    flex-basis: clamp(17.5rem, 26.5vw, 23rem);
+    border-color: rgba(200, 171, 119, 0.36);
+  }
+}
+
+.cxp03-production .cxp02-journey-scrim {
+  background:
+    linear-gradient(90deg, rgba(9, 13, 11, 0.88) 0%, rgba(9, 13, 11, 0.62) 52%, rgba(9, 13, 11, 0.46) 100%),
+    linear-gradient(180deg, rgba(9, 13, 11, 0.62) 0%, transparent 25%, transparent 72%, rgba(9, 13, 11, 0.86) 100%);
+}
+
+@media (max-width: 767px) {
+  .cxp03-production .cxp02-runway {
+    height: 960svh;
+  }
+
+  .cxp03-production .cxp01-opening-overlay {
+    padding: 5.5rem 1.5rem 5.75rem;
+  }
+
+  .cxp03-production .cxp01-chrome-footer {
+    padding: 0 1.25rem 1.15rem;
+  }
+
+  body:has(.cxp03-production) .concierge-floating {
+    right: max(1.25rem, env(safe-area-inset-right));
+    bottom: calc(4.4rem + env(safe-area-inset-bottom));
+  }
+
+  .cxp03-production .cxp02-discovery-layer {
+    padding: 4.85rem 1.25rem 4.35rem;
+  }
+
+  .cxp03-production .cxp02-discovery-grid {
+    grid-template-rows: 31% minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .cxp03-production .cxp02-discovery-right {
+    gap: 0.75rem;
+  }
+}
+
+.cxp03-reduced-production .cxp01-reduced-identity-stage {
+  padding-top: 5rem;
+}
+
+@media print {
+  .cxp03-production .cxp02-runway {
+    height: auto !important;
+  }
+
+  .cxp03-production .cxp02-stage {
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .cxp03-production .cxp01-veil-layer,
+  .cxp03-production .cxp01-pillar-occluder,
+  .cxp03-production .cxp01-scroll-cue,
+  .cxp03-production .cxp01-chrome-footer {
+    display: none !important;
+  }
+
+  .cxp03-production .cxp01-opening-overlay,
+  .cxp03-production .cxp01-world-overlay,
+  .cxp03-production .cxp01-human-overlay,
+  .cxp03-production .cxp02-discovery-layer,
+  .cxp03-production .cxp02-journey-overlay,
+  .cxp03-production .cxp02-concierge-overlay {
+    position: relative !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    color: #171a19 !important;
+    padding: 1.5rem 0 !important;
+  }
+}

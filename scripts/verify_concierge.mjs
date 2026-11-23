@@ -152,10 +152,15 @@ try {
   await client.send("Page.enable");await client.send("Runtime.enable");
   await client.send('Network.enable');
   await client.send("Emulation.setDeviceMetricsOverride",{width:viewport.width,height:viewport.height,deviceScaleFactor:1,mobile:viewport.width<768});
+  const openEntryExpr =
+    viewport.width < 1024
+      ? "(() => { const b = document.querySelector('button[aria-controls=\"mobile-navigation\"]'); if (b && b.getAttribute('aria-expanded') !== 'true') b.click(); document.querySelector('#mobile-navigation [data-concierge-trigger]').click(); })()"
+      : "document.querySelector('header [data-concierge-trigger]').click()";
   await client.send("Page.navigate",{url:siteUrl});
-  await until(client, "document.readyState === 'complete' && !!document.querySelector('.hero-primary-cta')");
+  await until(client, "document.readyState === 'complete' && !!document.querySelector('header [data-concierge-trigger]')");
   await wait(700);
-  await evaluate(client, "window.__tasks=[];new PerformanceObserver(list=>window.__tasks.push(...list.getEntries().map(e=>({start:e.startTime,duration:e.duration})))).observe({type:'longtask',buffered:true});window.__initialJs=performance.getEntriesByType('resource').filter(e=>e.name.includes('.js')).reduce((s,e)=>s+e.encodedBodySize,0);window.__openStart=performance.now();document.querySelector('.hero-primary-cta').click()");
+  check(await evaluate(client, "!document.querySelector('a.concierge-floating')"), 'Floating trigger must be hidden during Movement 01');
+  await evaluate(client, "window.__tasks=[];new PerformanceObserver(list=>window.__tasks.push(...list.getEntries().map(e=>({start:e.startTime,duration:e.duration})))).observe({type:'longtask',buffered:true});window.__initialJs=performance.getEntriesByType('resource').filter(e=>e.name.includes('.js')).reduce((s,e)=>s+e.encodedBodySize,0);window.__openStart=performance.now();" + openEntryExpr);
   await until(client,"!!document.querySelector('dialog[open]')");
   await wait(350);
   const welcome=await evaluate(client,`({pollingOpenMs:performance.now()-window.__openStart,paintMarkMs:(performance.getEntriesByName('adora-concierge-painted').at(-1)?.startTime??0)-(performance.getEntriesByName('adora-concierge-requested').at(-1)?.startTime??0),initialJsBytes:window.__initialJs,lazyJsBytes:performance.getEntriesByType('resource').filter(e=>e.name.includes('.js')).reduce((s,e)=>s+e.encodedBodySize,0)-window.__initialJs,longTasks:window.__tasks,focus:document.activeElement.id,overflow:document.documentElement.scrollWidth>innerWidth,lock:document.documentElement.style.overflow,logCount:Array.from(document.querySelectorAll('[role=log]')).filter(e=>e.checkVisibility()).length,title:document.querySelector('dialog').getAttribute('aria-labelledby')})`);
@@ -184,9 +189,17 @@ try {
   await pressKey(client,'Escape','Escape',27);
   await until(client,"!document.querySelector('dialog[open]')");
   await wait(50);
-  check(await evaluate(client,"document.activeElement.classList.contains('hero-primary-cta')"),'Focus not restored to origin');
+  check(
+    await evaluate(
+      client,
+      viewport.width < 1024
+        ? "document.activeElement!==document.body && document.activeElement.checkVisibility() && !document.activeElement.closest('[aria-hidden=\"true\"]')"
+        : "document.activeElement.matches('header [data-concierge-trigger]')",
+    ),
+    'Focus not restored to origin',
+  );
   check(await evaluate(client,"document.documentElement.style.overflow!== 'hidden'"),'Scroll lock leaked');
-  await evaluate(client,"document.querySelector('.hero-primary-cta').click()");
+  await evaluate(client, openEntryExpr);
   await until(client,"!!document.querySelector('dialog[open]')");
   check(await evaluate(client,"document.querySelector('#concierge-prompt').value==='draft survives'"),'Draft lost');
   await evaluate(client,"document.querySelector('dialog a[href=\"/ai-planner\"]').click()");
@@ -196,12 +209,12 @@ try {
   check(await evaluate(client,"document.querySelector('#planner-prompt').getBoundingClientRect().bottom<=innerHeight"),'Expanded survey obscured composer');
   await evaluate(client,"document.querySelector('details > summary').click()");
   await evaluate(client,"history.back()");
-  await until(client,"location.pathname==='/' && !!document.querySelector('.hero-primary-cta')");
+  await until(client,"location.pathname==='/' && !!document.querySelector('header [data-concierge-trigger]')");
   if(viewport.width<1024) {
     await evaluate(client,"document.querySelector('button[aria-controls=\"mobile-navigation\"]').click();history.forward()");
     await until(client,"location.pathname==='/ai-planner' && !!document.querySelector('#planner-prompt')");
     await evaluate(client,"history.back()");
-    await until(client,"location.pathname==='/' && !!document.querySelector('.hero-primary-cta')");
+    await until(client,"location.pathname==='/' && !!document.querySelector('header [data-concierge-trigger]')");
     check(await evaluate(client,"document.querySelector('button[aria-controls=\"mobile-navigation\"]').getAttribute('aria-expanded')==='false'"),'Mobile menu restored with stale state');
   }
   check(await evaluate(client,"!document.querySelector('dialog[open]') && document.documentElement.style.overflow!=='hidden'"),'Back left modal/lock');
@@ -209,10 +222,10 @@ try {
   await until(client,"location.pathname==='/ai-planner' && !!document.querySelector('#planner-prompt')");
   check(await evaluate(client,"document.querySelector('#planner-prompt').value==='draft survives'"),'Forward lost draft');
   await evaluate(client,"history.back()");
-  await until(client,"location.pathname==='/' && !!document.querySelector('.hero-primary-cta')");
+  await until(client,"location.pathname==='/' && !!document.querySelector('header [data-concierge-trigger]')");
   await client.send('Page.reload');
-  await until(client,"document.readyState==='complete' && !!document.querySelector('.hero-primary-cta')"); await wait(700);
-  await evaluate(client,"document.querySelector('.hero-primary-cta').click()");
+  await until(client,"document.readyState==='complete' && !!document.querySelector('header [data-concierge-trigger]')"); await wait(700);
+  await evaluate(client, openEntryExpr);
   await until(client,"!!document.querySelector('dialog[open]')");
   check(await evaluate(client,"document.querySelector('#concierge-prompt').value==='' && !document.querySelector('dialog .concierge-cover')"),'Reload did not reset');
   await evaluate(client,"document.querySelector('#concierge-prompt').focus();document.execCommand('insertText',false,'Tokyo budget')");
@@ -244,7 +257,7 @@ try {
   check(await evaluate(client,"document.activeElement!==document.body && document.activeElement.checkVisibility() && !document.activeElement.closest('[aria-hidden=\"true\"]')"),'Floating dismissal lost visible focus');
   check(errors.length===0,'Runtime errors after navigation '+errors.join(';'));
   if(viewport.width===390) {
-    await evaluate(client,"window.HTMLDialogElement=undefined;document.querySelector('.hero-primary-cta').click()");
+    await evaluate(client,"window.HTMLDialogElement=undefined;" + openEntryExpr);
     await until(client,"location.pathname==='/ai-planner' && !!document.querySelector('#planner-prompt')");
   }
   results.push({viewport:viewport.width,welcome,errors,passed:true});

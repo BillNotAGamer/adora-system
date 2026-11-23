@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useConcierge } from './concierge-provider';
 import { ConciergeTrigger } from './concierge-trigger';
 export function ConciergeFloatingTrigger() {
-  const { isOpen, menuOpen } = useConcierge();
+  const { isOpen, menuOpen, cinematicMovement } = useConcierge();
   const path = usePathname();
   const [eligible, setEligible] = useState(false);
   useEffect(() => {
@@ -20,9 +20,19 @@ export function ConciergeFloatingTrigger() {
     document.querySelectorAll('footer, [data-concierge-inline], .hero-primary-cta').forEach(el => observer.observe(el));
     const resize = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
     resize?.observe(document.documentElement);
-    update(); document.addEventListener('focusin', update); document.addEventListener('focusout', update); window.visualViewport?.addEventListener('resize', update);
-    return () => { observer.disconnect(); resize?.disconnect(); document.removeEventListener('focusin', update); document.removeEventListener('focusout', update); window.visualViewport?.removeEventListener('resize', update); };
-  }, [path]);
-  if (isOpen || menuOpen || !eligible || !/^\/(destinations|experiences|trips)(\/|$)/.test(path) && path !== '/') return null;
+    update(); document.addEventListener('focusin', update); document.addEventListener('focusout', update); window.addEventListener('scroll', update, { passive: true }); window.visualViewport?.addEventListener('resize', update);
+    return () => { observer.disconnect(); resize?.disconnect(); document.removeEventListener('focusin', update); document.removeEventListener('focusout', update); window.removeEventListener('scroll', update); window.visualViewport?.removeEventListener('resize', update); };
+  }, [path, cinematicMovement]);
+  const allowedOnHome =
+    cinematicMovement === '02' ||
+    cinematicMovement === '03' ||
+    cinematicMovement === '04' ||
+    cinematicMovement === '05';
+  if (isOpen || menuOpen || !eligible) return null;
+  if (path === '/') {
+    if (!allowedOnHome) return null;
+  } else if (!/^\/(destinations|experiences|trips)(\/|$)/.test(path)) {
+    return null;
+  }
   return <ConciergeTrigger href="/ai-planner" className="concierge-floating" aria-label="Open ADORA Travel Concierge"><span aria-hidden="true">✧</span> Concierge</ConciergeTrigger>;
 }
