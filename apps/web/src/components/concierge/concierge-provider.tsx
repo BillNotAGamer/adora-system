@@ -3,7 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { createContext, useContext, useEffect, useReducer, useRef, useState, type Dispatch, type ReactNode } from 'react';
 import { initialState, reducer, type Action, type State } from '@/lib/concierge/state';
-type Context = { state: State; dispatch: Dispatch<Action>; isOpen: boolean; open: (origin: HTMLElement) => void; close: (restore?: boolean) => void; menuOpen: boolean; setMenuOpen: (value: boolean) => void; logPositionRef: { current: number } };
+export type CinematicMovementId = "01" | "02" | "03" | "04" | "05" | "06";
+type Context = { state: State; dispatch: Dispatch<Action>; isOpen: boolean; open: (origin: HTMLElement) => void; close: (restore?: boolean) => void; menuOpen: boolean; setMenuOpen: (value: boolean) => void; cinematicMovement: CinematicMovementId | null; setCinematicMovement: (value: CinematicMovementId | null) => void; logPositionRef: { current: number } };
 const ConciergeContext = createContext<Context | null>(null);
 export function useConcierge() { const c = useContext(ConciergeContext); if (!c) throw new Error('Concierge provider required'); return c; }
 export function ConciergeProvider({ children }: { children: ReactNode }) {
@@ -12,6 +13,7 @@ export function ConciergeProvider({ children }: { children: ReactNode }) {
   const [Dialog, setDialog] = useState<typeof import('./concierge-dialog').default | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cinematicMovement, setCinematicMovement] = useState<CinematicMovementId | null>(null);
   const origin = useRef<HTMLElement | null>(null);
   const logPositionRef = useRef(0);
   const path = usePathname();
@@ -41,7 +43,7 @@ export function ConciergeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (previousPath.current !== path) { previousPath.current = path; setOpen(false); setMenuOpen(false); }
   }, [path]);
-  return <ConciergeContext value={{ state, dispatch, isOpen, menuOpen, setMenuOpen, logPositionRef, close, open: (element) => {
+  return <ConciergeContext value={{ state, dispatch, isOpen, menuOpen, setMenuOpen, cinematicMovement, setCinematicMovement, logPositionRef, close, open: (element) => {
     if (path === '/ai-planner') { document.querySelector<HTMLElement>('#planner-prompt')?.focus(); return; }
     origin.current = element; setMenuOpen(false); setOpen(true);
     if (!Dialog) { setLoadError(false); void import('./concierge-dialog').then(module => setDialog(() => module.default)).catch(() => setLoadError(true)); }

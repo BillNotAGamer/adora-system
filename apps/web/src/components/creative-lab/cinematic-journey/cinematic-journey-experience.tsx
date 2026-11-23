@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import "@/app/creative-lab/typography-world/typography-world.css";
 import "@/app/creative-lab/cinematic-journey/cinematic-journey.css";
+import { useConcierge } from "@/components/concierge/concierge-provider";
 import {
   DiscoveryRibbon,
   ReducedMotionDiscoverySection,
@@ -75,6 +76,7 @@ export function CinematicJourneyExperience({
   catalogDisclosure,
 }: Readonly<CinematicJourneyExperienceProps> = {}) {
   const isProduction = mode === "production";
+  const { setCinematicMovement } = useConcierge();
   const runwayRef = useRef<HTMLDivElement | null>(null);
   const worldLayerRef = useRef<HTMLDivElement | null>(null);
   const worldScrimRef = useRef<HTMLDivElement | null>(null);
@@ -147,6 +149,45 @@ export function CinematicJourneyExperience({
   }, []);
 
   useEffect(() => {
+    if (!isProduction) return;
+    if (!reducedMotion) return;
+
+    const syncReducedMovement = () => {
+      const sections = Array.from(
+        document.querySelectorAll<HTMLElement>("main > section[data-reduced-movement], main > section[aria-label]"),
+      );
+      const vh = window.innerHeight || 900;
+      const inView = (el: HTMLElement | undefined) => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.top < vh * 0.85 && r.bottom > vh * 0.15;
+      };
+      if (inView(sections[0])) {
+        setCinematicMovement("01");
+      } else if (inView(sections[5])) {
+        setCinematicMovement("06");
+      } else if (inView(sections[1]) || inView(sections[2]) || inView(sections[3]) || inView(sections[4])) {
+        setCinematicMovement("03");
+      } else {
+        setCinematicMovement("01");
+      }
+    };
+
+    syncReducedMovement();
+    window.addEventListener("scroll", syncReducedMovement, { passive: true });
+    window.addEventListener("resize", syncReducedMovement, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", syncReducedMovement);
+      window.removeEventListener("resize", syncReducedMovement);
+    };
+  }, [isProduction, reducedMotion, setCinematicMovement]);
+
+  useEffect(() => {
+    if (!isProduction) return;
+    return () => setCinematicMovement(null);
+  }, [isProduction, setCinematicMovement]);
+
+  useEffect(() => {
     if (reducedMotion) return;
 
     let rafId = 0;
@@ -166,6 +207,9 @@ export function CinematicJourneyExperience({
         lastMovementRef.current = state.movement;
         setMovement(state.movement);
         setMovementCaption(state.movementCaption);
+        if (isProduction) {
+          setCinematicMovement(state.movement);
+        }
       }
       if (state.discoveryInteractive !== lastFlagsRef.current.discovery) {
         lastFlagsRef.current.discovery = state.discoveryInteractive;
@@ -338,6 +382,9 @@ export function CinematicJourneyExperience({
       }
     };
 
+    if (isProduction) {
+      setCinematicMovement(lastMovementRef.current);
+    }
     applyFrame();
     window.addEventListener("scroll", scheduleFrame, { passive: true });
     window.addEventListener("resize", scheduleFrame, { passive: true });
@@ -349,7 +396,7 @@ export function CinematicJourneyExperience({
       window.removeEventListener("resize", scheduleFrame);
       window.removeEventListener("pageshow", scheduleFrame);
     };
-  }, [isMobile, reducedMotion]);
+  }, [isMobile, isProduction, reducedMotion, setCinematicMovement]);
 
   if (reducedMotion) {
     return (
