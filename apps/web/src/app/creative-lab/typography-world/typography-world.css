@@ -1,0 +1,641 @@
+.cxp01-root {
+  position: relative;
+  min-height: 100svh;
+  background: #0b0e0c;
+  color: #f4efe6;
+  isolation: isolate;
+}
+
+/* Top & bottom editorial chrome pinned inside the cinematic stage */
+.cxp01-chrome-header {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 30;
+  padding: clamp(1.25rem, 2.6vw, 2.25rem) clamp(1.25rem, 4vw, 3.75rem) 1.5rem;
+  background: linear-gradient(180deg, rgba(8, 12, 10, 0.46) 0%, rgba(8, 12, 10, 0) 100%);
+  pointer-events: none;
+}
+
+.cxp01-chrome-header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: clamp(0.85rem, 1.5vw, 1.25rem);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.22);
+}
+
+.cxp01-brand-link {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  pointer-events: auto;
+  text-decoration: none;
+  color: #f4efe6;
+}
+
+.cxp01-brand-wordmark {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+
+.cxp01-brand-tagline {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #c8ab77;
+}
+
+.cxp01-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  pointer-events: auto;
+}
+
+.cxp01-movement-tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.86);
+  white-space: nowrap;
+}
+
+.cxp01-skip-link {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.72);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.28);
+  padding-bottom: 0.15rem;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.cxp01-skip-link:hover {
+  color: #f4efe6;
+  border-color: #c8ab77;
+}
+
+/* Scroll runway & sticky cinematic theatre */
+.cxp01-runway {
+  position: relative;
+  height: 540svh;
+}
+
+.cxp01-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: #0b0e0c;
+}
+
+/* Layer 0: Continuous highland world photograph */
+.cxp01-world-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  transform-origin: center 48%;
+  will-change: transform;
+}
+
+.cxp01-plate-image {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 36% 48%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cxp01-plate-image--human {
+  object-position: center 48%;
+}
+
+.cxp01-world-scrim {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    linear-gradient(90deg, rgba(8, 12, 10, 0.56) 0%, rgba(8, 12, 10, 0.18) 46%, rgba(8, 12, 10, 0.08) 100%),
+    linear-gradient(180deg, rgba(8, 12, 10, 0.36) 0%, transparent 24%, transparent 78%, rgba(8, 12, 10, 0.5) 100%);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Layer 1: Architectural arch portal revealing Moment IV (Human Moment) */
+.cxp01-human-portal-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  will-change: clip-path;
+  pointer-events: none;
+}
+
+.cxp01-human-plate-wrap {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.cxp01-human-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(8, 11, 9, 0.64) 0%, rgba(8, 11, 9, 0.24) 44%, rgba(8, 11, 9, 0.06) 100%),
+    linear-gradient(180deg, rgba(8, 11, 9, 0.34) 0%, transparent 22%, transparent 76%, rgba(8, 11, 9, 0.56) 100%);
+  pointer-events: none;
+}
+
+/* Near-plane weathered stone colonnade pillar sweeping across the lens during Moment III -> IV */
+.cxp01-pillar-occluder {
+  position: absolute;
+  top: -4%;
+  left: 0;
+  height: 108%;
+  z-index: 8;
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(-24px 0 40px rgba(6, 9, 7, 0.62)) drop-shadow(18px 0 28px rgba(6, 9, 7, 0.35));
+}
+
+.cxp01-pillar-image {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: fill;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Layer 2: Precision vector inverted typographic veil (ADORA / mobile A) */
+.cxp01-veil-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.cxp01-veil-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cxp01-outer-frame {
+  position: absolute;
+  z-index: 14;
+  inset: clamp(5.5rem, 11vh, 7.25rem) clamp(1.25rem, 4vw, 3.75rem) clamp(4.75rem, 10vh, 6.25rem);
+  border: 1px solid rgba(244, 239, 230, 0.24);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Moment I — Opening subtitle & mobile composition */
+.cxp01-opening-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: clamp(5.5rem, 12vh, 8rem) clamp(1.5rem, 5vw, 4rem) clamp(8.5rem, 17.5vh, 10.5rem);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.cxp01-opening-subtitle {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.125rem, 2vw, 1.7rem);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1.4;
+  color: rgba(244, 239, 230, 0.92);
+  text-align: center;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.cxp01-mobile-opening-block {
+  display: none;
+}
+
+/* Scroll cue at bottom-center of Moment I */
+.cxp01-scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(4.9rem, 9.2vh, 5.65rem);
+  transform: translateX(-50%);
+  z-index: 19;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.cxp01-scroll-cue-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.68);
+  white-space: nowrap;
+}
+
+.cxp01-scroll-cue-line {
+  width: 1px;
+  height: 1.35rem;
+  background: linear-gradient(180deg, rgba(200, 171, 119, 0.9) 0%, rgba(200, 171, 119, 0) 100%);
+}
+
+/* Moment III — The World editorial statement */
+.cxp01-world-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  display: flex;
+  align-items: center;
+  padding: clamp(5.5rem, 10vh, 7.5rem) clamp(1.5rem, 5vw, 4.5rem);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.cxp01-world-copy {
+  max-width: 34rem;
+}
+
+.cxp01-world-headline {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.4rem, 5.2vw, 4.75rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: #f8f4ec;
+  text-shadow: 0 8px 34px rgba(0, 0, 0, 0.42);
+}
+
+.cxp01-world-subline {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.35rem, 2.4vw, 2.1rem);
+  font-weight: 400;
+  line-height: 1.25;
+  color: rgba(248, 244, 236, 0.92);
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.45);
+}
+
+.cxp01-world-eyebrow {
+  margin-top: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.88);
+}
+
+.cxp01-world-eyebrow::before {
+  content: "";
+  width: 2.75rem;
+  height: 1px;
+  background: #c8ab77;
+}
+
+/* Moment IV — The Human Moment editorial display & CTA */
+.cxp01-human-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  padding: clamp(5.5rem, 10vh, 7.5rem) clamp(1.5rem, 5vw, 4.5rem);
+  will-change: opacity, transform;
+}
+
+.cxp01-human-copy {
+  max-width: 32rem;
+}
+
+.cxp01-human-headline {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(3rem, 7vw, 6.25rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: 0.02em;
+  color: #f8f4ec;
+  text-shadow: 0 10px 38px rgba(0, 0, 0, 0.48);
+}
+
+.cxp01-human-subline {
+  margin: 1.35rem 0 0;
+  font-size: clamp(0.75rem, 1.1vw, 0.9rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.9);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.48);
+}
+
+.cxp01-cta-group {
+  margin-top: 2.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cxp01-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0.8rem 1.6rem;
+  background: #f4efe6;
+  color: #141816;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color 220ms ease,
+    transform 220ms ease;
+}
+
+.cxp01-primary-cta:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.cxp01-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.55);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.92);
+  text-decoration: none;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.cxp01-secondary-cta:hover {
+  color: #e4c68c;
+  border-color: #e4c68c;
+}
+
+/* Bottom editorial footer bar */
+.cxp01-chrome-footer {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 0 clamp(1.25rem, 4vw, 3.75rem) clamp(1.1rem, 2.2vw, 1.85rem);
+  pointer-events: none;
+}
+
+.cxp01-chrome-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: clamp(0.75rem, 1.3vw, 1.1rem);
+  border-top: 1px solid rgba(244, 239, 230, 0.22);
+}
+
+.cxp01-footer-caption {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.78);
+}
+
+.cxp01-progress-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.cxp01-progress-track {
+  width: 3.75rem;
+  height: 1px;
+  background: rgba(244, 239, 230, 0.25);
+  overflow: hidden;
+}
+
+.cxp01-progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #c8ab77;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.cxp01-progress-marker {
+  width: 0.55rem;
+  height: 0.8rem;
+  border: 1px solid #c8ab77;
+}
+
+@media (max-width: 1023px) and (orientation: portrait) {
+  .cxp01-plate-image--human {
+    object-position: 82% 42%;
+  }
+}
+
+/* Responsive mobile composition matching EXPERIMENTAL_MOBILE_Opening.png */
+@media (max-width: 767px) {
+  .cxp01-brand-tagline {
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+  }
+
+  .cxp01-header-meta {
+    gap: 0.75rem;
+  }
+
+  .cxp01-movement-tag,
+  .cxp01-skip-link {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+  }
+
+  .cxp01-runway {
+    height: 460svh;
+  }
+
+  .cxp01-outer-frame {
+    display: none;
+  }
+
+  .cxp01-opening-overlay {
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 5.5rem 1.5rem 5.75rem;
+  }
+
+  .cxp01-opening-subtitle {
+    display: none;
+  }
+
+  .cxp01-mobile-opening-block {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 18rem;
+  }
+
+  .cxp01-mobile-opening-title {
+    margin: 0;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: clamp(2.15rem, 9vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.12;
+    color: #f8f4ec;
+    text-shadow: 0 6px 26px rgba(0, 0, 0, 0.55);
+  }
+
+  .cxp01-mobile-opening-cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #f4efe6;
+  }
+
+  .cxp01-mobile-opening-cue::before {
+    content: "";
+    width: 2.2rem;
+    height: 1px;
+    background: #c8ab77;
+  }
+
+  .cxp01-scroll-cue {
+    display: none;
+  }
+
+  .cxp01-world-overlay,
+  .cxp01-human-overlay {
+    align-items: flex-end;
+    padding: 5.5rem 1.5rem 5.5rem;
+  }
+
+  .cxp01-human-scrim {
+    background:
+      linear-gradient(180deg, rgba(8, 11, 9, 0.34) 0%, rgba(8, 11, 9, 0.14) 38%, rgba(8, 11, 9, 0.78) 100%);
+  }
+
+  .cxp01-world-scrim {
+    background:
+      linear-gradient(180deg, rgba(8, 11, 9, 0.32) 0%, rgba(8, 11, 9, 0.12) 40%, rgba(8, 11, 9, 0.76) 100%);
+  }
+
+  .cxp01-world-layer {
+    transform-origin: 50% 48%;
+  }
+
+  .cxp01-plate-image {
+    object-position: 62% 48%;
+  }
+
+  .cxp01-plate-image--human {
+    object-position: 86% 42%;
+  }
+
+  .cxp01-footer-caption {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+  }
+
+  .cxp01-progress-track {
+    display: none;
+  }
+}
+
+/* Reduced-motion complete static editorial showcase */
+.cxp01-reduced-root {
+  background: #0b0e0c;
+  color: #f4efe6;
+}
+
+.cxp01-reduced-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem clamp(1.25rem, 4vw, 3.75rem);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.18);
+}
+
+.cxp01-reduced-section {
+  position: relative;
+  min-height: 82svh;
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(3rem, 7vw, 5.5rem) clamp(1.25rem, 4vw, 3.75rem);
+  overflow: hidden;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+}
+
+.cxp01-reduced-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.cxp01-reduced-content {
+  position: relative;
+  z-index: 2;
+  max-width: 36rem;
+}
+
+.cxp01-reduced-identity-stage {
+  position: relative;
+  min-height: 86svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+}
+
+.cxp01-reduced-caption {
+  position: relative;
+  z-index: 15;
+  align-self: end;
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+}
