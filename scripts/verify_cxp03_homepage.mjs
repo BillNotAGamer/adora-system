@@ -249,6 +249,7 @@ async function run() {
     motionOffAttr: null,
     noJsFallback: null,
     mobileMenuCheck: null,
+    floatingVisibility: { desktop: {}, mobile: {} },
     routeNavigation: {},
     recordings: {},
   };
@@ -365,20 +366,39 @@ async function run() {
       })()`,
     );
 
-    // Desktop 6-movement captures
+    // Desktop 6-movement captures + Floating Concierge movement visibility matrix
     const desktopCaptures = [
-      { p: 0.0, name: "01_home_identity.png" },
-      { p: 0.13, name: "02_home_passage_a.png" },
-      { p: 0.255, name: "03_home_world.png" },
-      { p: 0.355, name: "04_home_colonnade_handoff.png" },
-      { p: 0.44, name: "05_home_human_moment.png" },
-      { p: 0.62, name: "06_home_discovery_ribbon.png" },
-      { p: 0.83, name: "07_home_your_journey.png" },
-      { p: 0.97, name: "08_home_ai_concierge.png" },
+      { p: 0.0, name: "01_home_identity.png", key: "m01_start", expectFloating: false },
+      { p: 0.13, name: "02_home_passage_a.png", key: "m01_passage", expectFloating: false },
+      { p: 0.255, name: "03_home_world.png", key: "m02_world", expectFloating: true },
+      { p: 0.355, name: "04_home_colonnade_handoff.png", key: "m02_colonnade", expectFloating: true },
+      { p: 0.44, name: "05_home_human_moment.png", key: "m03_human", expectFloating: true },
+      { p: 0.62, name: "06_home_discovery_ribbon.png", key: "m04_discovery", expectFloating: true },
+      { p: 0.83, name: "07_home_your_journey.png", key: "m05_journey", expectFloating: true },
+      { p: 0.97, name: "08_home_ai_concierge.png", key: "m06_concierge", expectFloating: false },
     ];
     for (const c of desktopCaptures) {
       await scrollToProgress(client, c.p);
+      const vis = await evaluate(
+        client,
+        "(() => { const el = document.querySelector('a.concierge-floating'); return Boolean(el && el.checkVisibility()); })()",
+      );
+      report.floatingVisibility.desktop[c.key] = { visible: vis, expected: c.expectFloating, ok: vis === c.expectFloating };
       report.screenshots.push(await screenshot(client, c.name));
+    }
+    // Check M01 near-end (0.17), M06 start (0.90), and reverse scroll back to M04 (0.62) & M01 (0.0)
+    for (const [key, p, exp] of [
+      ["m01_end", 0.17, false],
+      ["m06_start", 0.9, false],
+      ["rev_m04", 0.62, true],
+      ["rev_m01", 0.0, false],
+    ]) {
+      await scrollToProgress(client, p);
+      const vis = await evaluate(
+        client,
+        "(() => { const el = document.querySelector('a.concierge-floating'); return Boolean(el && el.checkVisibility()); })()",
+      );
+      report.floatingVisibility.desktop[key] = { visible: vis, expected: exp, ok: vis === exp };
     }
 
     // Interactive Itinerary Switcher Check (Movement 05)
@@ -431,9 +451,18 @@ async function run() {
     const scrollAfterModal = await evaluate(client, "window.scrollY");
     report.conciergeModalCheck.scrollPreserved = Math.abs(scrollAfterModal - scrollBeforeModal) <= 2;
 
-    // Footer screenshot at absolute bottom
+    // Footer screenshot at absolute bottom + floating hidden check
     await evaluate(client, "window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' })");
     await sleep(250);
+    const footerFloatingVis = await evaluate(
+      client,
+      "(() => { const el = document.querySelector('a.concierge-floating'); return Boolean(el && el.checkVisibility()); })()",
+    );
+    report.floatingVisibility.desktop.footer = {
+      visible: footerFloatingVis,
+      expected: false,
+      ok: footerFloatingVis === false,
+    };
     report.screenshots.push(await screenshot(client, "10_home_footer.png"));
 
     // Mid-scroll Reload & Scroll Restoration Check
@@ -508,14 +537,19 @@ async function run() {
     });
     await sleep(280);
     const mobileShots = [
-      { p: 0.0, name: "11_mobile_opening.png" },
-      { p: 0.44, name: "12_mobile_human.png" },
-      { p: 0.62, name: "13_mobile_discovery.png" },
-      { p: 0.83, name: "14_mobile_journey.png" },
-      { p: 0.97, name: "15_mobile_concierge.png" },
+      { p: 0.0, name: "11_mobile_opening.png", key: "m01_start", expectFloating: false },
+      { p: 0.44, name: "12_mobile_human.png", key: "m03_human", expectFloating: true },
+      { p: 0.62, name: "13_mobile_discovery.png", key: "m04_discovery", expectFloating: true },
+      { p: 0.83, name: "14_mobile_journey.png", key: "m05_journey", expectFloating: true },
+      { p: 0.97, name: "15_mobile_concierge.png", key: "m06_concierge", expectFloating: false },
     ];
     for (const m of mobileShots) {
       await scrollToProgress(client, m.p);
+      const vis = await evaluate(
+        client,
+        "(() => { const el = document.querySelector('a.concierge-floating'); return Boolean(el && el.checkVisibility()); })()",
+      );
+      report.floatingVisibility.mobile[m.key] = { visible: vis, expected: m.expectFloating, ok: vis === m.expectFloating };
       report.screenshots.push(await screenshot(client, m.name));
     }
 
@@ -601,6 +635,8 @@ async function run() {
         h1Count: document.querySelectorAll('h1').length,
         headerCount: document.querySelectorAll('header').length,
         footerCount: document.querySelectorAll('footer').length,
+        hasLoadingSkeleton: Boolean(document.querySelector('[aria-busy="true"]')),
+        openingPaintedHeight: Math.round(document.querySelector('.cxp01-opening-overlay')?.getBoundingClientRect().height || 0),
         discoveryOpacity: getComputedStyle(document.querySelector('.cxp02-discovery-layer')).opacity,
         journeyOpacity: getComputedStyle(document.querySelector('.cxp02-journey-overlay')).opacity,
         conciergeOpacity: getComputedStyle(document.querySelector('.cxp02-concierge-overlay')).opacity,
@@ -652,10 +688,14 @@ async function run() {
     report.headerOwnership?.railAlignedWithFrame !== true ||
     (report.headerOwnership?.brokenEagerImages?.length ?? 0) > 0 ||
     Object.values(report.overflowChecks).some((o) => !o.ok) ||
+    Object.values(report.floatingVisibility.desktop).some((v) => !v.ok) ||
+    Object.values(report.floatingVisibility.mobile).some((v) => !v.ok) ||
     !report.conciergeModalCheck?.isOpen ||
     !report.conciergeModalCheck?.scrollPreserved ||
     report.reducedMotion?.mode !== "reduced-motion" ||
     report.motionOffAttr?.modeWhenOff !== "reduced-motion" ||
+    report.noJsFallback?.hasLoadingSkeleton !== false ||
+    (report.noJsFallback?.openingPaintedHeight ?? 0) < 100 ||
     report.noJsFallback?.discoveryOpacity !== "1" ||
     report.noJsFallback?.conciergeOpacity !== "1";
 
