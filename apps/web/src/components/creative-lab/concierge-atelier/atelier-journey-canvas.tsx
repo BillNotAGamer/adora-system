@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import { formatVnd } from "@/lib/demo/trips";
@@ -23,9 +24,9 @@ interface AtelierJourneyCanvasProps {
 }
 
 const STATUS_LABELS: Record<PreferenceFact["provenance"], string> = {
-  confirmed: "Đã xác nhận",
-  inferred: "Suy luận tạm",
-  missing: "Còn mở",
+  confirmed: "✓ Đã xác nhận",
+  inferred: "~ Suy luận tạm",
+  missing: "○ Còn mở",
 };
 
 export function AtelierJourneyCanvas({
@@ -46,7 +47,13 @@ export function AtelierJourneyCanvas({
     <aside className="cxp04-canvas-col" aria-label="Không gian hành trình và chi phí minh hoạ">
       {/* Contextual Visual Mood Plate */}
       <div className="cxp04-canvas-hero">
-        <img src={journey.coverSrc} alt={journey.coverAlt} />
+        <Image
+          src={journey.coverSrc}
+          alt={journey.coverAlt}
+          fill
+          sizes="(min-width: 1024px) 48vw, 100vw"
+          style={{ objectFit: "cover" }}
+        />
         <div className="cxp04-canvas-hero-scrim" aria-hidden="true" />
         <div className="cxp04-canvas-hero-content">
           <span className="cxp04-eyebrow">
@@ -150,6 +157,21 @@ export function AtelierJourneyCanvas({
             </div>
           ) : null}
 
+          {journey.lastRevision ? (
+            <section className="cxp04-revision-card" aria-label="Giải thích điều chỉnh gần nhất" data-cxp04-revision-card>
+              <span className="cxp04-eyebrow">Thay đổi vừa áp dụng</span>
+              <h3 className="cxp04-revision-title">{journey.lastRevision.title}</h3>
+              <p className="cxp04-revision-text">
+                {journey.lastRevision.whatChanged} {journey.lastRevision.whyChanged}
+              </p>
+              <ul className="cxp04-revision-list">
+                {journey.lastRevision.assumptionsChanged.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
           <section aria-label="Lịch trình minh hoạ từng ngày">
             <div className="cxp04-day-tabs" role="tablist" aria-label="Chọn ngày trong hành trình">
               {journey.days.map((d) => (
@@ -168,7 +190,13 @@ export function AtelierJourneyCanvas({
 
             <div className="cxp04-day-panel" role="tabpanel" style={{ marginTop: "0.85rem" }}>
               <div className="cxp04-day-media">
-                <img src={currentDay.moodImageSrc} alt={currentDay.moodImageAlt} />
+                <Image
+                  src={currentDay.moodImageSrc}
+                  alt={currentDay.moodImageAlt}
+                  fill
+                  sizes="(min-width: 1024px) 48vw, 100vw"
+                  style={{ objectFit: "cover" }}
+                />
               </div>
               <div className="cxp04-day-body">
                 <span className="cxp04-eyebrow">Ngày 0{currentDay.day} · {journey.destinationName}</span>

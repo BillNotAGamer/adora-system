@@ -10,6 +10,7 @@ import type {
   PreferenceFact,
   PreferenceKey,
   RefinementKind,
+  RevisionSummary,
 } from "./types.ts";
 
 export interface DiscoveryQuestion {
@@ -144,6 +145,7 @@ export const initialAtelierState: AtelierState = {
     budget: null,
     accessibility: null,
   },
+  skippedKeys: {},
   confirmedInferences: {},
   messages: [
     {
@@ -160,6 +162,7 @@ export const initialAtelierState: AtelierState = {
   nextId: 2,
   activeDay: 1,
   mobileView: "conversation",
+  lastRevision: null,
   refinements: {
     slowerPace: false,
     lowerBudget: false,
@@ -184,6 +187,52 @@ export type AtelierAction =
   | { type: "submit_text"; text: string }
   | { type: "reset" };
 
+function getInferredCompanionFromIntention(intention: string[]): {
+  count: number;
+  label: string;
+  rationale: string;
+} | null {
+  const isRomantic = intention.includes("romantic-escape");
+  const isFriends = intention.includes("friends-explore");
+  // Ambiguous / conflicting intentions: do not invent a traveler count; ask explicitly.
+  if (isRomantic && isFriends) return null;
+  if (isRomantic) {
+    return {
+      count: 2,
+      label: "Hai người (2 khách)",
+      rationale: "Suy luận từ cảm hứng “Lãng mạn hai người”",
+    };
+  }
+  if (isFriends) {
+    return {
+      count: 4,
+      label: "Nhóm bạn nhỏ (4 khách)",
+      rationale: "Suy luận từ cảm hứng “Nhóm bạn khám phá”",
+    };
+  }
+  return null;
+}
+
+function isStepResolvedInForwardFlow(state: AtelierState, key: PreferenceKey): boolean {
+  if (state.skippedKeys[key]) return true;
+  if (key === "intention") return state.answers.intention.length > 0;
+  if (key === "companions") {
+    if (state.answers.companions !== null || state.refinements.groupFour) return true;
+    return getInferredCompanionFromIntention(state.answers.intention) !== null;
+  }
+  return state.answers[key] !== null;
+}
+
+function findNextUnresolvedStepIndex(state: AtelierState, startIndex: number): number {
+  for (let i = Math.max(0, startIndex); i < ATELIER_QUESTIONS.length; i += 1) {
+    const q = ATELIER_QUESTIONS[i];
+    if (q && !isStepResolvedInForwardFlow(state, q.key)) {
+      return i;
+    }
+  }
+  return ATELIER_QUESTIONS.length;
+}
+
 export function getTravelerCount(state: AtelierState): number {
   if (state.refinements.groupFour) return 4;
   const comp = state.answers.companions;
@@ -191,9 +240,8 @@ export function getTravelerCount(state: AtelierState): number {
   if (comp === "couple") return 2;
   if (comp === "small-group") return 4;
   if (comp === "family") return 3;
-  // Deterministic contextual inference when romantic or friends mood was chosen
-  if (state.answers.intention.includes("romantic-escape")) return 2;
-  if (state.answers.intention.includes("friends-explore")) return 4;
+  const inferred = getInferredCompanionFromIntention(state.answers.intention);
+  if (inferred) return inferred.count;
   return 2;
 }
 
@@ -213,20 +261,17 @@ export function deriveInterpretation(state: AtelierState): PreferenceFact[] {
   let companionValue: string | null = null;
   let companionProv: PreferenceFact["provenance"] = "missing";
   let companionNote: string | undefined;
+  const inferredComp = getInferredCompanionFromIntention(answers.intention);
   if (refinements.groupFour) {
     companionValue = "Nhóm bạn nhỏ (4 người)";
     companionProv = "confirmed";
   } else if (answers.companions) {
     companionValue = getChoiceLabel(1, answers.companions);
     companionProv = "confirmed";
-  } else if (answers.intention.includes("romantic-escape")) {
-    companionValue = "Hai người (2 khách)";
+  } else if (inferredComp) {
+    companionValue = inferredComp.label;
     companionProv = confirmedInferences.companions ? "confirmed" : "inferred";
-    companionNote = "Suy luận từ cảm hứng “Lãng mạn hai người”";
-  } else if (answers.intention.includes("friends-explore")) {
-    companionValue = "Nhóm bạn nhỏ (4 khách)";
-    companionProv = confirmedInferences.companions ? "confirmed" : "inferred";
-    companionNote = "Suy luận từ cảm hứng “Nhóm bạn khám phá”";
+    companionNote = inferredComp.rationale;
   }
 
   let destValue: string | null = null;
@@ -346,6 +391,22 @@ export function computeJourneyCost(
   const food = durationDays * travelerCount * foodPerPersonPerDay;
   const buffer = Math.round((accommodation + transport + activities + food) * 0.08 / 10_000) * 10_000;
 
+  const transportAssumption =
+    budgetTier === "curated"
+      ? "Xe riêng có tài xế theo lịch trình"
+      : budgetTier === "lean"
+        ? "Xe máy / đi bộ & taxi chặng ngắn"
+        : travelerCount >= 4
+          ? "Taxi 7 chỗ chia sẻ theo nhóm"
+          : "Taxi nội vùng / thuê xe chủ động";
+
+  const foodAssumption =
+    budgetTier === "lean"
+      ? "Quán địa phương, bánh căn & cà phê vườn"
+      : budgetTier === "curated"
+        ? "Bistro cao nguyên chọn lọc & cà phê đặc sản"
+        : "Cà phê pha chậm, bữa trưa nhẹ & bữa tối ấm";
+
   const items: CostLineItem[] = [
     {
       category: "accommodation",
@@ -360,26 +421,25 @@ export function computeJourneyCost(
     },
     {
       category: "transport",
-      label: `Di chuyển nội vùng (${durationDays} ngày)`,
+      label: `Di chuyển nội vùng (${durationDays} ngày${travelerCount >= 4 ? " · chia sẻ nhóm" : ""})`,
       amountVnd: transport,
-      assumption:
-        budgetTier === "curated"
-          ? "Xe riêng có tài xế theo lịch trình"
-          : "Taxi nội vùng / thuê xe chủ động",
+      assumption: transportAssumption,
     },
     {
       category: "activities",
       label: "Trải nghiệm & phí tham quan",
       amountVnd: activities,
       assumption: slowerPace
-        ? "Nhịp chậm (2–3 điểm dừng chọn lọc mỗi ngày)"
-        : "Đi bộ rừng thông, nhà kính hoa & trải nghiệm địa phương",
+        ? "Nhịp chậm (giảm số điểm thu phí, ưu tiên không gian mở)"
+        : budgetTier === "lean"
+          ? "Ưu tiên lối đi bộ miễn phí & điểm tham quan nhẹ phí"
+          : "Đi bộ rừng thông, nhà kính hoa & trải nghiệm địa phương",
     },
     {
       category: "food",
       label: "Ẩm thực & cà phê cao nguyên",
       amountVnd: food,
-      assumption: "Cà phê pha chậm, bữa trưa nhẹ & bữa tối ấm",
+      assumption: foodAssumption,
     },
     {
       category: "buffer",
@@ -419,12 +479,19 @@ export function buildAtelierJourney(state: AtelierState): AtelierJourney {
     ? "lean"
     : state.answers.budget ?? "balanced";
 
-  const timeWindows: Record<string, string> = {
-    Sáng: state.answers.accessibility === "late-morning" ? "08:45 – 11:15" : "06:30 – 09:30",
-    Trưa: "11:45 – 14:00",
-    Chiều: "15:00 – 17:30",
-    Tối: "18:30 – 20:45",
-  };
+  const timeWindows: Record<string, string> = state.refinements.slowerPace
+    ? {
+        Sáng: state.answers.accessibility === "late-morning" ? "09:00 – 11:30" : "08:00 – 10:30",
+        Trưa: "12:00 – 14:30",
+        Chiều: "15:30 – 18:00",
+        Tối: "19:00 – 21:00",
+      }
+    : {
+        Sáng: state.answers.accessibility === "late-morning" ? "08:45 – 11:15" : "06:30 – 09:30",
+        Trưa: "11:45 – 14:00",
+        Chiều: "15:00 – 17:30",
+        Tối: "18:30 – 20:45",
+      };
 
   const days: AtelierDay[] = baseTrip.days.map((d, idx) => {
     let activities: AtelierActivity[] = d.activities.map((a) => {
@@ -440,22 +507,46 @@ export function buildAtelierJourney(state: AtelierState): AtelierJourney {
       };
     });
 
-    if (state.refinements.slowerPace && activities.length > 3) {
-      activities = activities.slice(0, 3);
-    }
-
-    if (state.refinements.coffeeCulture && idx === 1) {
-      activities = activities.map((act) =>
-        act.experienceSlug === "rung-thong-binh-minh"
+    if (budgetTier === "lean") {
+      activities = activities.map((act, actIdx) =>
+        actIdx === 1
           ? {
               ...act,
-              title: "Xưởng rang & cà phê thủ công buổi sớm",
-              summary: "Thử hạt Arabica Cầu Đất pha nhỏ giọt và trò chuyện cùng người rang bản địa.",
-              locationNote: "Xưởng rang nhỏ vùng đồi thông",
-              experienceSlug: "ca-phe-nho-giot-cao-nguyen",
+              title: `${act.title} (phương án tiết kiệm)`,
+              summary: "Ưu tiên đi bộ thong thả qua con dốc yên tĩnh và dừng tại quán địa phương gần khu lưu trú.",
+              locationNote: `${act.locationNote} · Chi phí nhẹ`,
             }
           : act,
       );
+    }
+
+    if (state.refinements.slowerPace && activities.length > 2) {
+      activities = activities.slice(0, Math.min(3, activities.length - 1));
+    }
+
+    if (state.refinements.coffeeCulture && idx === 1 && activities.length > 0) {
+      const first = activities[0];
+      if (first) {
+        activities[0] = {
+          ...first,
+          title: "Xưởng rang & cà phê thủ công buổi sớm",
+          summary: "Thử hạt Arabica Cầu Đất pha nhỏ giọt và trò chuyện cùng người rang bản địa.",
+          locationNote: "Xưởng rang nhỏ vùng đồi thông",
+          experienceSlug: "ca-phe-nho-giot-cao-nguyen",
+        };
+      }
+    }
+
+    if (state.refinements.coffeeCulture && idx === 2 && activities.length > 0) {
+      const last = activities[activities.length - 1];
+      if (last) {
+        activities[activities.length - 1] = {
+          ...last,
+          title: "Không gian gốm & trà thảo mộc cao nguyên",
+          summary: "Kết thúc hành trình bằng buổi thưởng trà atisô ấm và ghé xưởng thủ công nhỏ.",
+          locationNote: "Xưởng thủ công khu đồi",
+        };
+      }
     }
 
     const mood = DAY_IMAGES[idx % DAY_IMAGES.length] ?? {
@@ -511,6 +602,7 @@ export function buildAtelierJourney(state: AtelierState): AtelierJourney {
     days,
     cost,
     appliedRefinements,
+    lastRevision: state.lastRevision,
     notes: [...baseTrip.planNotes],
     provenance: "scripted-demo-fixture",
   };
@@ -518,22 +610,31 @@ export function buildAtelierJourney(state: AtelierState): AtelierJourney {
 
 function detectRefinementFromText(text: string): RefinementKind | null {
   const n = normalizeText(text);
+  const hasNegation =
+    /\b(khong|dung|chang|khoi|bo qua|huy|not|dont|don't|no)\b/.test(n) ||
+    n.includes("khong muon") ||
+    n.includes("dung ");
+  if (hasNegation) return null;
+
+  const matches: RefinementKind[] = [];
   if (n.includes("cham") || n.includes("thu tha") || n.includes("it di") || n.includes("relax")) {
-    return "slower-pace";
+    matches.push("slower-pace");
   }
   if (n.includes("ngan sach") || n.includes("tiet kiem") || n.includes("re hon") || n.includes("budget")) {
-    return "lower-budget";
+    matches.push("lower-budget");
   }
   if (n.includes("2 ngay") || n.includes("3 ngay") || n.includes("them 1 ngay") || n.includes("them ngay")) {
-    return "toggle-duration";
+    matches.push("toggle-duration");
   }
   if (n.includes("ca phe") || n.includes("van hoa") || n.includes("coffee")) {
-    return "coffee-culture";
+    matches.push("coffee-culture");
   }
   if (n.includes("4 nguoi") || n.includes("nhom")) {
-    return "group-four";
+    matches.push("group-four");
   }
-  return null;
+  // Ambiguous / multi-intent requests are preserved verbatim instead of guessing one partial change
+  if (matches.length !== 1) return null;
+  return matches[0] ?? null;
 }
 
 export function atelierReducer(state: AtelierState, action: AtelierAction): AtelierState {
@@ -557,6 +658,7 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
       const presetLabel = action.presetIntention
         ? getChoiceLabel(0, action.presetIntention)
         : null;
+      const inferred = getInferredCompanionFromIntention(nextAnswers.intention);
       const messages = presetLabel
         ? [
             ...state.messages,
@@ -571,29 +673,36 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
               id: state.nextId + 1,
               role: "assistant" as const,
               eyebrow: "ADORA Atelier · Bản mẫu kịch bản",
-              text:
-                action.presetIntention === "romantic-escape"
-                  ? "Một nhịp đi lãng mạn và riêng tư rất hợp với sương sớm Đà Lạt. Mình tạm ghi nhận giả định 2 người — bạn có thể xác nhận hoặc đổi ở bước kế tiếp."
-                  : "Rất rõ cảm hứng rồi. Cho mình thêm một vài thông tin ngắn gọn để phác thảo nhịp đi phù hợp nhất cho bạn.",
+              text: inferred
+                ? `Cảm hứng “${presetLabel}” giúp mình tạm suy luận quy mô ${inferred.label.toLowerCase()} (bạn có thể xác nhận hoặc chỉnh lại ở bước Tóm tắt). Tiếp theo, bạn đã nghĩ đến miền đất nào chưa?`
+                : "Rất rõ cảm hứng rồi. Cho mình thêm một vài thông tin ngắn gọn để phác thảo nhịp đi phù hợp nhất cho bạn.",
               provenance: "scripted-atelier" as const,
             },
           ]
         : state.messages;
 
-      return {
+      const candidateState: AtelierState = {
         ...state,
         phase: "discovery",
-        stepIndex: action.presetIntention ? 1 : 0,
         answers: nextAnswers,
         messages,
         nextId: presetLabel ? state.nextId + 2 : state.nextId,
         error: "",
+      };
+      const nextStep = action.presetIntention
+        ? findNextUnresolvedStepIndex(candidateState, 1)
+        : 0;
+
+      return {
+        ...candidateState,
+        stepIndex: nextStep >= ATELIER_QUESTIONS.length ? 0 : nextStep,
       };
     }
 
     case "select_choice": {
       const q = ATELIER_QUESTIONS.find((item) => item.key === action.key);
       if (!q || !q.choices.some((c) => c.id === action.value)) return state;
+      const nextSkipped = { ...state.skippedKeys, [action.key]: false };
       if (action.key === "intention") {
         const cur = state.answers.intention;
         const exists = cur.includes(action.value);
@@ -606,6 +715,16 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
         return {
           ...state,
           answers: { ...state.answers, intention: nextIntention },
+          skippedKeys: nextSkipped,
+          error: "",
+        };
+      }
+      if (action.key === "companions") {
+        return {
+          ...state,
+          answers: { ...state.answers, companions: action.value },
+          skippedKeys: nextSkipped,
+          refinements: { ...state.refinements, groupFour: false },
           error: "",
         };
       }
@@ -614,6 +733,7 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
         return {
           ...state,
           answers: { ...state.answers, duration: dur },
+          skippedKeys: nextSkipped,
           activeDay: 1,
           error: "",
         };
@@ -623,6 +743,7 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
         return {
           ...state,
           answers: { ...state.answers, budget: b },
+          skippedKeys: nextSkipped,
           refinements: { ...state.refinements, lowerBudget: b === "lean" },
           error: "",
         };
@@ -630,6 +751,7 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
       return {
         ...state,
         answers: { ...state.answers, [action.key]: action.value },
+        skippedKeys: nextSkipped,
         error: "",
       };
     }
@@ -672,42 +794,35 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
         };
       }
 
-      // Contextual branching: if romantic-escape was selected and user is on step 0,
-      // skip straight to destination (step 2) while marking companions as INFERRED (2 people) for review!
-      let nextIdx = state.stepIndex + 1;
-      if (
-        state.stepIndex === 0 &&
-        state.answers.intention.includes("romantic-escape") &&
-        !state.answers.companions
-      ) {
-        nextIdx = 2;
-      }
+      const nextStateForScan: AtelierState = {
+        ...state,
+        messages: appended,
+        nextId: userSummary ? state.nextId + 1 : state.nextId,
+        error: "",
+      };
+      const nextIdx = findNextUnresolvedStepIndex(nextStateForScan, state.stepIndex + 1);
 
       if (nextIdx >= ATELIER_QUESTIONS.length) {
         return {
-          ...state,
+          ...nextStateForScan,
           phase: "interpretation",
           messages: [
             ...appended,
             {
-              id: userSummary ? state.nextId + 1 : state.nextId,
+              id: nextStateForScan.nextId,
               role: "assistant",
               eyebrow: "ADORA Atelier · Tóm tắt hiểu biết",
               text: "Mình đã tổng hợp lại những gì bạn xác nhận và một vài giả định tạm thời ở bảng bên cạnh. Bạn kiểm tra nhanh và chỉnh sửa bất kỳ điểm nào trước khi mở lịch trình mẫu nhé.",
               provenance: "scripted-atelier",
             },
           ],
-          nextId: userSummary ? state.nextId + 2 : state.nextId + 1,
-          error: "",
+          nextId: nextStateForScan.nextId + 1,
         };
       }
 
       return {
-        ...state,
+        ...nextStateForScan,
         stepIndex: nextIdx,
-        messages: appended,
-        nextId: userSummary ? state.nextId + 1 : state.nextId,
-        error: "",
       };
     }
 
@@ -715,11 +830,14 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
       if (state.editingKey) {
         return { ...state, phase: "interpretation", editingKey: null, error: "" };
       }
-      const nextIdx = state.stepIndex + 1;
+      const q = ATELIER_QUESTIONS[state.stepIndex];
+      const nextSkipped = q ? { ...state.skippedKeys, [q.key]: true } : state.skippedKeys;
+      const nextState: AtelierState = { ...state, skippedKeys: nextSkipped, error: "" };
+      const nextIdx = findNextUnresolvedStepIndex(nextState, state.stepIndex + 1);
       if (nextIdx >= ATELIER_QUESTIONS.length) {
-        return { ...state, phase: "interpretation", error: "" };
+        return { ...nextState, phase: "interpretation" };
       }
-      return { ...state, stepIndex: nextIdx, error: "" };
+      return { ...nextState, stepIndex: nextIdx };
     }
 
     case "go_interpretation":
@@ -769,31 +887,84 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
       const nextRef = { ...state.refinements };
       const nextAnswers = { ...state.answers };
       let reply = "";
+      let lastRevision: RevisionSummary;
 
       if (action.kind === "slower-pace") {
         nextRef.slowerPace = !nextRef.slowerPace;
         reply = nextRef.slowerPace
-          ? "Đã giãn nhịp hành trình: giới hạn tối đa 3 khoảnh khắc chọn lọc mỗi ngày và cập nhật lại chi phí trải nghiệm."
+          ? "Đã giãn nhịp hành trình: rút gọn còn tối đa 2–3 điểm dừng chọn lọc mỗi ngày, lùi khung giờ sáng muộn hơn và cập nhật chi phí trải nghiệm."
           : "Đã khôi phục mật độ trải nghiệm tiêu chuẩn cho hành trình.";
+        lastRevision = {
+          kind: action.kind,
+          title: nextRef.slowerPace ? "Đã giãn nhịp đi chậm hơn" : "Đã khôi phục nhịp tiêu chuẩn",
+          whatChanged: nextRef.slowerPace
+            ? "Giảm số hoạt động mỗi ngày và nới rộng khung giờ nghỉ."
+            : "Khôi phục đầy đủ các khung giờ hoạt động tiêu chuẩn.",
+          whyChanged: "Giữ đúng tinh thần đi chậm, tránh cảm giác chạy lịch.",
+          assumptionsChanged: [
+            nextRef.slowerPace ? "Khung sáng chuyển sang 08:00–10:30" : "Khung sáng trở về 06:30–09:30",
+            "Chi phí trải nghiệm được tính lại theo số điểm dừng",
+          ],
+        };
       } else if (action.kind === "lower-budget") {
         nextRef.lowerBudget = !nextRef.lowerBudget;
         reply = nextRef.lowerBudget
-          ? "Đã chuyển giả định lưu trú và ẩm thực sang mức Tinh gọn — tổng ước tính minh hoạ đã được tính lại theo từng hạng mục."
+          ? "Đã chuyển sang mức Tinh gọn: đổi giả định lưu trú sang homestay, di chuyển chặng ngắn, ẩm thực địa phương và cập nhật các điểm dừng tiết kiệm trong lịch trình."
           : "Đã trở lại mức ngân sách Cân bằng ban đầu.";
+        lastRevision = {
+          kind: action.kind,
+          title: nextRef.lowerBudget ? "Đã tối ưu sang mức Tinh gọn" : "Đã trở lại mức Cân bằng",
+          whatChanged: nextRef.lowerBudget
+            ? "Chuyển lưu trú, ăn uống, di chuyển và điểm dừng giữa ngày sang phương án chi phí nhẹ."
+            : "Khôi phục hạng Boutique stay và giả định chi tiêu Cân bằng.",
+          whyChanged: "Giúp cấu trúc chi phí VND và lịch trình khớp với ngân sách tinh gọn.",
+          assumptionsChanged: [
+            nextRef.lowerBudget ? "Lưu trú: Homestay/nhà gỗ ven trung tâm" : "Lưu trú: Boutique stay yên tĩnh",
+            nextRef.lowerBudget ? "Di chuyển: Xe máy / đi bộ & taxi ngắn" : "Di chuyển: Taxi nội vùng chủ động",
+          ],
+        };
       } else if (action.kind === "toggle-duration") {
         const nextDur = state.answers.duration === "2" ? "3" : "2";
         nextAnswers.duration = nextDur;
-        reply = `Đã chuyển lịch trình sang khung ${nextDur} ngày và cập nhật toàn bộ từng ngày cùng bảng chi phí minh hoạ.`;
+        reply = `Đã chuyển lịch trình sang khung ${nextDur} ngày (${Number(nextDur) - 1} đêm) và cập nhật toàn bộ các ngày cùng bảng chi phí minh hoạ.`;
+        lastRevision = {
+          kind: action.kind,
+          title: `Đã đổi thời lượng sang ${nextDur} ngày`,
+          whatChanged: `Phân bổ lại hoạt động cho ${nextDur} ngày và ${Number(nextDur) - 1} đêm lưu trú.`,
+          whyChanged: "Thay đổi số ngày tác động trực tiếp đến số đêm phòng, vận chuyển và bữa ăn.",
+          assumptionsChanged: [`Lưu trú: ${Number(nextDur) - 1} đêm`, `Di chuyển: ${nextDur} ngày`],
+        };
       } else if (action.kind === "coffee-culture") {
         nextRef.coffeeCulture = !nextRef.coffeeCulture;
         reply = nextRef.coffeeCulture
-          ? "Đã ưu tiên trải nghiệm xưởng rang & cà phê thủ công buổi sớm vào Ngày 02."
-          : "Đã khôi phục hoạt động đi bộ rừng thông bình minh vào Ngày 02.";
-      } else if (action.kind === "group-four") {
+          ? "Đã ưu tiên trải nghiệm xưởng rang cà phê thủ công buổi sớm (Ngày 02) và không gian gốm & trà thảo mộc (Ngày 03)."
+          : "Đã khôi phục hoạt động đi bộ rừng thông bình minh ban đầu.";
+        lastRevision = {
+          kind: action.kind,
+          title: nextRef.coffeeCulture ? "Đã ưu tiên cà phê & văn hoá bản địa" : "Đã khôi phục nhịp thiên nhiên mặc định",
+          whatChanged: nextRef.coffeeCulture
+            ? "Thay điểm dừng sáng Ngày 02 bằng xưởng rang Arabica Cầu Đất và bổ sung không gian gốm/trà."
+            : "Đưa các điểm dừng thiên nhiên ban đầu trở lại lịch trình.",
+          whyChanged: "Phù hợp hơn với gu thưởng thức cà phê chậm và thủ công địa phương.",
+          assumptionsChanged: ["Hoạt động Ngày 02–03 ưu tiên xưởng rang & thủ công bản địa"],
+        };
+      } else {
         nextRef.groupFour = !nextRef.groupFour;
         reply = nextRef.groupFour
-          ? "Đã điều chỉnh cấu trúc phòng và chi phí di chuyển chia sẻ cho nhóm 4 người."
+          ? "Đã điều chỉnh cấu trúc 2 phòng lưu trú và taxi 7 chỗ chia sẻ cho nhóm 4 người."
           : "Đã khôi phục số lượng khách theo lựa chọn ban đầu.";
+        lastRevision = {
+          kind: action.kind,
+          title: nextRef.groupFour ? "Đã chỉnh cho nhóm 4 người" : "Đã khôi phục số khách ban đầu",
+          whatChanged: nextRef.groupFour
+            ? "Tăng quy mô lên 4 khách (2 phòng) và áp dụng chia sẻ xe 7 chỗ."
+            : "Tính lại số phòng và chi phí đầu người theo lựa chọn gốc.",
+          whyChanged: "Chi phí phòng và di chuyển không tăng tuyến tính khi đi nhóm 4 người.",
+          assumptionsChanged: [
+            nextRef.groupFour ? "Lưu trú: 2 phòng cho 4 khách" : "Số phòng theo quy mô khách gốc",
+            nextRef.groupFour ? "Di chuyển: Taxi 7 chỗ chia sẻ nhóm" : "Di chuyển nội vùng tiêu chuẩn",
+          ],
+        };
       }
 
       return {
@@ -801,6 +972,7 @@ export function atelierReducer(state: AtelierState, action: AtelierAction): Atel
         phase: "refinement",
         answers: nextAnswers,
         refinements: nextRef,
+        lastRevision,
         activeDay: 1,
         messages: [
           ...state.messages,

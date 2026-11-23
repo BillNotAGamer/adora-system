@@ -180,8 +180,20 @@
   color: rgba(244, 239, 230, 0.72);
 }
 
-.cxp04-preset-row {
+.cxp04-preset-wrap {
   margin-top: 1.5rem;
+}
+
+.cxp04-preset-heading {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.68);
+  font-weight: 600;
+}
+
+.cxp04-preset-row {
+  margin-top: 0.75rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
@@ -898,12 +910,42 @@
   padding-left: 1.1rem;
 }
 
+/* Revision Explanation Card */
+.cxp04-revision-card {
+  border: 1px solid rgba(169, 217, 190, 0.32);
+  background: rgba(18, 28, 23, 0.85);
+  padding: 1rem 1.2rem;
+}
+
+.cxp04-revision-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #f8f4ec;
+}
+
+.cxp04-revision-text {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(244, 239, 230, 0.82);
+}
+
+.cxp04-revision-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.74rem;
+  color: #e4c68c;
+}
+
 /* ==========================================================================
    RESPONSIVE MOBILE COMPOSITION (<= 1023px)
    ========================================================================== */
 @media (max-width: 1023px) {
   .cxp04-invitation-pillars {
     grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
 
   .cxp04-mobile-switcher {
@@ -947,8 +989,81 @@
 }
 
 @media (max-width: 639px) {
+  .cxp04-topbar {
+    padding: 0.65rem 1rem;
+  }
+
   .cxp04-badge {
     display: none;
+  }
+
+  .cxp04-topbar-actions {
+    gap: 0.65rem;
+  }
+
+  .cxp04-top-link {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .cxp04-invitation {
+    place-items: start center;
+    padding: 0.85rem 0.9rem 1.25rem;
+  }
+
+  .cxp04-invitation-card {
+    padding: 1.25rem 1.15rem;
+  }
+
+  .cxp04-invitation-title {
+    margin-top: 0.65rem;
+    font-size: clamp(1.6rem, 6.4vw, 2.05rem);
+    line-height: 1.12;
+  }
+
+  .cxp04-invitation-lead {
+    margin-top: 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .cxp04-invitation-actions {
+    margin-top: 1.05rem;
+  }
+
+  .cxp04-primary-btn {
+    width: 100%;
+  }
+
+  .cxp04-preset-wrap {
+    margin-top: 1rem;
+  }
+
+  .cxp04-preset-row {
+    margin-top: 0.5rem;
+    gap: 0.45rem;
+  }
+
+  .cxp04-preset-chip {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .cxp04-invitation-pillars {
+    margin-top: 1rem;
+    padding: 0.75rem 0;
+    gap: 0.45rem;
+  }
+
+  .cxp04-pillar-text {
+    display: none;
+  }
+
+  .cxp04-disclosure-inline {
+    margin-top: 0.85rem;
+    font-size: 0.72rem;
   }
 
   .cxp04-choice-grid {

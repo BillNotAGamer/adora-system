@@ -82,6 +82,14 @@ export interface AtelierDay {
   activities: AtelierActivity[];
 }
 
+export interface RevisionSummary {
+  kind: RefinementKind;
+  title: string;
+  whatChanged: string;
+  whyChanged: string;
+  assumptionsChanged: string[];
+}
+
 export interface AtelierJourney {
   slug: string;
   title: string;
@@ -96,6 +104,7 @@ export interface AtelierJourney {
   days: AtelierDay[];
   cost: AtelierCostBreakdown;
   appliedRefinements: string[];
+  lastRevision: RevisionSummary | null;
   notes: string[];
   provenance: "scripted-demo-fixture";
 }
@@ -121,6 +130,7 @@ export interface AtelierState {
   stepIndex: number;
   editingKey: PreferenceKey | null;
   answers: DiscoveryAnswers;
+  skippedKeys: Partial<Record<PreferenceKey, boolean>>;
   confirmedInferences: Partial<Record<PreferenceKey, boolean>>;
   messages: AtelierMessage[];
   freeNotes: string[];
@@ -129,6 +139,7 @@ export interface AtelierState {
   nextId: number;
   activeDay: number;
   mobileView: "conversation" | "canvas";
+  lastRevision: RevisionSummary | null;
   refinements: {
     slowerPace: boolean;
     lowerBudget: boolean;
