@@ -340,6 +340,15 @@ async function run() {
         const h1s = document.querySelectorAll('h1');
         const mains = document.querySelectorAll('main');
         const labHeader = document.querySelector('.cxp01-chrome-header');
+        const openingCta = document.querySelector('.cxp01-opening-overlay [data-concierge-trigger], .cxp01-opening-overlay .cxp03-opening-cta');
+        const outerFrame = document.querySelector('.cxp01-outer-frame')?.getBoundingClientRect();
+        const railInner = document.querySelector('.cxp01-chrome-footer-inner')?.getBoundingClientRect();
+        const railAligned = Boolean(
+          outerFrame &&
+            railInner &&
+            Math.abs(outerFrame.left - railInner.left) <= 2 &&
+            Math.abs(outerFrame.right - railInner.right) <= 2,
+        );
         const imgs = Array.from(document.querySelectorAll('img')).filter(img => img.getAttribute('loading') !== 'lazy');
         const brokenImgs = imgs.filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src);
         return {
@@ -348,6 +357,8 @@ async function run() {
           h1Count: h1s.length,
           mainCount: mains.length,
           hasLabHeader: Boolean(labHeader),
+          hasInHeroCta: Boolean(openingCta),
+          railAlignedWithFrame: railAligned,
           brokenEagerImages: brokenImgs,
           h1Text: h1s[0]?.textContent?.trim() || '',
         };
@@ -637,6 +648,8 @@ async function run() {
     report.headerOwnership?.footerCount !== 1 ||
     report.headerOwnership?.h1Count !== 1 ||
     report.headerOwnership?.hasLabHeader !== false ||
+    report.headerOwnership?.hasInHeroCta !== false ||
+    report.headerOwnership?.railAlignedWithFrame !== true ||
     (report.headerOwnership?.brokenEagerImages?.length ?? 0) > 0 ||
     Object.values(report.overflowChecks).some((o) => !o.ok) ||
     !report.conciergeModalCheck?.isOpen ||

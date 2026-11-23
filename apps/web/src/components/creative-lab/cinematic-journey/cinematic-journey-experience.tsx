@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import "@/app/creative-lab/typography-world/typography-world.css";
 import "@/app/creative-lab/cinematic-journey/cinematic-journey.css";
-import { ConciergeTrigger } from "@/components/concierge/concierge-trigger";
 import {
   DiscoveryRibbon,
   ReducedMotionDiscoverySection,
@@ -109,14 +108,12 @@ export function CinematicJourneyExperience({
   const [movementCaption, setMovementCaption] = useState(
     "01  /  IDENTITY — TYPOGRAPHY BECOMES LANDSCAPE",
   );
-  const [openingInteractive, setOpeningInteractive] = useState(true);
   const [discoveryInteractive, setDiscoveryInteractive] = useState(false);
   const [journeyInteractive, setJourneyInteractive] = useState(false);
   const [conciergeInteractive, setConciergeInteractive] = useState(false);
 
   const lastMovementRef = useRef<JourneyMovementId>("01");
   const lastFlagsRef = useRef({
-    opening: true,
     discovery: false,
     journey: false,
     concierge: false,
@@ -169,10 +166,6 @@ export function CinematicJourneyExperience({
         lastMovementRef.current = state.movement;
         setMovement(state.movement);
         setMovementCaption(state.movementCaption);
-      }
-      if (state.openingInteractive !== lastFlagsRef.current.opening) {
-        lastFlagsRef.current.opening = state.openingInteractive;
-        setOpeningInteractive(state.openingInteractive);
       }
       if (state.discoveryInteractive !== lastFlagsRef.current.discovery) {
         lastFlagsRef.current.discovery = state.discoveryInteractive;
@@ -471,13 +464,6 @@ export function CinematicJourneyExperience({
             <p className="cxp01-opening-subtitle">
               Một nơi chốn không thể chỉ nhìn qua màn hình.
             </p>
-            {isProduction ? (
-              <div style={{ marginTop: "1.25rem" }}>
-                <ConciergeTrigger href="/ai-planner" className="hero-primary-cta cxp03-opening-cta">
-                  Plan with Adora AI
-                </ConciergeTrigger>
-              </div>
-            ) : null}
           </div>
         </section>
 
@@ -780,15 +766,6 @@ export function CinematicJourneyExperience({
               </p>
               <span className="cxp01-mobile-opening-cue">Khám phá ADORA</span>
             </div>
-            {isProduction ? (
-              <ConciergeTrigger
-                href="/ai-planner"
-                className="hero-primary-cta cxp03-opening-cta"
-                tabIndex={openingInteractive ? 0 : -1}
-              >
-                Plan with Adora AI
-              </ConciergeTrigger>
-            ) : null}
           </section>
 
           <div ref={scrollCueRef} className="cxp01-scroll-cue" aria-hidden="true">

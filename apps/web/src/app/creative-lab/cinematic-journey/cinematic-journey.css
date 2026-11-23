@@ -564,40 +564,23 @@
 }
 
 .cxp03-production .cxp01-opening-overlay {
-  padding-bottom: clamp(7.25rem, 15vh, 9.5rem);
-  gap: 1rem;
+  padding-bottom: clamp(8.5rem, 17.5vh, 10.5rem);
 }
 
-.cxp03-opening-cta {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  padding: 0.45rem 1.2rem;
-  border: 1px solid rgba(200, 171, 119, 0.65);
-  background: rgba(11, 14, 12, 0.52);
-  color: #f4efe6;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  text-decoration: none;
-  backdrop-filter: blur(4px);
-  transition:
-    background-color 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease;
-}
-
-.cxp03-opening-cta:hover {
-  background: #f4efe6;
-  border-color: #f4efe6;
-  color: #141816;
-}
-
-/* Offset production movement bar from bottom-right ConciergeFloatingTrigger */
+/* Full-grid bottom horizontal rail aligned symmetrically with header & outer hero frame */
 .cxp03-production .cxp01-chrome-footer {
-  padding-right: clamp(10.75rem, 16vw, 14rem);
+  padding: 0 clamp(1.25rem, 4vw, 3.75rem) clamp(1.15rem, 2.2vw, 1.85rem);
+}
+
+.cxp03-production .cxp01-chrome-footer-inner {
+  padding-top: clamp(0.85rem, 1.35vw, 1.15rem);
+  border-top: 1px solid rgba(244, 239, 230, 0.24);
+}
+
+/* Lift floating Concierge trigger cleanly above the full-width bottom rail on / */
+body:has(.cxp03-production) .concierge-floating {
+  right: clamp(1.25rem, 4vw, 3.75rem);
+  bottom: clamp(4.35rem, 8.5vh, 5.15rem);
 }
 
 /* Authored editorial rhythm in Discovery ribbon on desktop (>= 768px) */
@@ -650,12 +633,16 @@
   }
 
   .cxp03-production .cxp01-opening-overlay {
-    padding: 6rem 1.5rem 5.25rem;
-    gap: 1.15rem;
+    padding: 5.5rem 1.5rem 5.75rem;
   }
 
   .cxp03-production .cxp01-chrome-footer {
-    padding-right: 9.75rem;
+    padding: 0 1.25rem 1.15rem;
+  }
+
+  body:has(.cxp03-production) .concierge-floating {
+    right: max(1.25rem, env(safe-area-inset-right));
+    bottom: calc(4.4rem + env(safe-area-inset-bottom));
   }
 
   .cxp03-production .cxp02-discovery-layer {

@@ -50,7 +50,13 @@ export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderPro
 
   return (
     <header className={headerClass}>
-      <div className="adora-container flex h-20 items-center justify-between lg:h-24">
+      <div
+        className={
+          isCinematic
+            ? "flex h-20 w-full items-center justify-between px-[clamp(1.25rem,4vw,3.75rem)] lg:h-24"
+            : "adora-container flex h-20 items-center justify-between lg:h-24"
+        }
+      >
         <Link
           href="/"
           className="text-base font-bold tracking-[0.36em] sm:text-lg"
