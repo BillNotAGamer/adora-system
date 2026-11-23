@@ -1,0 +1,552 @@
+/* ADORA CXP-02: Full Cinematic Narrative (scoped .cxp02-* classes, compatible with Turbopack *.css rule) */
+
+.cxp02-root {
+  position: relative;
+  min-height: 100svh;
+  background: #0b0e0c;
+  color: #f4efe6;
+  isolation: isolate;
+}
+
+.cxp02-runway {
+  position: relative;
+  height: 1080svh;
+}
+
+.cxp02-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: #0b0e0c;
+}
+
+/* Act I — Discovery Obsidian Backdrop & Scroll-Driven Diurnal Ribbon */
+.cxp02-discovery-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    radial-gradient(circle at 20% 45%, rgba(196, 156, 98, 0.14) 0%, transparent 52%),
+    linear-gradient(110deg, #0d120f 0%, #111815 48%, #0a0e0c 100%);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.cxp02-discovery-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(5.5rem, 11vh, 7.25rem) clamp(1.25rem, 4vw, 3.75rem) clamp(4.5rem, 9vh, 5.75rem);
+  will-change: opacity;
+}
+
+.cxp02-discovery-grid {
+  display: grid;
+  grid-template-columns: 30% minmax(0, 1fr);
+  gap: clamp(1.5rem, 3.5vw, 3.5rem);
+  align-items: center;
+  height: 100%;
+}
+
+/* Left slot reserves visual alignment over the reframed Human Moment plate */
+.cxp02-origin-caption-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 0 0.75rem 0.85rem;
+  pointer-events: none;
+}
+
+.cxp02-origin-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #d4b47c;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+.cxp02-origin-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  font-weight: 400;
+  color: #f8f4ec;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.75);
+}
+
+.cxp02-discovery-right {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.2vh, 1.75rem);
+  min-width: 0;
+}
+
+.cxp02-discovery-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cxp02-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c8ab77;
+}
+
+.cxp02-eyebrow::before {
+  content: "";
+  width: 2.25rem;
+  height: 1px;
+  background: #c8ab77;
+}
+
+.cxp02-discovery-headline {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.75rem, 3.2vw, 2.85rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #f8f4ec;
+}
+
+.cxp02-destination-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  border-bottom: 1px solid rgba(200, 171, 119, 0.65);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f4efe6;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease;
+}
+
+.cxp02-destination-link:hover {
+  color: #e4c68c;
+  border-color: #e4c68c;
+}
+
+/* Horizontal scroll-driven diurnal ribbon */
+.cxp02-ribbon-viewport {
+  overflow: hidden;
+  width: 100%;
+  padding-block: 0.25rem;
+}
+
+.cxp02-ribbon-track {
+  display: flex;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  will-change: transform;
+}
+
+.cxp02-ribbon-plate {
+  flex: 0 0 clamp(15rem, 24vw, 21rem);
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #f4efe6;
+  border: 1px solid rgba(244, 239, 230, 0.16);
+  background: rgba(16, 21, 18, 0.72);
+  transition:
+    border-color 220ms ease,
+    transform 260ms ease;
+}
+
+.cxp02-ribbon-plate:hover {
+  border-color: rgba(200, 171, 119, 0.72);
+  transform: translateY(-3px);
+}
+
+.cxp02-ribbon-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #141a17;
+}
+
+.cxp02-ribbon-img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  display: block;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cxp02-ribbon-plate:hover .cxp02-ribbon-img {
+  transform: scale(1.04);
+}
+
+.cxp02-ribbon-body {
+  padding: 0.9rem 1rem 1.05rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cxp02-ribbon-meta {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c8ab77;
+}
+
+.cxp02-ribbon-title {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.25;
+  color: #f8f4ec;
+}
+
+.cxp02-ribbon-tagline {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(244, 239, 230, 0.72);
+}
+
+.cxp02-discovery-footnote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(244, 239, 230, 0.14);
+  font-size: 0.68rem;
+  color: rgba(244, 239, 230, 0.62);
+}
+
+.cxp02-coming-soon-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  color: rgba(244, 239, 230, 0.52);
+}
+
+/* Act II — Discovery -> Your Journey (Widescreen Horizontal Cinema Shutter) */
+.cxp02-journey-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 19;
+  overflow: hidden;
+  pointer-events: none;
+  will-change: clip-path;
+}
+
+.cxp02-journey-plate-wrap {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.cxp02-journey-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(9, 13, 11, 0.84) 0%, rgba(9, 13, 11, 0.56) 52%, rgba(9, 13, 11, 0.42) 100%),
+    linear-gradient(180deg, rgba(9, 13, 11, 0.55) 0%, transparent 25%, transparent 72%, rgba(9, 13, 11, 0.82) 100%);
+}
+
+.cxp02-journey-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 23;
+  display: flex;
+  align-items: center;
+  padding: clamp(5.5rem, 10vh, 7.5rem) clamp(1.25rem, 4.5vw, 4.5rem) clamp(4.5rem, 9vh, 6rem);
+  will-change: opacity, transform;
+}
+
+.cxp02-journey-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(1.5rem, 4vw, 4.5rem);
+  align-items: center;
+}
+
+.cxp02-journey-headline {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.15rem, 4.4vw, 4rem);
+  font-weight: 400;
+  line-height: 1.08;
+  color: #f8f4ec;
+}
+
+.cxp02-journey-lead {
+  margin: 1.15rem 0 0;
+  max-width: 31rem;
+  font-size: clamp(0.875rem, 1.15vw, 1rem);
+  line-height: 1.65;
+  color: rgba(244, 239, 230, 0.82);
+}
+
+.cxp02-trip-switcher {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.cxp02-trip-pill {
+  min-height: 2.6rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(244, 239, 230, 0.28);
+  background: rgba(11, 14, 12, 0.55);
+  color: rgba(244, 239, 230, 0.85);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
+.cxp02-trip-pill[aria-pressed="true"] {
+  background: #f4efe6;
+  border-color: #f4efe6;
+  color: #141816;
+}
+
+.cxp02-itinerary-preview {
+  border-left: 1px solid rgba(200, 171, 119, 0.42);
+  padding-left: clamp(1.25rem, 2.5vw, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.cxp02-day-item {
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+}
+
+.cxp02-day-item:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cxp02-day-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c8ab77;
+}
+
+.cxp02-day-title {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-weight: 400;
+  color: #f8f4ec;
+}
+
+.cxp02-day-summary {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(244, 239, 230, 0.74);
+}
+
+.cxp02-itinerary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  margin-top: 0.35rem;
+}
+
+.cxp02-demo-note {
+  font-size: 0.68rem;
+  color: rgba(244, 239, 230, 0.64);
+}
+
+/* Act III — Your Journey -> AI Concierge Studio Finale */
+.cxp02-concierge-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(196, 156, 98, 0.16) 0%, rgba(10, 14, 12, 0.92) 58%, #080b09 100%);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.cxp02-concierge-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 26;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(5.5rem, 10vh, 7.5rem) clamp(1.25rem, 4.5vw, 4rem) clamp(4.5rem, 9vh, 6rem);
+  will-change: opacity, transform;
+}
+
+.cxp02-concierge-inner {
+  max-width: 44rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cxp02-concierge-headline {
+  margin: 1rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.15rem, 4.8vw, 4.25rem);
+  font-weight: 400;
+  line-height: 1.08;
+  color: #f8f4ec;
+}
+
+.cxp02-concierge-copy {
+  margin: 1.25rem 0 0;
+  max-width: 34rem;
+  font-size: clamp(0.875rem, 1.15vw, 1rem);
+  line-height: 1.7;
+  color: rgba(244, 239, 230, 0.78);
+}
+
+.cxp02-concierge-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.15rem;
+}
+
+.cxp02-concierge-disclosure {
+  margin: 1.75rem 0 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: rgba(244, 239, 230, 0.56);
+}
+
+/* Mobile adaptation */
+@media (max-width: 767px) {
+  .cxp02-runway {
+    height: 920svh;
+  }
+
+  .cxp02-discovery-layer {
+    padding: 5.25rem 1.25rem 4.75rem;
+  }
+
+  .cxp02-discovery-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 34% minmax(0, 1fr);
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .cxp02-origin-caption-slot {
+    padding: 0 0.5rem 0.5rem;
+  }
+
+  .cxp02-discovery-headline {
+    font-size: clamp(1.45rem, 6.4vw, 1.9rem);
+  }
+
+  .cxp02-ribbon-plate {
+    flex: 0 0 14.5rem;
+  }
+
+  .cxp02-ribbon-tagline {
+    display: none;
+  }
+
+  .cxp02-coming-soon-list {
+    display: none;
+  }
+
+  .cxp02-journey-overlay {
+    align-items: flex-end;
+    padding: 5.25rem 1.25rem 4.75rem;
+  }
+
+  .cxp02-journey-grid {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .cxp02-journey-headline {
+    font-size: clamp(1.7rem, 7.2vw, 2.2rem);
+  }
+
+  .cxp02-journey-lead {
+    display: none;
+  }
+
+  .cxp02-itinerary-preview {
+    border-left: none;
+    border-top: 1px solid rgba(200, 171, 119, 0.36);
+    padding-left: 0;
+    padding-top: 0.85rem;
+    gap: 0.65rem;
+  }
+
+  .cxp02-day-item {
+    padding-bottom: 0.5rem;
+  }
+
+  .cxp02-day-summary {
+    display: none;
+  }
+
+  .cxp02-concierge-headline {
+    font-size: clamp(1.85rem, 7.6vw, 2.4rem);
+  }
+}
+
+/* Reduced-motion vertical editorial narrative additions */
+.cxp02-reduced-discovery {
+  padding: clamp(3.5rem, 7vw, 5.5rem) clamp(1.25rem, 4vw, 3.75rem);
+  background: #0f1512;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+}
+
+.cxp02-reduced-cards {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+}
+
+.cxp02-reduced-concierge {
+  padding: clamp(4rem, 9vw, 6.5rem) clamp(1.25rem, 4vw, 3.75rem);
+  background: radial-gradient(circle at 50% 35%, rgba(196, 156, 98, 0.14) 0%, #090c0a 70%);
+}
