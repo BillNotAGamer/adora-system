@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useReducer, useRef } from "react";
+import { useMemo, useReducer, useRef, type Dispatch, type RefObject } from "react";
 
 import "@/app/creative-lab/concierge-experience/concierge-atelier.css";
 import { AtelierJourneyCanvas } from "@/components/creative-lab/concierge-atelier/atelier-journey-canvas";
@@ -13,19 +13,45 @@ import {
   deriveInterpretation,
   initialAtelierState,
   REFINEMENT_OPTIONS,
+  type AtelierAction,
 } from "@/lib/concierge-atelier/engine";
+import type { AtelierState } from "@/lib/concierge-atelier/types";
 
 const PHASE_LABELS: Record<string, string> = {
-  invitation: "State I · Lời mời",
-  discovery: "State II · Khám phá có dẫn dắt",
-  interpretation: "State III · Kiểm chứng hiểu biết",
-  reveal: "State IV · Phác thảo hành trình",
-  refinement: "State V · Tinh chỉnh cộng tác",
+  invitation: "Lời mời",
+  discovery: "Bước 01 · Khám phá có dẫn dắt",
+  interpretation: "Bước 02 · Kiểm chứng hiểu biết",
+  reveal: "Bước 03 · Phác thảo hành trình",
+  refinement: "Bước 04 · Tinh chỉnh cộng tác",
 };
 
-export function ConciergeAtelierExperience() {
-  const [state, dispatch] = useReducer(atelierReducer, initialAtelierState);
+export interface ConciergeAtelierExperienceProps {
+  variant?: "lab" | "overlay" | "route";
+  externalState?: AtelierState;
+  externalDispatch?: Dispatch<AtelierAction>;
+  onClose?: () => void;
+  onNavigateAway?: () => void;
+  titleId?: string;
+  headingRef?: RefObject<HTMLHeadingElement | null>;
+}
+
+export function ConciergeAtelierExperience({
+  variant = "lab",
+  externalState,
+  externalDispatch,
+  onClose,
+  onNavigateAway,
+  titleId,
+  headingRef,
+}: Readonly<ConciergeAtelierExperienceProps> = {}) {
+  const [localState, localDispatch] = useReducer(atelierReducer, initialAtelierState);
+  const state = externalState ?? localState;
+  const dispatch = externalDispatch ?? localDispatch;
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const isOverlay = variant === "overlay";
+  const isRoute = variant === "route";
+  const isLab = variant === "lab";
 
   const facts = useMemo(() => deriveInterpretation(state), [state]);
   const journey = useMemo(() => buildAtelierJourney(state), [state]);
@@ -56,14 +82,26 @@ export function ConciergeAtelierExperience() {
             ? 4
             : 0;
 
+  const RootTag = isOverlay ? "div" : "main";
+  const HeadingTag = isOverlay ? "h2" : "h1";
+
   return (
-    <main id="main-content" className="cxp04-root" data-cxp04-phase={state.phase}>
+    <RootTag
+      id={isOverlay ? undefined : "main-content"}
+      className={`cxp04-root ${isOverlay ? "cxp04-root--overlay" : ""}`}
+      data-cxp04-phase={state.phase}
+      data-cxp04-variant={variant}
+    >
       {/* Top Studio Header */}
       <header className="cxp04-topbar">
         <div className="cxp04-brand-group">
-          <Link href="/" className="cxp04-brand" aria-label="ADORA — trở về trang chủ">
-            ADORA
-          </Link>
+          {isOverlay ? (
+            <span className="cxp04-brand">ADORA</span>
+          ) : (
+            <Link href="/" className="cxp04-brand" aria-label="ADORA — trở về trang chủ">
+              ADORA
+            </Link>
+          )}
           <span className="cxp04-badge">Personal Journey Atelier</span>
         </div>
         <div className="cxp04-topbar-actions">
@@ -76,21 +114,42 @@ export function ConciergeAtelierExperience() {
               Bắt đầu lại
             </button>
           ) : null}
-          <Link href="/" className="cxp04-top-link">
-            ← Trang chủ
-          </Link>
+          {isOverlay ? (
+            <>
+              <Link
+                href="/ai-planner"
+                className="cxp04-top-link cxp04-hide-sm"
+                onClick={() => onNavigateAway?.()}
+              >
+                Mở trang riêng ↗
+              </Link>
+              <button
+                type="button"
+                className="cxp04-close-btn"
+                aria-label="Đóng Travel Concierge"
+                onClick={() => onClose?.()}
+                data-cxp04-close-btn
+              >
+                Đóng ×
+              </button>
+            </>
+          ) : (
+            <Link href="/" className="cxp04-top-link">
+              ← Trang chủ
+            </Link>
+          )}
         </div>
       </header>
 
       {/* STATE I — THE INVITATION */}
       {state.phase === "invitation" ? (
-        <section className="cxp04-invitation" aria-label="State I — Lời mời thiết kế hành trình">
+        <section className="cxp04-invitation" aria-label="Lời mời thiết kế hành trình">
           <div className="cxp04-invitation-bg" aria-hidden="true">
             <Image
               src="/images/cxp01/highland-world.jpg"
               alt=""
               fill
-              priority
+              priority={!isOverlay}
               sizes="100vw"
               style={{ objectFit: "cover", objectPosition: "center 45%" }}
             />
@@ -99,9 +158,14 @@ export function ConciergeAtelierExperience() {
 
           <div className="cxp04-invitation-card">
             <span className="cxp04-eyebrow">ADORA · Personal Journey Atelier</span>
-            <h1 className="cxp04-invitation-title">
+            <HeadingTag
+              id={titleId}
+              ref={headingRef}
+              tabIndex={isOverlay ? -1 : undefined}
+              className="cxp04-invitation-title"
+            >
               Thiết kế một hành trình vừa vặn với nhịp thở của riêng bạn.
-            </h1>
+            </HeadingTag>
             <p className="cxp04-invitation-lead">
               Bắt đầu từ cảm giác bạn muốn giữ lại — Atelier lắng nghe từng bước, tách bạch giả định trước khi mở lịch trình và chi phí minh bạch.
             </p>
@@ -145,7 +209,7 @@ export function ConciergeAtelierExperience() {
               <div>
                 <div className="cxp04-pillar-title">02 · Tôn trọng riêng tư</div>
                 <p className="cxp04-pillar-text">
-                  Không yêu cầu tuổi, giới tính hay thông tin nhạy cảm. Dữ liệu chỉ tồn tại trong phiên thử này.
+                  Không yêu cầu tuổi, giới tính hay thông tin nhạy cảm. Dữ liệu chỉ tồn tại trong phiên này.
                 </p>
               </div>
               <div>
@@ -157,11 +221,16 @@ export function ConciergeAtelierExperience() {
             </div>
 
             <p className="cxp04-disclosure-inline">
-              <strong>Lưu ý minh bạch:</strong> Bản mẫu tương tác sử dụng kịch bản dựng sẵn cho Đà Lạt — chưa kết nối AI trực tiếp, không phải báo giá hay đặt chỗ thực tế.{" "}
-              <Link href="/ai-planner" style={{ color: "#e4c68c", textDecoration: "underline" }}>
-                Mở bản AI Planner chuẩn
-              </Link>
-              .
+              <strong>Lưu ý minh bạch:</strong> Bản xem trước tương tác sử dụng kịch bản dựng sẵn cho Đà Lạt — chưa kết nối AI trực tiếp, không phải báo giá hay đặt chỗ thực tế.
+              {isLab && !isRoute ? (
+                <>
+                  {" "}
+                  <Link href="/ai-planner" style={{ color: "#e4c68c", textDecoration: "underline" }}>
+                    Mở trang AI Planner
+                  </Link>
+                  .
+                </>
+              ) : null}
             </p>
           </div>
         </section>
@@ -195,7 +264,14 @@ export function ConciergeAtelierExperience() {
             {/* Left Column: Conversational Atelier */}
             <section className="cxp04-dialogue-col" aria-label="Đối thoại thiết kế hành trình">
               <div className="cxp04-stage-strip">
-                <h1 className="sr-only">ADORA Personal Journey Atelier</h1>
+                <HeadingTag
+                  id={titleId}
+                  ref={headingRef}
+                  tabIndex={isOverlay ? -1 : undefined}
+                  className="sr-only"
+                >
+                  ADORA Personal Journey Atelier
+                </HeadingTag>
                 <span>{PHASE_LABELS[state.phase]}</span>
                 <div className="cxp04-stage-dots" aria-hidden="true">
                   {[1, 2, 3, 4].map((dot) => (
@@ -301,7 +377,7 @@ export function ConciergeAtelierExperience() {
                 {state.phase === "interpretation" ? (
                   <div className="cxp04-question-card">
                     <span className="cxp04-eyebrow" style={{ color: "#586c65" }}>
-                      State III · Sẵn sàng mở phác thảo
+                      Kiểm chứng hiểu biết · Sẵn sàng mở phác thảo
                     </span>
                     <h2 className="cxp04-question-title">
                       Mọi thông tin bạn chọn đã được tách rõ với các giả định tạm thời.
@@ -332,7 +408,7 @@ export function ConciergeAtelierExperience() {
                 {state.phase === "reveal" || state.phase === "refinement" ? (
                   <div className="cxp04-refinement-box" aria-label="Tinh chỉnh hành trình">
                     <span className="cxp04-eyebrow" style={{ color: "#586c65" }}>
-                      State V · Tinh chỉnh cộng tác
+                      Tinh chỉnh cộng tác
                     </span>
                     <p className="cxp04-question-hint" style={{ marginTop: "0.4rem" }}>
                       Thử thay đổi nhịp đi, ngân sách, số ngày hoặc nhóm khách — lịch trình và cấu trúc chi phí minh hoạ sẽ cập nhật tức thì.
@@ -402,10 +478,11 @@ export function ConciergeAtelierExperience() {
               onEditPreference={(key) => dispatch({ type: "edit_preference", key })}
               onConfirmInference={(key) => dispatch({ type: "confirm_inference", key })}
               onRevealJourney={() => dispatch({ type: "reveal_journey" })}
+              onNavigateLink={onNavigateAway}
             />
           </div>
         </>
       )}
-    </main>
+    </RootTag>
   );
 }

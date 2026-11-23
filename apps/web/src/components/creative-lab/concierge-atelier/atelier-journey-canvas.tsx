@@ -21,6 +21,7 @@ interface AtelierJourneyCanvasProps {
   onEditPreference: (key: PreferenceKey) => void;
   onConfirmInference: (key: PreferenceKey) => void;
   onRevealJourney: () => void;
+  onNavigateLink?: () => void;
 }
 
 const STATUS_LABELS: Record<PreferenceFact["provenance"], string> = {
@@ -39,6 +40,7 @@ export function AtelierJourneyCanvas({
   onEditPreference,
   onConfirmInference,
   onRevealJourney,
+  onNavigateLink,
 }: Readonly<AtelierJourneyCanvasProps>) {
   const showJourney = phase === "reveal" || phase === "refinement";
   const currentDay = journey.days.find((d) => d.day === activeDay) ?? journey.days[0];
@@ -268,12 +270,14 @@ export function AtelierJourneyCanvas({
               <div style={{ marginTop: "0.85rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
                 <Link
                   href={`/trips/${journey.slug}`}
+                  onClick={() => onNavigateLink?.()}
                   style={{ color: "#e4c68c", textDecoration: "underline", fontWeight: 600 }}
                 >
                   Xem trang lịch trình mẫu đầy đủ ↗
                 </Link>
                 <Link
                   href="/destinations/da-lat"
+                  onClick={() => onNavigateLink?.()}
                   style={{ color: "#f4efe6", textDecoration: "underline" }}
                 >
                   Khám phá điểm đến Đà Lạt

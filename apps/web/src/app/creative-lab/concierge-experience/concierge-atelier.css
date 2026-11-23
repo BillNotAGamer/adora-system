@@ -8,6 +8,64 @@
   flex-direction: column;
 }
 
+.cxp04-root button:focus-visible,
+.cxp04-root a:focus-visible,
+.cxp04-root textarea:focus-visible {
+  outline: 2px solid #c8ab77;
+  outline-offset: 2px;
+}
+
+dialog.cxp04-dialog-host {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: #0b0e0c;
+  color: #f4efe6;
+  overflow: hidden;
+}
+
+dialog.cxp04-dialog-host::backdrop {
+  background: rgba(6, 9, 8, 0.88);
+}
+
+.cxp04-root--overlay {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cxp04-root--overlay .cxp04-workspace {
+  flex: 1;
+  min-height: 0;
+}
+
+.cxp04-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(200, 171, 119, 0.55);
+  background: rgba(200, 171, 119, 0.08);
+  color: #f4efe6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cxp04-close-btn:hover {
+  background: #f4efe6;
+  color: #141816;
+}
+
 /* Top Atelier Chrome Bar */
 .cxp04-topbar {
   position: sticky;
@@ -989,6 +1047,10 @@
 }
 
 @media (max-width: 639px) {
+  .cxp04-hide-sm {
+    display: none;
+  }
+
   .cxp04-topbar {
     padding: 0.65rem 1rem;
   }
@@ -1086,4 +1148,13 @@ html[data-motion="off"] .cxp04-root *::before,
 html[data-motion="off"] .cxp04-root *::after {
   transition: none !important;
   animation: none !important;
+}
+
+@media print {
+  dialog.cxp04-dialog-host {
+    display: none !important;
+  }
+  html:has(dialog.cxp04-dialog-host[open]) {
+    overflow: visible !important;
+  }
 }
