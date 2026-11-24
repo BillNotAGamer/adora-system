@@ -158,3 +158,21 @@ test("CXP-04B cost breakdown arithmetic invariants hold across all tiers, durati
     }
   }
 });
+
+test("CXP-04F transferred UX-1 behavioral contracts: bounded multi-select, empty/overlong guard, and preserved answers", () => {
+  let state = atelierReducer(initialAtelierState, { type: "start" });
+  state = atelierReducer(state, { type: "select_choice", key: "intention", value: "calm-nature" });
+  state = atelierReducer(state, { type: "select_choice", key: "intention", value: "coffee-culture" });
+  // 3rd intention must be rejected and error surfaced without mutating selected choices
+  state = atelierReducer(state, { type: "select_choice", key: "intention", value: "friends-explore" });
+  assert.equal(state.answers.intention.length, 2);
+  assert.ok(state.error.length > 0);
+
+  // Empty & overlong (>1000 chars) free-text submissions must not append transcript
+  const beforeLen = state.messages.length;
+  state = atelierReducer(state, { type: "submit_text", text: "   " });
+  assert.equal(state.messages.length, beforeLen);
+  state = atelierReducer(state, { type: "submit_text", text: "a".repeat(1001) });
+  assert.equal(state.messages.length, beforeLen);
+  assert.ok(state.error.length > 0);
+});

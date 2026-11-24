@@ -17,7 +17,7 @@ export function AiPlannerSection() {
             Không gian lập kế hoạch của ADORA đang được xây dựng để biến sở thích, thời gian và nhịp đi của bạn thành một bản phác thảo hành trình mạch lạc.
           </p>
           <ConciergeTrigger href="/ai-planner" className="editorial-link mt-9 text-[var(--adora-ivory)]">
-            Plan with Adora AI
+            Travel Atelier
             <ArrowUpRight className="size-4" aria-hidden="true" />
           </ConciergeTrigger>
           <p className="mt-5 text-[0.67rem] leading-5 tracking-[0.08em] text-white/42 uppercase">

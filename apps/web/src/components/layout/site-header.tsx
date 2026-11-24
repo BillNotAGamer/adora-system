@@ -80,7 +80,7 @@ export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderPro
             );
           })}
           <ConciergeTrigger href="/ai-planner" className={ctaClass}>
-            Plan with Adora AI
+            Travel Atelier
           </ConciergeTrigger>
         </nav>
 
@@ -120,7 +120,7 @@ export function SiteHeader({ tone = "overlay", current }: Readonly<SiteHeaderPro
           className={`${isDark ? "light-cta" : "dark-cta"} mt-6 inline-flex min-h-12 items-center justify-center px-5 text-xs font-bold tracking-[0.1em]`}
           onClick={() => updateMenu(false)}
         >
-          Plan with Adora AI
+          Travel Atelier
         </ConciergeTrigger>
       </nav>
     </header>

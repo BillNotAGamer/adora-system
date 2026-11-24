@@ -21,7 +21,7 @@ export function PlannerCta({ heading, body }: Readonly<PlannerCtaProps>) {
         <div>
           <p className="max-w-md text-sm leading-7 text-white/72">{body}</p>
           <ConciergeTrigger href="/ai-planner" className="editorial-link mt-8 text-[var(--adora-ivory)]">
-            Plan with Adora AI
+            Travel Atelier
             <ArrowUpRight className="size-4" aria-hidden="true" />
           </ConciergeTrigger>
           <p className="mt-4 text-[0.66rem] leading-5 tracking-[0.08em] text-white/50 uppercase">Kịch bản dựng sẵn · chưa kết nối mô hình AI</p>

@@ -13,17 +13,11 @@ import {
   type ReactNode,
 } from "react";
 
-import { initialState, reducer, type Action, type State } from "@/lib/concierge/state";
 import {
   atelierReducer,
   initialAtelierState,
   type AtelierAction,
 } from "@/lib/concierge-atelier/engine";
-import {
-  CONCIERGE_EXPERIENCE_MODE,
-  IS_ATELIER_MODE,
-  type ConciergeExperienceMode,
-} from "@/lib/concierge-atelier/mode";
 import type { AtelierState } from "@/lib/concierge-atelier/types";
 
 export type CinematicMovementId = "01" | "02" | "03" | "04" | "05" | "06";
@@ -34,11 +28,8 @@ type CloseOptions = {
 };
 
 type Context = {
-  mode: ConciergeExperienceMode;
-  state: State;
-  dispatch: Dispatch<Action>;
-  atelierState?: AtelierState;
-  atelierDispatch?: Dispatch<AtelierAction>;
+  atelierState: AtelierState;
+  atelierDispatch: Dispatch<AtelierAction>;
   isOpen: boolean;
   open: (origin: HTMLElement) => void;
   close: (restore?: boolean, options?: CloseOptions) => void;
@@ -46,7 +37,6 @@ type Context = {
   setMenuOpen: (value: boolean) => void;
   cinematicMovement: CinematicMovementId | null;
   setCinematicMovement: (value: CinematicMovementId | null) => void;
-  logPositionRef: { current: number };
 };
 
 const ConciergeContext = createContext<Context | null>(null);
@@ -97,122 +87,6 @@ function restoreFocusAfterClose(
   });
 }
 
-function Ux1OnlyProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [isOpen, setOpen] = useState(false);
-  const [Dialog, setDialog] = useState<typeof import("./concierge-dialog").default | null>(null);
-  const [loadError, setLoadError] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [cinematicMovement, setCinematicMovement] = useState<CinematicMovementId | null>(null);
-  const origin = useRef<HTMLElement | null>(null);
-  const logPositionRef = useRef(0);
-  const path = usePathname();
-  const previousPath = useRef(path);
-
-  function close(restore = true) {
-    setOpen(false);
-    if (restore) {
-      requestAnimationFrame(() => {
-        const target = origin.current;
-        if (target?.isConnected && target.checkVisibility()) {
-          target.focus({ preventScroll: true });
-        } else {
-          const fallback = [
-            document.querySelector<HTMLElement>("a.concierge-floating"),
-            ...Array.from(document.querySelectorAll<HTMLElement>('header a[href="/"], main h1')),
-          ].find(
-            (element) =>
-              element && element.checkVisibility() && !element.closest('[aria-hidden="true"]'),
-          );
-          if (fallback) {
-            if (fallback.tagName === "H1") fallback.tabIndex = -1;
-            fallback.focus({ preventScroll: true });
-          }
-        }
-      });
-    }
-  }
-
-  useEffect(() => {
-    const dismiss = () => setOpen(false);
-    window.addEventListener("popstate", dismiss);
-    window.addEventListener("hashchange", dismiss);
-    const navigate = (event: MouseEvent) => {
-      const link = (event.target as Element)?.closest("a[href]");
-      if (
-        link &&
-        !link.hasAttribute("data-concierge-trigger") &&
-        !event.defaultPrevented &&
-        !event.ctrlKey &&
-        !event.metaKey
-      ) {
-        dismiss();
-      }
-    };
-    document.addEventListener("click", navigate);
-    return () => {
-      window.removeEventListener("popstate", dismiss);
-      window.removeEventListener("hashchange", dismiss);
-      document.removeEventListener("click", navigate);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (previousPath.current !== path) {
-      previousPath.current = path;
-      setOpen(false);
-      setMenuOpen(false);
-    }
-  }, [path]);
-
-  return (
-    <ConciergeContext
-      value={{
-        mode: "ux1-dialog",
-        state,
-        dispatch,
-        isOpen,
-        menuOpen,
-        setMenuOpen,
-        cinematicMovement,
-        setCinematicMovement,
-        logPositionRef,
-        close,
-        open: (element) => {
-          if (path === "/ai-planner") {
-            document.querySelector<HTMLElement>("#planner-prompt")?.focus();
-            return;
-          }
-          origin.current = element;
-          setMenuOpen(false);
-          setOpen(true);
-          if (!Dialog) {
-            setLoadError(false);
-            void import("./concierge-dialog")
-              .then((module) => setDialog(() => module.default))
-              .catch(() => setLoadError(true));
-          }
-        },
-      }}
-    >
-      {children}
-      {isOpen && path !== "/ai-planner" ? (
-        Dialog ? (
-          <Dialog />
-        ) : (
-          <div role="status" className="concierge-floating">
-            {loadError ? "Không mở được Concierge." : "Đang mở Concierge…"}{" "}
-            <a href="/ai-planner">Mở trang đầy đủ</a>
-            <button type="button" onClick={() => close()}>
-              Đóng
-            </button>
-          </div>
-        )
-      ) : null}
-    </ConciergeContext>
-  );
-}
-
 function withoutOverlayHistoryFlag(rawState: unknown): Record<string, unknown> {
   if (!rawState || typeof rawState !== "object") return {};
   const copy = { ...(rawState as Record<string, unknown>) };
@@ -220,8 +94,7 @@ function withoutOverlayHistoryFlag(rawState: unknown): Record<string, unknown> {
   return copy;
 }
 
-function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [ux1State, ux1Dispatch] = useReducer(reducer, initialState);
+export function ConciergeProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [atelierState, atelierDispatch] = useReducer(atelierReducer, initialAtelierState);
   const [isOpen, setOpen] = useState(false);
   const [AtelierHost, setAtelierHost] = useState<
@@ -234,7 +107,6 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
   const origin = useRef<HTMLElement | null>(null);
   const originWasFloating = useRef(false);
   const originWasMobileMenu = useRef(false);
-  const logPositionRef = useRef(0);
   const path = usePathname();
   const previousPath = useRef(path);
   const isOpenRef = useRef(isOpen);
@@ -244,7 +116,6 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
 
   useEffect(() => {
     mountedRef.current = true;
-    // Strip any stale overlay marker left behind from a previous session before reload
     if (
       typeof window !== "undefined" &&
       (window.history.state as { adoraConciergeOverlay?: boolean } | null)?.adoraConciergeOverlay ===
@@ -424,9 +295,6 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
   return (
     <ConciergeContext
       value={{
-        mode: CONCIERGE_EXPERIENCE_MODE,
-        state: ux1State,
-        dispatch: ux1Dispatch,
         atelierState,
         atelierDispatch,
         isOpen,
@@ -434,7 +302,6 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
         setMenuOpen,
         cinematicMovement,
         setCinematicMovement,
-        logPositionRef,
         close,
         open,
       }}
@@ -457,11 +324,4 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
       ) : null}
     </ConciergeContext>
   );
-}
-
-export function ConciergeProvider({ children }: Readonly<{ children: ReactNode }>) {
-  if (IS_ATELIER_MODE) {
-    return <AtelierEnabledProvider>{children}</AtelierEnabledProvider>;
-  }
-  return <Ux1OnlyProvider>{children}</Ux1OnlyProvider>;
 }

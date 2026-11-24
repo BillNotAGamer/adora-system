@@ -40,7 +40,7 @@ export function EditorialHero() {
               style={{ "--stagger-index": 2 } as CSSProperties}
               className="light-cta hero-primary-cta group inline-flex min-h-13 items-center gap-4 px-6 text-xs font-bold tracking-[0.11em] transition-colors adora-load-rise"
             >
-              Plan with Adora AI
+              Travel Atelier
               <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
             </ConciergeTrigger>
             <Link

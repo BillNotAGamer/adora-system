@@ -6,15 +6,14 @@ import path from "node:path";
 
 const PORT = process.env.CXP04C_PORT || "3105";
 const BASE_URL = process.env.ADORA_WEB_URL || `http://127.0.0.1:${PORT}`;
-const MODE = process.env.CXP04C_MODE === "off" ? "off" : "on";
 const CHROME_PATH = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const CDP_PORT_DESKTOP = Number(process.env.CXP04C_CDP_PORT || 9251);
 const CDP_PORT_MOBILE = Number(process.env.CXP04C_CDP_MOBILE_PORT || 9252);
 const SCRATCH_DIR =
-  process.env.CXP04C_SCRATCH_DIR || path.join(os.tmpdir(), "adora-cxp04d-scratch");
+  process.env.CXP04C_SCRATCH_DIR || path.join(os.tmpdir(), "adora-cxp04f-scratch");
 const REPORT_ASSETS_DIR =
   process.env.CXP04C_OUTPUT_DIR ||
-  path.resolve(process.cwd(), "docs/reports/assets/cxp04d");
+  path.resolve(process.cwd(), "docs/reports/assets/cxp04f");
 
 fs.mkdirSync(SCRATCH_DIR, { recursive: true });
 fs.mkdirSync(REPORT_ASSETS_DIR, { recursive: true });
@@ -258,13 +257,12 @@ async function run() {
       bytes: buf.length,
       capturedAt: new Date().toISOString(),
       gitSha,
-      mode: MODE,
       ...meta,
     });
     return outPath;
   };
 
-  const userDataDesktop = fs.mkdtempSync(path.join(os.tmpdir(), "adora-cxp04d-desk-"));
+  const userDataDesktop = fs.mkdtempSync(path.join(os.tmpdir(), "adora-cxp04f-desk-"));
   const chromeDesktop = spawn(
     CHROME_PATH,
     [
@@ -280,7 +278,7 @@ async function run() {
   );
 
   const report = {
-    mode: MODE,
+    mode: "official-atelier",
     baseUrl: BASE_URL,
     gitSha,
     consoleErrors: [],
@@ -331,45 +329,28 @@ async function run() {
       mobile: false,
     });
 
-    if (MODE === "off") {
-      await client.send("Page.navigate", { url: `${BASE_URL}/ai-planner` });
-      await sleep(700);
-      report.aiPlanner.modeOff = await evaluate(
-        client,
-        `({
-          title: document.title,
-          hasPlannerPrompt: Boolean(document.querySelector('#planner-prompt')),
-          hasAtelierRoot: Boolean(document.querySelector('[data-cxp04-phase]')),
-        })`,
-      );
-      await captureEvidence(client, "13_ai_planner_mode_off.png", {
-        route: "/ai-planner",
-        viewport: "1440x900",
-        dpr: 1,
-        scenario: "ai_planner_mode_off",
-      });
-      client.close();
-      fs.writeFileSync(
-        path.join(SCRATCH_DIR, "verify_cxp04d_off.json"),
-        JSON.stringify(report, null, 2),
-      );
-      console.log(JSON.stringify(report, null, 2));
-      if (
-        report.consoleErrors.length > 0 ||
-        report.pageErrors.length > 0 ||
-        !report.aiPlanner.modeOff?.hasPlannerPrompt ||
-        report.aiPlanner.modeOff?.hasAtelierRoot
-      ) {
-        process.exitCode = 1;
-      }
-      return;
-    }
+    // =========================================================================
+    // CXP-04F OFFICIAL ATELIER CUTOVER CHECKS
+    // =========================================================================
+    const labRes = await fetch(`${BASE_URL}/creative-lab/concierge-experience`);
+    report.cutover = {
+      retiredLabStatus: labRes.status,
+    };
 
     // =========================================================================
-    // MODE ON: RECORDED DESKTOP INTEGRATION WALKTHROUGH (~18-24s real timing)
+    // OFFICIAL DESKTOP ATELIER WALKTHROUGH (~18-24s real timing)
     // =========================================================================
     await client.send("Page.navigate", { url: `${BASE_URL}/` });
     await sleep(900);
+    report.cutover.home = await evaluate(
+      client,
+      `({
+        headerTriggerText: document.querySelector('header a[data-concierge-trigger]')?.textContent?.trim() || '',
+        footerTriggerText: document.querySelector('footer a[data-concierge-trigger]')?.textContent?.trim() || '',
+        hasLegacyDialog: Boolean(document.querySelector('dialog.concierge-dialog')),
+        hasLegacyPrompt: Boolean(document.querySelector('#planner-prompt')),
+      })`,
+    );
     await captureEvidence(client, "01_home_before_open.png", {
       route: "/",
       viewport: "1440x900",
@@ -755,8 +736,10 @@ async function run() {
     client.close();
   } finally {
     chromeDesktop.kill();
-    await sleep(300);
-    fs.rmSync(userDataDesktop, { recursive: true, force: true });
+    await sleep(400);
+    try {
+      fs.rmSync(userDataDesktop, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    } catch {}
   }
 
   // ===========================================================================
@@ -942,12 +925,14 @@ async function run() {
     mobClient.close();
   } finally {
     chromeMobile.kill();
-    await sleep(300);
-    fs.rmSync(userDataMobile, { recursive: true, force: true });
+    await sleep(400);
+    try {
+      fs.rmSync(userDataMobile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    } catch {}
   }
 
   report.manifestCount = manifest.length;
-  const manifestPath = path.join(SCRATCH_DIR, "cxp04d_evidence_manifest.json");
+  const manifestPath = path.join(SCRATCH_DIR, "cxp04f_evidence_manifest.json");
   fs.writeFileSync(manifestPath, JSON.stringify({ manifest, reportSummary: report }, null, 2));
   console.log(JSON.stringify(report, null, 2));
 
@@ -955,6 +940,11 @@ async function run() {
     report.consoleErrors.length > 0 ||
     report.pageErrors.length > 0 ||
     report.failedRequests.length > 0 ||
+    report.cutover?.retiredLabStatus !== 404 ||
+    report.cutover?.home?.hasLegacyDialog ||
+    report.cutover?.home?.hasLegacyPrompt ||
+    report.cutover?.home?.headerTriggerText !== "Travel Atelier" ||
+    !["Travel Atelier", "AI Planner"].includes(report.cutover?.home?.footerTriggerText) ||
     report.historyStress.scenarioA_10Cycles?.historyLenDelta !== 0 ||
     report.historyStress.scenarioA_10Cycles?.maxDialogs !== 1 ||
     report.historyStress.scenarioA_10Cycles?.residualLockFound ||
