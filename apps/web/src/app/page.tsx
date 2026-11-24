@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { CinematicJourneyExperience } from "@/components/creative-lab/cinematic-journey/cinematic-journey-experience";
+import { FirstLetterBootScript } from "@/components/entrance/first-letter-boot-script";
 import { EDITORIAL_CATALOG_FALLBACK, getHomepageCatalog } from "@/lib/catalog";
 import { homepageEditorialPresentation } from "@/lib/catalog-contract";
 
@@ -40,10 +41,13 @@ export default function Home() {
   );
 
   return (
-    <CinematicJourneyExperience
-      mode="production"
-      catalogSource={EDITORIAL_CATALOG_FALLBACK.source}
-      catalogDisclosure={catalogDisclosure}
-    />
+    <>
+      <FirstLetterBootScript />
+      <CinematicJourneyExperience
+        mode="production"
+        catalogSource={EDITORIAL_CATALOG_FALLBACK.source}
+        catalogDisclosure={catalogDisclosure}
+      />
+    </>
   );
 }

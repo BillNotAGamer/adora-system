@@ -216,6 +216,20 @@ async function recordWheelSegment(client, dirName, outWebm, steps, deltaY) {
   };
 }
 
+async function waitForEntranceComplete(client, timeoutMs = 8000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const done = await evaluate(
+        client,
+        `Boolean(window.location.pathname === "/" && window.__ADORA_CXP05_OWNED__ && window.__ADORA_CXP05_TELEMETRY__ && (window.__ADORA_CXP05_TELEMETRY__.phase === "complete" || window.__ADORA_CXP05_TELEMETRY__.phase === "skipped"))`,
+      );
+      if (done) return;
+    } catch {}
+    await sleep(50);
+  }
+}
+
 async function run() {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "adora-cxp03-chrome-"));
   const chrome = spawn(
@@ -289,7 +303,8 @@ async function run() {
       mobile: false,
     });
     await client.send("Page.navigate", { url: `${BASE_URL}/` });
-    await sleep(1600);
+    await waitForEntranceComplete(client, 8000);
+    await sleep(300);
 
     // Performance & LCP/CLS/LongTasks
     report.performance = await evaluate(
