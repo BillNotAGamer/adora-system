@@ -243,6 +243,20 @@ async function smoothScrollToProgress(client, targetProgress, steps = 10, stepMs
   await sleep(220);
 }
 
+async function waitForEntranceComplete(client, timeoutMs = 8000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const done = await evaluate(
+        client,
+        `Boolean(window.location.pathname === "/" && window.__ADORA_CXP05_OWNED__ && window.__ADORA_CXP05_TELEMETRY__ && (window.__ADORA_CXP05_TELEMETRY__.phase === "complete" || window.__ADORA_CXP05_TELEMETRY__.phase === "skipped"))`,
+      );
+      if (done) return;
+    } catch {}
+    await sleep(50);
+  }
+}
+
 async function run() {
   const gitSha = gitHeadSha();
   const manifest = [];
@@ -341,7 +355,8 @@ async function run() {
     // OFFICIAL DESKTOP ATELIER WALKTHROUGH (~18-24s real timing)
     // =========================================================================
     await client.send("Page.navigate", { url: `${BASE_URL}/` });
-    await sleep(900);
+    await waitForEntranceComplete(client, 8000);
+    await sleep(250);
     report.cutover.home = await evaluate(
       client,
       `({
@@ -569,11 +584,13 @@ async function run() {
 
     // Scenario E: Reload while overlay was open strips stale flag -> opens & closes cleanly staying on '/'
     await client.send("Page.navigate", { url: `${BASE_URL}/` });
-    await sleep(700);
+    await waitForEntranceComplete(client, 8000);
+    await sleep(250);
     await evaluate(client, `document.querySelector('header a[data-concierge-trigger]')?.click()`);
     await sleep(350);
     await client.send("Page.reload");
-    await sleep(700);
+    await waitForEntranceComplete(client, 8000);
+    await sleep(250);
     const afterReload = await evaluate(
       client,
       `({
@@ -775,7 +792,8 @@ async function run() {
     });
 
     await mobClient.send("Page.navigate", { url: `${BASE_URL}/` });
-    await sleep(900);
+    await waitForEntranceComplete(mobClient, 8000);
+    await sleep(250);
 
     const mobileRecorder = await startRealtimeRecorder(mobClient, {
       width: 390,
@@ -883,7 +901,8 @@ async function run() {
       mobile: false,
     });
     await mobClient.send("Page.navigate", { url: `${BASE_URL}/` });
-    await sleep(600);
+    await waitForEntranceComplete(mobClient, 8000);
+    await sleep(250);
     await evaluate(mobClient, `document.querySelector('header a[data-concierge-trigger]')?.click()`);
     await sleep(400);
     const noPref = await evaluate(

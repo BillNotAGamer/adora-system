@@ -1,0 +1,233 @@
+/* ==========================================================================
+   ADORA CXP-05A: THE FIRST LETTER — CINEMATIC ENTRANCE
+   Scoped .cxp05-* styles + zero-flash first-paint coordination
+   ========================================================================== */
+
+/* Atmospheric warm-obsidian base beneath highland-world.jpg during slow network decode */
+.cxp03-production .cxp01-world-layer {
+  background: radial-gradient(
+    ellipse at 52% 46%,
+    #3d3426 0%,
+    #1d221c 46%,
+    #0b0e0c 100%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Pre-hydration first-paint guard (runs ONLY when boot script sets "pending")
+   Prevents any flash of the finished homepage or wrong SSR aspect ratio on mobile.
+   Never applies when JavaScript is disabled (no-JS fallback stays 100% visible).
+   -------------------------------------------------------------------------- */
+html[data-cxp05-entrance="pending"],
+html[data-cxp05-entrance="active"],
+html[data-cxp05-entrance="reduced"],
+html[data-cxp05-entrance="pending"] body,
+html[data-cxp05-entrance="active"] body,
+html[data-cxp05-entrance="reduced"] body,
+html[data-cxp05-entrance="pending"] .cxp03-production,
+html[data-cxp05-entrance="active"] .cxp03-production {
+  background: #070a08 !important;
+}
+
+html[data-cxp05-entrance="pending"] .cxp03-production .cxp01-world-layer,
+html[data-cxp05-entrance="pending"] .cxp03-production .cxp01-veil-layer,
+html[data-cxp05-entrance="pending"] .cxp03-production header,
+html[data-cxp05-entrance="pending"] .cxp03-production .cxp01-outer-frame,
+html[data-cxp05-entrance="pending"] .cxp03-production .cxp01-opening-overlay,
+html[data-cxp05-entrance="pending"] .cxp03-production .cxp01-scroll-cue,
+html[data-cxp05-entrance="pending"] .cxp03-production .cxp01-chrome-footer {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Active cinematic choreography: live SVG photographic A shines through while chrome waits */
+html[data-cxp05-entrance="active"] .cxp03-production header,
+html[data-cxp05-entrance="active"] .cxp03-production .cxp01-outer-frame,
+html[data-cxp05-entrance="active"] .cxp03-production .cxp01-chrome-footer {
+  opacity: var(--cxp05-chrome-opacity, 0) !important;
+  pointer-events: none !important;
+}
+
+html[data-cxp05-entrance="active"] .cxp03-production .cxp01-opening-overlay,
+html[data-cxp05-entrance="active"] .cxp03-production .cxp01-scroll-cue {
+  opacity: var(--cxp05-chrome-opacity, 0) !important;
+  pointer-events: none !important;
+}
+
+html[data-cxp05-entrance="active"] .cxp03-production .cxp01-opening-overlay {
+  transform: translate3d(0, var(--cxp05-chrome-offset, 10px), 0) !important;
+}
+
+html[data-cxp05-entrance="pending"] .concierge-floating,
+html[data-cxp05-entrance="active"] .concierge-floating,
+html[data-cxp05-entrance="reduced"] .concierge-floating {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Reduced-motion pre-hydration veil: restrained static obsidian without spatial motion */
+html[data-cxp05-entrance="reduced"] .cxp03-reduced-production,
+html[data-cxp05-entrance="reduced"] .cxp03-production {
+  background: #070a08;
+}
+
+/* --------------------------------------------------------------------------
+   Entrance HUD Shell — transparent over the live photographic A stage
+   -------------------------------------------------------------------------- */
+.cxp05-hud-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: auto;
+  user-select: none;
+  touch-action: none;
+  background: transparent;
+}
+
+.cxp05-hud-shell--reduced {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #070a08;
+  transition: opacity 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cxp05-hud-shell--reduced[data-cxp05-fading="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cxp05-hud-shell--reduced[data-cxp05-instant="true"] {
+  transition: none;
+}
+
+/* Progress interface positioned dynamically beneath the measured feet of the monumental A */
+.cxp05-progress-anchor {
+  position: fixed;
+  left: 50%;
+  top: var(--cxp05-hud-top, 64vh);
+  transform: translate3d(-50%, 0, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: clamp(11rem, 24vw, 14.5rem);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  opacity: 1;
+  transition:
+    opacity 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.cxp05-progress-anchor[data-cxp05-ui-hidden="true"] {
+  opacity: 0;
+  transform: translate3d(-50%, 8px, 0);
+  pointer-events: none;
+}
+
+.cxp05-progress-track {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  background: rgba(244, 239, 230, 0.16);
+  overflow: hidden;
+}
+
+.cxp05-progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(196, 166, 114, 0.45) 0%,
+    rgba(232, 208, 162, 0.96) 100%
+  );
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+
+.cxp05-progress-meta {
+  margin-top: 0.9rem;
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cxp05-progress-label {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.56);
+  white-space: nowrap;
+}
+
+.cxp05-progress-value {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(232, 208, 162, 0.92);
+  white-space: nowrap;
+}
+
+/* Reduced-motion brand lockup (no spatial flight) */
+.cxp05-reduced-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  padding: 1.5rem;
+  width: min(18rem, 84vw);
+}
+
+.cxp05-reduced-wordmark {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.1rem, 5vw, 3rem);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(244, 239, 230, 0.92);
+  line-height: 1;
+}
+
+.cxp05-reduced-progress-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mobile calibration */
+@media (max-width: 767px) {
+  .cxp05-progress-anchor {
+    width: clamp(10.5rem, 54vw, 13.25rem);
+  }
+
+  .cxp05-progress-label {
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+  }
+
+  .cxp05-progress-value {
+    font-size: 0.625rem;
+  }
+}
+
+/* Respect reduced motion globally on entrance transitions */
+@media (prefers-reduced-motion: reduce) {
+  .cxp05-progress-anchor {
+    transition: opacity 160ms linear;
+  }
+}
+
+html[data-motion="off"] .cxp05-progress-anchor,
+html[data-motion="off"] .cxp05-hud-shell--reduced {
+  transition: none !important;
+}

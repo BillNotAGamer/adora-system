@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import "@/app/creative-lab/typography-world/typography-world.css";
 import "@/app/creative-lab/cinematic-journey/cinematic-journey.css";
+import "@/components/entrance/first-letter-entrance.css";
 import { useConcierge } from "@/components/concierge/concierge-provider";
+import { FirstLetterHud } from "@/components/entrance/first-letter-hud";
+import { useFirstLetterEntrance } from "@/components/entrance/use-first-letter-entrance";
 import {
   DiscoveryRibbon,
   ReducedMotionDiscoverySection,
@@ -21,6 +24,8 @@ import {
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import type { HomepageCatalog } from "@/lib/catalog";
+
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const HIGHLAND_PLATE = "/images/cxp01/highland-world.jpg";
 const HUMAN_PLATE = "/images/cxp01/human-moment.jpg";
@@ -104,8 +109,34 @@ export function CinematicJourneyExperience({
   const conciergeOverlayRef = useRef<HTMLElement | null>(null);
   const progressFillRef = useRef<HTMLSpanElement | null>(null);
 
+  // CXP-05A First-Letter Entrance instrumentation refs (production homepage only)
+  const veilSvgRef = useRef<SVGSVGElement | null>(null);
+  const worldImgRef = useRef<HTMLImageElement | null>(null);
+  const entranceFirstAGroupRef = useRef<SVGGElement | null>(null);
+  const heroFirstAAnchorRef = useRef<SVGTextElement | null>(null);
+  const entranceDarknessRef = useRef<SVGRectElement | null>(null);
+  const secondaryDRef = useRef<SVGTextElement | null>(null);
+  const secondaryORef = useRef<SVGTextElement | null>(null);
+  const secondaryRRef = useRef<SVGTextElement | null>(null);
+  const secondaryFinalARef = useRef<SVGTextElement | null>(null);
+
   const [isMobile, setIsMobile] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  const entrance = useFirstLetterEntrance({
+    isProduction,
+    isMobile,
+    reducedMotion,
+    veilSvgRef,
+    worldImgRef,
+    entranceFirstAGroupRef,
+    heroFirstAAnchorRef,
+    entranceDarknessRef,
+    secondaryDRef,
+    secondaryORef,
+    secondaryRRef,
+    secondaryFinalARef,
+  });
   const [movement, setMovement] = useState<JourneyMovementId>("01");
   const [movementCaption, setMovementCaption] = useState(
     "01  /  IDENTITY — TYPOGRAPHY BECOMES LANDSCAPE",
@@ -121,7 +152,7 @@ export function CinematicJourneyExperience({
     concierge: false,
   });
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 767px)");
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -406,7 +437,20 @@ export function CinematicJourneyExperience({
         data-cxp02-mode="reduced-motion"
       >
         {isProduction ? (
-          <SiteHeader tone="cinematic" />
+          <>
+            <FirstLetterHud
+              active={entrance.entranceActive}
+              isReducedMode={entrance.isReducedMode}
+              isMotionOff={entrance.isMotionOff}
+              phase={entrance.phase}
+              displayPercent={entrance.displayPercent}
+              hudTopPx={entrance.hudTopPx}
+              statusMessage={entrance.statusMessage}
+            />
+            <div inert={entrance.entranceActive ? true : undefined}>
+              <SiteHeader tone="cinematic" />
+            </div>
+          </>
         ) : (
           <header className="cxp01-reduced-header">
             <Link href="/" className="cxp01-brand-link">
@@ -573,10 +617,26 @@ export function CinematicJourneyExperience({
           <noscript>
             <style>{NO_JS_FALLBACK_CSS}</style>
           </noscript>
-          <SiteHeader tone="cinematic" />
+          <FirstLetterHud
+            active={entrance.entranceActive}
+            isReducedMode={entrance.isReducedMode}
+            isMotionOff={entrance.isMotionOff}
+            phase={entrance.phase}
+            displayPercent={entrance.displayPercent}
+            hudTopPx={entrance.hudTopPx}
+            statusMessage={entrance.statusMessage}
+          />
+          <div inert={entrance.entranceActive ? true : undefined}>
+            <SiteHeader tone="cinematic" />
+          </div>
         </>
       ) : null}
-      <div ref={runwayRef} className="cxp02-runway" data-cxp02-runway>
+      <div
+        ref={runwayRef}
+        className="cxp02-runway"
+        data-cxp02-runway
+        inert={isProduction && entrance.entranceActive ? true : undefined}
+      >
         <div className="cxp02-stage" data-cxp02-stage>
           {!isProduction ? (
             <header className="cxp01-chrome-header">
@@ -603,6 +663,7 @@ export function CinematicJourneyExperience({
           {/* Layer 0: Continuous highland world (Identity -> Passage -> World) */}
           <div ref={worldLayerRef} className="cxp01-world-layer" aria-hidden="true">
             <img
+              ref={worldImgRef}
               src={HIGHLAND_PLATE}
               alt=""
               fetchPriority="high"
@@ -653,6 +714,7 @@ export function CinematicJourneyExperience({
           {/* Layer 2: Precision vector inverted typographic mask veil */}
           <div ref={veilLayerRef} className="cxp01-veil-layer" aria-hidden="true">
             <svg
+              ref={veilSvgRef}
               className="cxp01-veil-svg"
               viewBox={isMobile ? "0 0 900 1600" : "0 0 1600 900"}
               preserveAspectRatio="xMidYMid slice"
@@ -686,17 +748,19 @@ export function CinematicJourneyExperience({
                   <g ref={maskGroupRef}>
                     {isMobile ? (
                       <>
-                        <text
-                          x={MOBILE_A_X}
-                          y={MOBILE_A_Y + 215}
-                          textAnchor="middle"
-                          fill="black"
-                          fontFamily="var(--font-display), Georgia, serif"
-                          fontSize="680"
-                          fontWeight="500"
-                        >
-                          A
-                        </text>
+                        <g ref={entranceFirstAGroupRef} data-cxp05-first-a>
+                          <text
+                            x={MOBILE_A_X}
+                            y={MOBILE_A_Y + 215}
+                            textAnchor="middle"
+                            fill="black"
+                            fontFamily="var(--font-display), Georgia, serif"
+                            fontSize="680"
+                            fontWeight="500"
+                          >
+                            A
+                          </text>
+                        </g>
                         <polygon
                           ref={portalCounterRef}
                           points="438,494 256,955 604,955"
@@ -706,17 +770,19 @@ export function CinematicJourneyExperience({
                       </>
                     ) : (
                       <>
-                        <text
-                          x={DESKTOP_A_X}
-                          y="500"
-                          textAnchor="middle"
-                          fill="black"
-                          fontFamily="var(--font-display), Georgia, serif"
-                          fontSize="315"
-                          fontWeight="500"
-                        >
-                          A
-                        </text>
+                        <g ref={entranceFirstAGroupRef} data-cxp05-first-a>
+                          <text
+                            x={DESKTOP_A_X}
+                            y="500"
+                            textAnchor="middle"
+                            fill="black"
+                            fontFamily="var(--font-display), Georgia, serif"
+                            fontSize="315"
+                            fontWeight="500"
+                          >
+                            A
+                          </text>
+                        </g>
                         <polygon
                           ref={portalCounterRef}
                           points="350,288 262,500 426,500"
@@ -725,6 +791,7 @@ export function CinematicJourneyExperience({
                         />
                         <g ref={secondaryLettersRef} fill="black" fillOpacity="1">
                           <text
+                            ref={secondaryDRef}
                             x="578"
                             y="500"
                             textAnchor="middle"
@@ -735,6 +802,7 @@ export function CinematicJourneyExperience({
                             D
                           </text>
                           <text
+                            ref={secondaryORef}
                             x="814"
                             y="500"
                             textAnchor="middle"
@@ -745,6 +813,7 @@ export function CinematicJourneyExperience({
                             O
                           </text>
                           <text
+                            ref={secondaryRRef}
                             x="1044"
                             y="500"
                             textAnchor="middle"
@@ -755,6 +824,7 @@ export function CinematicJourneyExperience({
                             R
                           </text>
                           <text
+                            ref={secondaryFinalARef}
                             x="1256"
                             y="500"
                             textAnchor="middle"
@@ -789,7 +859,36 @@ export function CinematicJourneyExperience({
                   height={isMobile ? 1600 : 900}
                   fill="url(#cxp02-veil-vignette)"
                 />
+                {isProduction ? (
+                  <rect
+                    ref={entranceDarknessRef}
+                    x="0"
+                    y="0"
+                    width={isMobile ? 900 : 1600}
+                    height={isMobile ? 1600 : 900}
+                    fill="#070a08"
+                    fillOpacity="0"
+                  />
+                ) : null}
               </g>
+
+              {isProduction ? (
+                /* Zero-pixel live DOM geometry anchor for exact target A measurement */
+                <text
+                  ref={heroFirstAAnchorRef}
+                  data-cxp05-target-anchor
+                  x={isMobile ? MOBILE_A_X : DESKTOP_A_X}
+                  y={isMobile ? MOBILE_A_Y + 215 : 500}
+                  textAnchor="middle"
+                  fill="none"
+                  pointerEvents="none"
+                  fontFamily="var(--font-display), Georgia, serif"
+                  fontSize={isMobile ? "680" : "315"}
+                  fontWeight="500"
+                >
+                  A
+                </text>
+              ) : null}
             </svg>
           </div>
 
