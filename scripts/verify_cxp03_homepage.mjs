@@ -427,9 +427,9 @@ async function run() {
         if (!trigger) return { found: false };
         trigger.click();
         return new Promise((resolve) => setTimeout(() => {
-          const dlg = document.querySelector('dialog.concierge-dialog');
+          const dlg = document.querySelector('dialog.cxp04-dialog-host');
           const open = Boolean(dlg && dlg.open);
-          const heading = dlg?.querySelector('#concierge-title')?.textContent?.trim() || null;
+          const heading = dlg?.querySelector('h2')?.textContent?.trim() || null;
           resolve({ found: true, isOpen: open, headingText: heading });
         }, 500));
       })()`,

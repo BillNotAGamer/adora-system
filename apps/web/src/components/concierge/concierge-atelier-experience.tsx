@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useReducer, useRef, type Dispatch, type RefObject } from "react";
 
-import "@/app/creative-lab/concierge-experience/concierge-atelier.css";
-import { AtelierJourneyCanvas } from "@/components/creative-lab/concierge-atelier/atelier-journey-canvas";
+import "@/components/concierge/concierge-atelier.css";
+import { AtelierJourneyCanvas } from "@/components/concierge/atelier-journey-canvas";
 import {
   ATELIER_QUESTIONS,
   atelierReducer,
@@ -26,7 +26,7 @@ const PHASE_LABELS: Record<string, string> = {
 };
 
 export interface ConciergeAtelierExperienceProps {
-  variant?: "lab" | "overlay" | "route";
+  variant?: "overlay" | "route";
   externalState?: AtelierState;
   externalDispatch?: Dispatch<AtelierAction>;
   onClose?: () => void;
@@ -36,7 +36,7 @@ export interface ConciergeAtelierExperienceProps {
 }
 
 export function ConciergeAtelierExperience({
-  variant = "lab",
+  variant = "route",
   externalState,
   externalDispatch,
   onClose,
@@ -50,8 +50,6 @@ export function ConciergeAtelierExperience({
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
 
   const isOverlay = variant === "overlay";
-  const isRoute = variant === "route";
-  const isLab = variant === "lab";
 
   const facts = useMemo(() => deriveInterpretation(state), [state]);
   const journey = useMemo(() => buildAtelierJourney(state), [state]);
@@ -221,16 +219,7 @@ export function ConciergeAtelierExperience({
             </div>
 
             <p className="cxp04-disclosure-inline">
-              <strong>Lưu ý minh bạch:</strong> Bản xem trước tương tác sử dụng kịch bản dựng sẵn cho Đà Lạt — chưa kết nối AI trực tiếp, không phải báo giá hay đặt chỗ thực tế.
-              {isLab && !isRoute ? (
-                <>
-                  {" "}
-                  <Link href="/ai-planner" style={{ color: "#e4c68c", textDecoration: "underline" }}>
-                    Mở trang AI Planner
-                  </Link>
-                  .
-                </>
-              ) : null}
+              <strong>Lưu ý minh bạch:</strong> Trải nghiệm hiện sử dụng kịch bản dựng sẵn cho Đà Lạt — chưa kết nối AI trực tiếp, không phải báo giá hay đặt chỗ thực tế.
             </p>
           </div>
         </section>
@@ -439,7 +428,7 @@ export function ConciergeAtelierExperience({
                 }}
               >
                 <label htmlFor="cxp04-composer-input" className="cxp04-composer-label">
-                  Ghi chú hoặc yêu cầu tinh chỉnh tự do · Bản mẫu kịch bản
+                  Ghi chú hoặc yêu cầu tinh chỉnh tự do · Kịch bản minh hoạ
                 </label>
                 <div className="cxp04-composer-row">
                   <textarea
@@ -462,7 +451,7 @@ export function ConciergeAtelierExperience({
                   </button>
                 </div>
                 <p className="cxp04-composer-note">
-                  Enter để gửi · Shift+Enter xuống dòng. Bản mẫu chưa kết nối AI trực tiếp — yêu cầu ngoài kịch bản sẽ được giữ nguyên làm ghi chú.
+                  Enter để gửi · Shift+Enter xuống dòng. Chưa kết nối AI trực tiếp — yêu cầu ngoài kịch bản sẽ được giữ nguyên làm ghi chú.
                 </p>
               </form>
             </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useConcierge } from "@/components/concierge/concierge-provider";
-import { ConciergeAtelierExperience } from "@/components/creative-lab/concierge-atelier/concierge-atelier-experience";
+import { ConciergeAtelierExperience } from "@/components/concierge/concierge-atelier-experience";
 
 /**
  * Integrated /ai-planner route view when Atelier preview mode is explicitly enabled.

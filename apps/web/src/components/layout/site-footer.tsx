@@ -28,7 +28,7 @@ export function SiteFooter({ showCta = true, tone = "light" }: Readonly<SiteFoot
               </h2>
             </div>
             <ConciergeTrigger href="/ai-planner" className="editorial-link lg:ml-auto">
-              Plan with Adora AI
+              Travel Atelier
               <ArrowUpRight className="size-4" aria-hidden="true" />
             </ConciergeTrigger>
           </Reveal>

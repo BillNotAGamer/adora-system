@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef } from "react";
 
 import { useConcierge } from "@/components/concierge/concierge-provider";
-import { ConciergeAtelierExperience } from "@/components/creative-lab/concierge-atelier/concierge-atelier-experience";
+import { ConciergeAtelierExperience } from "@/components/concierge/concierge-atelier-experience";
 
 /**
  * Full-viewport modal <dialog> host for the integrated Personal Journey Atelier.
