@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 
 const chromePath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 const siteUrl = process.env.ADORA_WEB_URL ?? "http://127.0.0.1:3100";
-const outputDirectory = resolve(process.env.ADORA_VERIFY_OUTPUT ?? "../adora-ux1-scratch/concierge");
+const outputDirectory = resolve(process.env.ADORA_VERIFY_OUTPUT ?? join(tmpdir(), "adora-concierge-verify"));
 const debugPort = 9235;
 const configuredViewports = [
   { name: "360", width: 360, height: 800, heroOnly: true },

@@ -1,0 +1,1214 @@
+/* ADORA CXP-04A: The Personal Journey Atelier (scoped .cxp04-* classes) */
+
+.cxp04-root {
+  min-height: 100svh;
+  background: #0b0e0c;
+  color: #f4efe6;
+  display: flex;
+  flex-direction: column;
+}
+
+.cxp04-root button:focus-visible,
+.cxp04-root a:focus-visible,
+.cxp04-root textarea:focus-visible,
+.cxp04-root [tabindex="0"]:focus-visible {
+  outline: 2px solid #c8ab77;
+  outline-offset: 2px;
+}
+
+.cxp04-invitation-title[tabindex="-1"]:focus:not(:focus-visible),
+.cxp04-stage-strip [tabindex="-1"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.cxp04-invitation-title[tabindex="-1"]:focus-visible,
+.cxp04-stage-strip [tabindex="-1"]:focus-visible {
+  outline: 2px solid #c8ab77;
+  outline-offset: 4px;
+}
+
+dialog.cxp04-dialog-host {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: #0b0e0c;
+  color: #f4efe6;
+  overflow: hidden;
+}
+
+dialog.cxp04-dialog-host::backdrop {
+  background: rgba(6, 9, 8, 0.88);
+}
+
+.cxp04-root--overlay {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.cxp04-root--overlay .cxp04-topbar,
+.cxp04-root--overlay .cxp04-mobile-switcher,
+.cxp04-root--overlay .cxp04-stage-strip,
+.cxp04-root--overlay .cxp04-composer {
+  flex-shrink: 0;
+}
+
+.cxp04-root--overlay .cxp04-invitation {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cxp04-root--overlay .cxp04-workspace {
+  flex: 1;
+  min-height: 0;
+}
+
+.cxp04-root--overlay .cxp04-dialogue-col,
+.cxp04-root--overlay .cxp04-canvas-col {
+  min-height: 0;
+  height: 100%;
+  overscroll-behavior: contain;
+}
+
+.cxp04-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(200, 171, 119, 0.55);
+  background: rgba(200, 171, 119, 0.08);
+  color: #f4efe6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cxp04-close-btn:hover {
+  background: #f4efe6;
+  color: #141816;
+}
+
+/* Top Atelier Chrome Bar */
+.cxp04-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem clamp(1.25rem, 3.5vw, 3rem);
+  background: rgba(11, 14, 12, 0.92);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+  backdrop-filter: blur(8px);
+}
+
+.cxp04-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.cxp04-brand {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  color: #f4efe6;
+  text-decoration: none;
+}
+
+.cxp04-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba(200, 171, 119, 0.45);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e4c68c;
+  white-space: nowrap;
+}
+
+.cxp04-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cxp04-top-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.78);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.cxp04-top-link:hover {
+  color: #f4efe6;
+}
+
+/* ==========================================================================
+   STATE I — THE INVITATION (Atmospheric Editorial Threshold)
+   ========================================================================== */
+.cxp04-invitation {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: clamp(2.5rem, 6vh, 4.5rem) clamp(1.25rem, 4vw, 3.5rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.cxp04-invitation-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.cxp04-invitation-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 45%;
+  opacity: 0.34;
+}
+
+.cxp04-invitation-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(200, 171, 119, 0.12) 0%, rgba(11, 14, 12, 0.86) 62%, #090c0a 100%);
+}
+
+.cxp04-invitation-card {
+  width: min(100%, 54rem);
+  padding: clamp(2rem, 4.5vw, 3.75rem);
+  border: 1px solid rgba(244, 239, 230, 0.18);
+  background: rgba(13, 18, 15, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.cxp04-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #c8ab77;
+}
+
+.cxp04-eyebrow::before {
+  content: "";
+  width: 2rem;
+  height: 1px;
+  background: #c8ab77;
+}
+
+.cxp04-invitation-title {
+  margin: 1rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.2rem, 4.6vw, 3.85rem);
+  font-weight: 400;
+  line-height: 1.08;
+  color: #f8f4ec;
+}
+
+.cxp04-invitation-lead {
+  margin: 1.25rem 0 0;
+  max-width: 39rem;
+  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  line-height: 1.72;
+  color: rgba(244, 239, 230, 0.82);
+}
+
+.cxp04-invitation-pillars {
+  margin: 1.75rem 0 0;
+  padding: 1.25rem 0;
+  border-top: 1px solid rgba(244, 239, 230, 0.14);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.cxp04-pillar-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e4c68c;
+}
+
+.cxp04-pillar-text {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: rgba(244, 239, 230, 0.72);
+}
+
+.cxp04-preset-wrap {
+  margin-top: 1.5rem;
+}
+
+.cxp04-preset-heading {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.68);
+  font-weight: 600;
+}
+
+.cxp04-preset-row {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.cxp04-preset-chip {
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid rgba(244, 239, 230, 0.28);
+  background: rgba(244, 239, 230, 0.05);
+  color: #f4efe6;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.cxp04-preset-chip:hover {
+  border-color: #c8ab77;
+  background: rgba(200, 171, 119, 0.16);
+}
+
+.cxp04-invitation-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cxp04-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.65rem;
+  border: 1px solid #f4efe6;
+  background: #f4efe6;
+  color: #141816;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.cxp04-primary-btn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.cxp04-dark-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.85rem;
+  padding: 0.65rem 1.35rem;
+  border: 1px solid #171a19;
+  background: #171a19;
+  color: #faf8f3;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 180ms ease;
+}
+
+.cxp04-dark-btn:hover {
+  background: #36453f;
+}
+
+.cxp04-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cec8bc;
+  background: transparent;
+  color: #3a4641;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.cxp04-ghost-btn:hover {
+  border-color: #171a19;
+  color: #171a19;
+}
+
+.cxp04-disclosure-inline {
+  margin: 1.5rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: rgba(244, 239, 230, 0.62);
+}
+
+/* ==========================================================================
+   STATES II–V — LIVING ATELIER SPLIT WORKSPACE
+   ========================================================================== */
+.cxp04-mobile-switcher {
+  display: none;
+}
+
+.cxp04-workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  min-height: calc(100svh - 3.9rem);
+}
+
+/* Left Column: Warm Paper Conversational Studio */
+.cxp04-dialogue-col {
+  display: flex;
+  flex-direction: column;
+  background: #faf8f3;
+  color: #171a19;
+  border-right: 1px solid #d9d2c5;
+  min-width: 0;
+}
+
+.cxp04-stage-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem clamp(1.25rem, 3vw, 2.5rem);
+  background: #f3efe7;
+  border-bottom: 1px solid #ded7ca;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #46524d;
+}
+
+.cxp04-stage-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cxp04-stage-dot {
+  width: 1.65rem;
+  height: 3px;
+  background: #d5cec1;
+}
+
+.cxp04-stage-dot[data-active="true"] {
+  background: #b39a70;
+}
+
+.cxp04-stage-dot[data-done="true"] {
+  background: #171a19;
+}
+
+.cxp04-dialogue-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cxp04-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.cxp04-msg {
+  padding: 1rem 1.2rem;
+  border-left: 2px solid #cec8bc;
+  background: #f3efe7;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #171a19;
+  overflow-wrap: anywhere;
+}
+
+.cxp04-msg[data-role="user"] {
+  margin-left: clamp(1rem, 3vw, 2.5rem);
+  background: #ffffff;
+  border-left-color: #b39a70;
+}
+
+.cxp04-msg[data-provenance="unsupported-notice"] {
+  background: #f7f2e7;
+  border-left-color: #9e7e46;
+}
+
+.cxp04-msg-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #586c65;
+}
+
+.cxp04-msg p:last-child {
+  margin: 0;
+}
+
+/* Active Discovery Question Card */
+.cxp04-question-card {
+  padding: clamp(1.25rem, 2.5vw, 1.85rem);
+  border: 1px solid #d4cdc0;
+  background: #ffffff;
+}
+
+.cxp04-question-title {
+  margin: 0.65rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+  font-weight: 400;
+  line-height: 1.22;
+  color: #171a19;
+}
+
+.cxp04-question-hint {
+  margin: 0.55rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #46524d;
+}
+
+.cxp04-choice-grid {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.cxp04-choice-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-height: 3.25rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid #cfc8ba;
+  background: #faf8f3;
+  color: #171a19;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.cxp04-choice-btn:hover {
+  border-color: #171a19;
+}
+
+.cxp04-choice-btn[aria-pressed="true"] {
+  border-color: #171a19;
+  background: #171a19;
+  color: #faf8f3;
+}
+
+.cxp04-choice-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.cxp04-choice-detail {
+  font-size: 0.74rem;
+  color: #586c65;
+}
+
+.cxp04-choice-btn[aria-pressed="true"] .cxp04-choice-detail {
+  color: rgba(250, 248, 243, 0.74);
+}
+
+.cxp04-question-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.cxp04-error {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8f2d2d;
+}
+
+/* Refinement Quick Controls */
+.cxp04-refinement-box {
+  padding: 1.25rem 1.4rem;
+  border: 1px solid #d4cdc0;
+  background: #ffffff;
+}
+
+.cxp04-refinement-chips {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.cxp04-refine-chip {
+  min-height: 2.75rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #c6beb0;
+  background: #faf8f3;
+  color: #171a19;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.cxp04-refine-chip:hover {
+  border-color: #171a19;
+}
+
+.cxp04-refine-chip[aria-pressed="true"] {
+  background: #171a19;
+  border-color: #171a19;
+  color: #faf8f3;
+}
+
+/* Sticky Composer */
+.cxp04-composer {
+  padding: 1rem clamp(1.25rem, 3vw, 2.5rem) max(1rem, env(safe-area-inset-bottom));
+  border-top: 1px solid #d9d2c5;
+  background: #f3efe7;
+}
+
+.cxp04-composer-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #46524d;
+}
+
+.cxp04-composer-row {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.65rem;
+  align-items: stretch;
+}
+
+.cxp04-composer textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.85rem;
+  max-height: 6.5rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #c9c1b2;
+  background: #ffffff;
+  color: #171a19;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.cxp04-composer-note {
+  margin: 0.45rem 0 0;
+  font-size: 0.7rem;
+  color: #586c65;
+}
+
+/* ==========================================================================
+   RIGHT COLUMN — LIVING JOURNEY CANVAS (Deep Pine Editorial Monograph)
+   ========================================================================== */
+.cxp04-canvas-col {
+  background: #0f1512;
+  color: #f4efe6;
+  overflow-y: auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.cxp04-canvas-hero {
+  position: relative;
+  min-height: 14rem;
+  overflow: hidden;
+  border: 1px solid rgba(244, 239, 230, 0.16);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+}
+
+.cxp04-canvas-hero img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.52;
+}
+
+.cxp04-canvas-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 14, 12, 0.25) 0%, rgba(11, 14, 12, 0.88) 100%);
+}
+
+.cxp04-canvas-hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.cxp04-canvas-title {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.65rem, 2.6vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.12;
+  color: #f8f4ec;
+}
+
+.cxp04-canvas-sub {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgba(244, 239, 230, 0.78);
+}
+
+/* Trust Ledger (State III Interpretation + Live Discovery Facts) */
+.cxp04-ledger {
+  border: 1px solid rgba(244, 239, 230, 0.15);
+  background: rgba(18, 25, 21, 0.75);
+  padding: 1.25rem 1.4rem;
+}
+
+.cxp04-ledger-list {
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cxp04-ledger-row {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.cxp04-ledger-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cxp04-ledger-key {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.6);
+}
+
+.cxp04-ledger-val {
+  margin: 0.25rem 0 0;
+  font-size: 0.88rem;
+  color: #f8f4ec;
+}
+
+.cxp04-ledger-rationale {
+  margin: 0.2rem 0 0;
+  font-size: 0.74rem;
+  color: rgba(228, 198, 140, 0.85);
+}
+
+.cxp04-ledger-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cxp04-status-pill {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.cxp04-status-pill[data-status="confirmed"] {
+  border-color: rgba(143, 194, 165, 0.45);
+  color: #a9d9be;
+}
+
+.cxp04-status-pill[data-status="inferred"] {
+  border-color: rgba(228, 198, 140, 0.55);
+  color: #e4c68c;
+}
+
+.cxp04-status-pill[data-status="missing"] {
+  border-color: rgba(244, 239, 230, 0.24);
+  color: rgba(244, 239, 230, 0.62);
+}
+
+.cxp04-inline-btn {
+  min-height: 2.25rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid rgba(244, 239, 230, 0.28);
+  background: transparent;
+  color: #f4efe6;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cxp04-inline-btn:hover {
+  border-color: #e4c68c;
+  color: #e4c68c;
+}
+
+/* State IV/V — Day-by-Day Editorial Itinerary */
+.cxp04-day-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cxp04-day-tab {
+  min-height: 2.75rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(244, 239, 230, 0.24);
+  background: rgba(244, 239, 230, 0.04);
+  color: rgba(244, 239, 230, 0.82);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cxp04-day-tab[aria-selected="true"] {
+  background: #f4efe6;
+  border-color: #f4efe6;
+  color: #141816;
+}
+
+.cxp04-day-panel {
+  border: 1px solid rgba(244, 239, 230, 0.16);
+  background: rgba(18, 25, 21, 0.82);
+  overflow: hidden;
+}
+
+.cxp04-day-media {
+  position: relative;
+  height: 10.5rem;
+  overflow: hidden;
+}
+
+.cxp04-day-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cxp04-day-body {
+  padding: 1.25rem 1.4rem;
+}
+
+.cxp04-day-title {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #f8f4ec;
+}
+
+.cxp04-activity-list {
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.cxp04-activity-item {
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(244, 239, 230, 0.12);
+}
+
+.cxp04-activity-meta {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c8ab77;
+}
+
+.cxp04-activity-title {
+  margin: 0.2rem 0 0;
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: #f8f4ec;
+}
+
+.cxp04-activity-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(244, 239, 230, 0.74);
+}
+
+/* Cost Transparency Panel */
+.cxp04-cost-card {
+  border: 1px solid rgba(200, 171, 119, 0.42);
+  background: rgba(14, 19, 16, 0.92);
+  padding: 1.35rem 1.45rem;
+}
+
+.cxp04-cost-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.cxp04-cost-total {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.6rem, 2.5vw, 2.15rem);
+  color: #f8f4ec;
+  line-height: 1;
+}
+
+.cxp04-cost-per-person {
+  font-size: 0.78rem;
+  color: #e4c68c;
+  margin-top: 0.25rem;
+}
+
+.cxp04-cost-bar {
+  margin-top: 1rem;
+  display: flex;
+  height: 0.5rem;
+  gap: 2px;
+  overflow: hidden;
+  background: rgba(244, 239, 230, 0.08);
+}
+
+.cxp04-cost-seg[data-cat="accommodation"] { background: #c8ab77; }
+.cxp04-cost-seg[data-cat="transport"] { background: #7f9b8e; }
+.cxp04-cost-seg[data-cat="activities"] { background: #a8b7ab; }
+.cxp04-cost-seg[data-cat="food"] { background: #d7c3a1; }
+.cxp04-cost-seg[data-cat="buffer"] { background: #5a6a62; }
+
+.cxp04-cost-rows {
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.cxp04-cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.1);
+}
+
+.cxp04-cost-row-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f4efe6;
+}
+
+.cxp04-cost-row-assumption {
+  font-size: 0.72rem;
+  color: rgba(244, 239, 230, 0.64);
+}
+
+.cxp04-cost-row-amt {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #e4c68c;
+  white-space: nowrap;
+}
+
+.cxp04-cost-disclaimer {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(200, 171, 119, 0.28);
+  font-size: 0.74rem;
+  line-height: 1.55;
+  color: rgba(244, 239, 230, 0.72);
+}
+
+.cxp04-cost-disclaimer ul {
+  margin: 0.45rem 0 0;
+  padding-left: 1.1rem;
+}
+
+/* Revision Explanation Card */
+.cxp04-revision-card {
+  border: 1px solid rgba(169, 217, 190, 0.32);
+  background: rgba(18, 28, 23, 0.85);
+  padding: 1rem 1.2rem;
+}
+
+.cxp04-revision-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #f8f4ec;
+}
+
+.cxp04-revision-text {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: rgba(244, 239, 230, 0.82);
+}
+
+.cxp04-revision-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.74rem;
+  color: #e4c68c;
+}
+
+/* ==========================================================================
+   RESPONSIVE MOBILE COMPOSITION (<= 1023px)
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .cxp04-invitation-pillars {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .cxp04-mobile-switcher {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid rgba(244, 239, 230, 0.18);
+    background: #0f1512;
+  }
+
+  .cxp04-mobile-tab {
+    min-height: 3rem;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: rgba(244, 239, 230, 0.72);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .cxp04-mobile-tab[aria-selected="true"] {
+    color: #f4efe6;
+    border-bottom-color: #c8ab77;
+    background: rgba(200, 171, 119, 0.08);
+  }
+
+  .cxp04-workspace {
+    grid-template-columns: 1fr;
+    min-height: calc(100svh - 6.9rem);
+  }
+
+  .cxp04-root--overlay .cxp04-workspace {
+    min-height: 0;
+  }
+
+  .cxp04-workspace[data-mobile-view="conversation"] .cxp04-canvas-col {
+    display: none;
+  }
+
+  .cxp04-workspace[data-mobile-view="canvas"] .cxp04-dialogue-col {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .cxp04-hide-sm {
+    display: none;
+  }
+
+  .cxp04-topbar {
+    padding: 0.65rem 1rem;
+  }
+
+  .cxp04-badge {
+    display: none;
+  }
+
+  .cxp04-topbar-actions {
+    gap: 0.65rem;
+  }
+
+  .cxp04-top-link {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .cxp04-invitation {
+    place-items: start center;
+    padding: 0.85rem 0.9rem 1.25rem;
+  }
+
+  .cxp04-invitation-card {
+    padding: 1.25rem 1.15rem;
+  }
+
+  .cxp04-invitation-title {
+    margin-top: 0.65rem;
+    font-size: clamp(1.6rem, 6.4vw, 2.05rem);
+    line-height: 1.12;
+  }
+
+  .cxp04-invitation-lead {
+    margin-top: 0.75rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .cxp04-invitation-actions {
+    margin-top: 1.05rem;
+  }
+
+  .cxp04-primary-btn {
+    width: 100%;
+  }
+
+  .cxp04-preset-wrap {
+    margin-top: 1rem;
+  }
+
+  .cxp04-preset-row {
+    margin-top: 0.5rem;
+    gap: 0.45rem;
+  }
+
+  .cxp04-preset-chip {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .cxp04-invitation-pillars {
+    margin-top: 1rem;
+    padding: 0.75rem 0;
+    gap: 0.45rem;
+  }
+
+  .cxp04-pillar-text {
+    display: none;
+  }
+
+  .cxp04-disclosure-inline {
+    margin-top: 0.85rem;
+    font-size: 0.72rem;
+  }
+
+  .cxp04-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Short-viewport / emulated soft-keyboard resilience */
+@media (max-height: 560px) {
+  .cxp04-root--overlay .cxp04-topbar {
+    padding-block: 0.45rem;
+  }
+
+  .cxp04-root--overlay .cxp04-stage-strip {
+    padding-block: 0.45rem;
+  }
+
+  .cxp04-root--overlay .cxp04-composer {
+    padding-block: 0.5rem;
+  }
+
+  .cxp04-root--overlay .cxp04-composer-note {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cxp04-root *,
+  .cxp04-root *::before,
+  .cxp04-root *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="off"] .cxp04-root *,
+html[data-motion="off"] .cxp04-root *::before,
+html[data-motion="off"] .cxp04-root *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+@media print {
+  dialog.cxp04-dialog-host {
+    display: none !important;
+  }
+  html:has(dialog.cxp04-dialog-host[open]) {
+    overflow: visible !important;
+  }
+}

@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 
+import { AtelierRouteWorkspace } from "@/components/planner/atelier-route-workspace";
 import { PlannerWorkspace, type TripPreview } from "@/components/planner/planner-workspace";
+import { IS_ATELIER_MODE } from "@/lib/concierge-atelier/mode";
 import { PLANNER_SCENARIOS, TRIPS, getDestinationBySlug } from "@/lib/demo";
 
 export const metadata: Metadata = {
-  title: "AI Planner (demo)",
-  description:
-    "Bản demo AI Planner của ADORA với kịch bản lập kế hoạch dựng sẵn cho Đà Lạt. Chưa kết nối mô hình AI; không có phản hồi nào được tạo động.",
+  title: IS_ATELIER_MODE ? "Personal Journey Atelier" : "AI Planner (demo)",
+  description: IS_ATELIER_MODE
+    ? "Không gian thiết kế hành trình cá nhân hoá của ADORA với kịch bản minh hoạ cho Đà Lạt và ước tính chi phí VND minh bạch."
+    : "Bản demo AI Planner của ADORA với kịch bản lập kế hoạch dựng sẵn cho Đà Lạt. Chưa kết nối mô hình AI; không có phản hồi nào được tạo động.",
 };
 
 function buildPreviews(): Record<string, TripPreview> {
@@ -26,6 +29,10 @@ function buildPreviews(): Record<string, TripPreview> {
 }
 
 export default function AiPlannerPage() {
+  if (IS_ATELIER_MODE) {
+    return <AtelierRouteWorkspace />;
+  }
+
   return (
     <main id="main-content">
       <PlannerWorkspace scenarios={[...PLANNER_SCENARIOS]} previews={buildPreviews()} />
