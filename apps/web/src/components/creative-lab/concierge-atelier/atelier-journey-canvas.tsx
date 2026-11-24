@@ -176,21 +176,50 @@ export function AtelierJourneyCanvas({
 
           <section aria-label="Lịch trình minh hoạ từng ngày">
             <div className="cxp04-day-tabs" role="tablist" aria-label="Chọn ngày trong hành trình">
-              {journey.days.map((d) => (
-                <button
-                  key={d.day}
-                  type="button"
-                  role="tab"
-                  aria-selected={d.day === currentDay.day}
-                  className="cxp04-day-tab"
-                  onClick={() => onSelectDay(d.day)}
-                >
-                  Ngày 0{d.day}
-                </button>
-              ))}
+              {journey.days.map((d, idx) => {
+                const selected = d.day === currentDay.day;
+                return (
+                  <button
+                    key={d.day}
+                    id={`cxp04-day-tab-${d.day}`}
+                    type="button"
+                    role="tab"
+                    tabIndex={selected ? 0 : -1}
+                    aria-selected={selected}
+                    aria-controls={`cxp04-day-panel-${d.day}`}
+                    className="cxp04-day-tab"
+                    onClick={() => onSelectDay(d.day)}
+                    onKeyDown={(event) => {
+                      const days = journey.days;
+                      let targetIdx = -1;
+                      if (event.key === "ArrowRight") targetIdx = (idx + 1) % days.length;
+                      else if (event.key === "ArrowLeft")
+                        targetIdx = (idx - 1 + days.length) % days.length;
+                      else if (event.key === "Home") targetIdx = 0;
+                      else if (event.key === "End") targetIdx = days.length - 1;
+                      if (targetIdx < 0) return;
+                      const nextDay = days[targetIdx];
+                      if (!nextDay) return;
+                      event.preventDefault();
+                      onSelectDay(nextDay.day);
+                      document.getElementById(`cxp04-day-tab-${nextDay.day}`)?.focus();
+                    }}
+                  >
+                    Ngày 0{d.day}
+                    {selected ? <span className="sr-only"> (Đang xem)</span> : null}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="cxp04-day-panel" role="tabpanel" style={{ marginTop: "0.85rem" }}>
+            <div
+              id={`cxp04-day-panel-${currentDay.day}`}
+              className="cxp04-day-panel"
+              role="tabpanel"
+              aria-labelledby={`cxp04-day-tab-${currentDay.day}`}
+              tabIndex={0}
+              style={{ marginTop: "0.85rem" }}
+            >
               <div className="cxp04-day-media">
                 <Image
                   src={currentDay.moodImageSrc}

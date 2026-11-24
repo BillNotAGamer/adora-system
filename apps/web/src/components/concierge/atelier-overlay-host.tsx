@@ -15,17 +15,21 @@ export default function AtelierOverlayHost() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
+  const descId = useId();
 
   useEffect(() => {
     const element = dialogRef.current;
     if (!element) return;
     const root = document.documentElement;
     const previousOverflow = root.style.overflow;
+    const previousOverscroll = root.style.overscrollBehavior;
     root.style.overflow = "hidden";
+    root.style.overscrollBehavior = "contain";
     if (!element.open && typeof element.showModal === "function") {
       element.showModal();
     }
-    headingRef.current?.focus({ preventScroll: true });
+    const focusTarget = headingRef.current ?? element;
+    focusTarget.focus({ preventScroll: true });
     const frame = requestAnimationFrame(() => {
       performance.mark("adora-concierge-painted");
     });
@@ -33,6 +37,7 @@ export default function AtelierOverlayHost() {
       cancelAnimationFrame(frame);
       if (element.open) element.close();
       root.style.overflow = previousOverflow;
+      root.style.overscrollBehavior = previousOverscroll;
     };
   }, []);
 
@@ -43,6 +48,7 @@ export default function AtelierOverlayHost() {
       ref={dialogRef}
       className="cxp04-dialog-host"
       aria-labelledby={titleId}
+      aria-describedby={descId}
       aria-modal="true"
       onCancel={(event) => {
         event.preventDefault();
@@ -60,7 +66,9 @@ export default function AtelierOverlayHost() {
         if (!first || !last) return;
         if (
           event.shiftKey &&
-          (document.activeElement === first || document.activeElement === headingRef.current)
+          (document.activeElement === first ||
+            document.activeElement === headingRef.current ||
+            document.activeElement === event.currentTarget)
         ) {
           event.preventDefault();
           last.focus();
@@ -70,6 +78,9 @@ export default function AtelierOverlayHost() {
         }
       }}
     >
+      <p id={descId} className="sr-only">
+        Không gian phác thảo hành trình cá nhân hoá ADORA theo kịch bản minh hoạ Đà Lạt. Nhấn Escape hoặc nút Đóng để trở về đúng vị trí trước đó.
+      </p>
       <ConciergeAtelierExperience
         variant="overlay"
         externalState={atelierState}

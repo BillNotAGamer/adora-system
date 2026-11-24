@@ -213,6 +213,13 @@ function Ux1OnlyProvider({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
+function withoutOverlayHistoryFlag(rawState: unknown): Record<string, unknown> {
+  if (!rawState || typeof rawState !== "object") return {};
+  const copy = { ...(rawState as Record<string, unknown>) };
+  delete copy.adoraConciergeOverlay;
+  return copy;
+}
+
 function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [ux1State, ux1Dispatch] = useReducer(reducer, initialState);
   const [atelierState, atelierDispatch] = useReducer(atelierReducer, initialAtelierState);
@@ -233,6 +240,26 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
   const isOpenRef = useRef(isOpen);
   const handledPopFromCloseRef = useRef(false);
   const closingForNavigationRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    // Strip any stale overlay marker left behind from a previous session before reload
+    if (
+      typeof window !== "undefined" &&
+      (window.history.state as { adoraConciergeOverlay?: boolean } | null)?.adoraConciergeOverlay ===
+        true
+    ) {
+      window.history.replaceState(
+        withoutOverlayHistoryFlag(window.history.state),
+        "",
+        window.location.href,
+      );
+    }
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     isOpenRef.current = isOpen;
@@ -242,22 +269,40 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
     if (!AtelierHost) {
       setLoadError(false);
       void import("./atelier-overlay-host")
-        .then((module) => setAtelierHost(() => module.default))
-        .catch(() => setLoadError(true));
+        .then((module) => {
+          if (mountedRef.current) setAtelierHost(() => module.default);
+        })
+        .catch(() => {
+          if (mountedRef.current) setLoadError(true);
+        });
     }
   }, [AtelierHost]);
 
   const close = useCallback((restore = true, options?: CloseOptions) => {
+    isOpenRef.current = false;
+    setOpen(false);
+
     if (options?.navigating) {
       closingForNavigationRef.current = true;
+      if (
+        typeof window !== "undefined" &&
+        (window.history.state as { adoraConciergeOverlay?: boolean } | null)
+          ?.adoraConciergeOverlay === true
+      ) {
+        window.history.replaceState(
+          withoutOverlayHistoryFlag(window.history.state),
+          "",
+          window.location.href,
+        );
+      }
+      return;
     }
-    setOpen(false);
 
     if (
       !options?.fromPopstate &&
-      !options?.navigating &&
       typeof window !== "undefined" &&
-      window.history.state?.adoraConciergeOverlay === true
+      (window.history.state as { adoraConciergeOverlay?: boolean } | null)?.adoraConciergeOverlay ===
+        true
     ) {
       handledPopFromCloseRef.current = true;
       window.history.back();
@@ -280,14 +325,17 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
       }
       if (closingForNavigationRef.current) {
         closingForNavigationRef.current = false;
+        isOpenRef.current = false;
         setOpen(false);
         return;
       }
       const wantsOverlay = Boolean(
         (event.state as { adoraConciergeOverlay?: boolean } | null)?.adoraConciergeOverlay,
       );
-      if (wantsOverlay && path !== "/ai-planner") {
+      const currentPathname = window.location.pathname;
+      if (wantsOverlay && currentPathname !== "/ai-planner") {
         ensureAtelierHostLoaded();
+        isOpenRef.current = true;
         setOpen(true);
       } else if (isOpenRef.current) {
         close(true, { fromPopstate: true });
@@ -310,8 +358,7 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
         !event.metaKey &&
         isOpenRef.current
       ) {
-        closingForNavigationRef.current = true;
-        setOpen(false);
+        close(false, { navigating: true });
       }
     };
 
@@ -323,12 +370,13 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
       window.removeEventListener("hashchange", onHashchange);
       document.removeEventListener("click", onDocumentClick);
     };
-  }, [close, ensureAtelierHostLoaded, path]);
+  }, [close, ensureAtelierHostLoaded]);
 
   useEffect(() => {
     if (previousPath.current !== path) {
       previousPath.current = path;
       closingForNavigationRef.current = false;
+      isOpenRef.current = false;
       setOpen(false);
       setMenuOpen(false);
     }
@@ -336,7 +384,8 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
 
   const open = useCallback(
     (element: HTMLElement) => {
-      if (path === "/ai-planner") {
+      const currentPathname = typeof window !== "undefined" ? window.location.pathname : path;
+      if (currentPathname === "/ai-planner") {
         const focusTarget = document.querySelector<HTMLElement>(
           "#cxp04-composer-input, [data-cxp04-start-btn], main h1",
         );
@@ -350,17 +399,16 @@ function AtelierEnabledProvider({ children }: Readonly<{ children: ReactNode }>)
       originWasMobileMenu.current = Boolean(element.closest("#mobile-navigation"));
       closingForNavigationRef.current = false;
 
+      isOpenRef.current = true;
       setMenuOpen(false);
       setOpen(true);
 
       if (
         typeof window !== "undefined" &&
-        window.history.state?.adoraConciergeOverlay !== true
+        (window.history.state as { adoraConciergeOverlay?: boolean } | null)
+          ?.adoraConciergeOverlay !== true
       ) {
-        const baseState =
-          window.history.state && typeof window.history.state === "object"
-            ? window.history.state
-            : {};
+        const baseState = withoutOverlayHistoryFlag(window.history.state);
         window.history.pushState(
           { ...baseState, adoraConciergeOverlay: true },
           "",

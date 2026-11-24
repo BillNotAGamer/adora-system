@@ -10,9 +10,21 @@
 
 .cxp04-root button:focus-visible,
 .cxp04-root a:focus-visible,
-.cxp04-root textarea:focus-visible {
+.cxp04-root textarea:focus-visible,
+.cxp04-root [tabindex="0"]:focus-visible {
   outline: 2px solid #c8ab77;
   outline-offset: 2px;
+}
+
+.cxp04-invitation-title[tabindex="-1"]:focus:not(:focus-visible),
+.cxp04-stage-strip [tabindex="-1"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.cxp04-invitation-title[tabindex="-1"]:focus-visible,
+.cxp04-stage-strip [tabindex="-1"]:focus-visible {
+  outline: 2px solid #c8ab77;
+  outline-offset: 4px;
 }
 
 dialog.cxp04-dialog-host {
@@ -35,6 +47,18 @@ dialog.cxp04-dialog-host::backdrop {
 .cxp04-root--overlay {
   height: 100%;
   min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.cxp04-root--overlay .cxp04-topbar,
+.cxp04-root--overlay .cxp04-mobile-switcher,
+.cxp04-root--overlay .cxp04-stage-strip,
+.cxp04-root--overlay .cxp04-composer {
+  flex-shrink: 0;
+}
+
+.cxp04-root--overlay .cxp04-invitation {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -42,6 +66,13 @@ dialog.cxp04-dialog-host::backdrop {
 .cxp04-root--overlay .cxp04-workspace {
   flex: 1;
   min-height: 0;
+}
+
+.cxp04-root--overlay .cxp04-dialogue-col,
+.cxp04-root--overlay .cxp04-canvas-col {
+  min-height: 0;
+  height: 100%;
+  overscroll-behavior: contain;
 }
 
 .cxp04-close-btn {
@@ -1037,6 +1068,10 @@ dialog.cxp04-dialog-host::backdrop {
     min-height: calc(100svh - 6.9rem);
   }
 
+  .cxp04-root--overlay .cxp04-workspace {
+    min-height: 0;
+  }
+
   .cxp04-workspace[data-mobile-view="conversation"] .cxp04-canvas-col {
     display: none;
   }
@@ -1130,6 +1165,25 @@ dialog.cxp04-dialog-host::backdrop {
 
   .cxp04-choice-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Short-viewport / emulated soft-keyboard resilience */
+@media (max-height: 560px) {
+  .cxp04-root--overlay .cxp04-topbar {
+    padding-block: 0.45rem;
+  }
+
+  .cxp04-root--overlay .cxp04-stage-strip {
+    padding-block: 0.45rem;
+  }
+
+  .cxp04-root--overlay .cxp04-composer {
+    padding-block: 0.5rem;
+  }
+
+  .cxp04-root--overlay .cxp04-composer-note {
+    display: none;
   }
 }
 
